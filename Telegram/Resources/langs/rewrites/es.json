@@ -158,5 +158,11 @@
 	"ktg_reminder_preview": "Recordar con vista previa",
 	"ktg_schedule_preview": "Enviar vista previa programada",
 	"ktg_language_reloaded": "Se actualizaron las cadenas de idioma específicas de LibreGram.",
+	"ktg_profiles_menu": "Perfiles de LibreGram",
+	"ktg_profiles_title": "Perfiles de LibreGram",
+	"ktg_profiles_description": "Cada perfil tiene su propia carpeta de datos y se abre en una instancia independiente de LibreGram. Esto no significa 500 conexiones simultáneas.",
+	"ktg_profiles_empty": "Todavía no hay perfiles guardados.",
+	"ktg_profiles_create": "Crear perfil",
+	"ktg_profiles_prompt": "Nombre del perfil",
 	"dummy_last_string": ""
 }
