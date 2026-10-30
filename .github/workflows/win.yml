@@ -176,7 +176,7 @@ jobs:
       - name: Read configuration matrix.
         shell: bash
         run: |
-          ARTIFACT_NAME="Kotatogram"
+          ARTIFACT_NAME="LibreGram"
 
           ARCH=""
           if [ -n "${{ matrix.arch }}" ]; then
@@ -225,7 +225,7 @@ jobs:
         shell: bash
         run: find $LibrariesPath '(' '(' ! '(' -name '*.lib' -o -name '*.a' -o -name '*.exe' -o -name '*.h' -o -name '*.hpp' -o -name '*.inc' -o -name '*.cmake' -o -name '*.pc' -o -path '*/include/*' -o -path '*/objects-*' -o -path '*/cache_keys/*' -o -path '*/patches/*' -o -path '*/nv-codec-headers/*' ')' -type f ')' -o -empty ')' -delete
 
-      - name: Kotatogram Desktop build.
+      - name: LibreGram Desktop build.
         if: env.ONLY_CACHE == 'false'
         run: |
           C:
@@ -250,8 +250,7 @@ jobs:
         run: |
           set OUT=%TBUILD%\%REPO_NAME%\out\Debug
           mkdir artifact
-          move %OUT%\Kotatogram.exe artifact/
-          move %OUT%\Updater.exe artifact/
+          move %OUT%\LibreGram.exe artifact/
       - uses: actions/upload-artifact@v7
         name: Upload artifact.
         if: (env.UPLOAD_ARTIFACT == 'true') || (github.ref == 'refs/heads/nightly')
