@@ -173,5 +173,11 @@
 	"ktg_forward_force_old_unquoted_desc": "Old method copies messages content on client rather than server. Currently it's used only for \"Regroup media\" grouping mode, since new one doesn't support it. If for some reason unquoted forward doesn't work correctly, try switching this option.",
 	"ktg_disable_chat_themes": "Disable chat themes",
 	"ktg_settings_compress_images_default": "Compress images by default",
+	"ktg_profiles_menu": "LibreGram profilleri",
+	"ktg_profiles_title": "LibreGram profilleri",
+	"ktg_profiles_description": "Her profilin ayrı bir veri klasörü vardır ve ayrı bir LibreGram örneğinde açılır. Bu, aynı anda 500 bağlantı anlamına gelmez.",
+	"ktg_profiles_empty": "Henüz kayıtlı profil yok.",
+	"ktg_profiles_create": "Profil oluştur",
+	"ktg_profiles_prompt": "Profil adı",
 	"dummy_last_string": ""
 }
