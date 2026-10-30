@@ -64,6 +64,7 @@ def validate_json_resources() -> int:
 def validate_application_identity() -> None:
     root_cmake = read("CMakeLists.txt")
     app_cmake = read("Telegram/CMakeLists.txt")
+    settings_source = read("Telegram/SourceFiles/kotato/kotato_settings.cpp")
     desktop = read("lib/xdg/io.github.w0rd3r566.libregram.desktop")
     metainfo = read("lib/xdg/io.github.w0rd3r566.libregram.metainfo.xml")
     snap = read("snap/snapcraft.yaml")
@@ -80,6 +81,14 @@ def validate_application_identity() -> None:
     require(
         'set(bundle_identifier "io.github.w0rd3r566.libregram")' in app_cmake,
         "Bundle identifier must use the LibreGram application ID.",
+    )
+    require(
+        'tdata/libregram-settings-custom.json' in settings_source,
+        "Custom settings must use the LibreGram settings path.",
+    )
+    require(
+        'QFile::copy(legacyPath, path)' in settings_source,
+        "Legacy custom settings must be migrated without deleting the original.",
     )
     require("Name=LibreGram" in desktop, "Linux desktop entry name is incorrect.")
     require("Exec=LibreGram -- %U" in desktop, "Linux desktop entry launches the wrong binary.")
