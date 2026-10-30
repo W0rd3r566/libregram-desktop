@@ -111,6 +111,8 @@ def validate_application_identity() -> None:
     require("kMaxSavedProfiles = 500" in profile_header, "The profile catalog limit must be 500.")
     require('u"-workdir"_q' in profile_source, "Profiles must launch through the existing -workdir argument.")
     require("QProcess::startDetached" in profile_source, "Profile launch must use a detached LibreGram process.")
+    require("#include <QtCore/QLockFile>" in profile_source, "Profile registry writes must be protected by a lock.")
+    require("EnsurePrivateDirectory" in profile_source, "Profile data directories must have owner-only permissions.")
     require("ktg_profiles_menu" in settings_menu, "The profile manager must be accessible from the existing settings menu.")
     require("Each profile" in profile_docs, "Profile workspace documentation is missing its architecture explanation.")
     require("Name=LibreGram" in desktop, "Linux desktop entry name is incorrect.")
