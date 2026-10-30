@@ -472,7 +472,7 @@ int Launcher::exec() {
 			base::Platform::DeleteDirectory(cWorkingDir() + u"tupdates/temp"_q);
 		}
 	} else if (cRestarting()) {
-		DEBUG_LOG(("Sandbox Info: executing Kotatogram because of restart."));
+		DEBUG_LOG(("Sandbox Info: executing LibreGram because of restart."));
 		launchUpdater(UpdaterLaunch::JustRelaunch);
 	}
 
