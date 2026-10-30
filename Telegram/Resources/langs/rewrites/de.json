@@ -173,5 +173,11 @@
 	"ktg_forward_force_old_unquoted_desc": "Die alte Methode kopiert den Inhalt der Nachrichten auf dem Client statt auf dem Server. Wir aktuell nur von \"Medien neu gruppieren\" unterstützt. Wenn aus irgendeinem Grund die nicht zitierte Weiterleitung nicht richtig funktioniert, versuchen Sie diese Option zu ändern.",
 	"ktg_disable_chat_themes": "Chat-Themes deaktivieren",
 	"ktg_settings_compress_images_default": "Bilder standardmäßig komprimieren",
+	"ktg_profiles_menu": "LibreGram-Profile",
+	"ktg_profiles_title": "LibreGram-Profile",
+	"ktg_profiles_description": "Jedes Profil hat einen eigenen Datenspeicher und wird in einer separaten LibreGram-Instanz geöffnet. Das bedeutet nicht 500 gleichzeitige Verbindungen.",
+	"ktg_profiles_empty": "Noch keine Profile gespeichert.",
+	"ktg_profiles_create": "Profil erstellen",
+	"ktg_profiles_prompt": "Profilname",
 	"dummy_last_string": ""
 }
