@@ -25,9 +25,9 @@ Planned scope:
 
 A browser CSS engine is not assumed. Unsupported selectors or arbitrary layout replacement must not be advertised.
 
-### Multi-account workspace
+### Multi-account and profile workspaces
 
-A dedicated account switcher with lazy activation. The long-term design target is up to 500 saved profiles, subject to Telegram API limits, platform constraints and secure session storage. This is not a promise of 500 simultaneous connections.
+Do not raise the inherited `Main::Domain::kMaxAccounts` limit to 500. LibreGram stores up to 500 separate workspace profiles in a metadata registry and gives every profile its own working directory. Profiles are launched as separate LibreGram instances through the existing `-workdir` argument. The registry contains only UUIDs, names and timestamps, never auth keys or API credentials. Each instance continues using the inherited account/session model and limits. See [MULTI_ACCOUNT.md](MULTI_ACCOUNT.md).
 
 ### LibreProxy
 
