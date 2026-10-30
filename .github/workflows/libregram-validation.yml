@@ -1,0 +1,38 @@
+name: LibreGram validation
+
+on:
+  push:
+    branches:
+      - "**"
+    paths:
+      - "CMakeLists.txt"
+      - "Telegram/CMakeLists.txt"
+      - "Telegram/Resources/langs/rewrites/**"
+      - "lib/xdg/**"
+      - "snap/snapcraft.yaml"
+      - ".github/workflows/**"
+      - "tools/ci/**"
+  pull_request:
+    paths:
+      - "CMakeLists.txt"
+      - "Telegram/CMakeLists.txt"
+      - "Telegram/Resources/langs/rewrites/**"
+      - "lib/xdg/**"
+      - "snap/snapcraft.yaml"
+      - ".github/workflows/**"
+      - "tools/ci/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate project metadata and resources
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+
+      - name: Validate LibreGram
+        run: python3 tools/ci/validate_project.py
