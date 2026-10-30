@@ -223,17 +223,39 @@ void LibreGramProfilesBox(not_null<Ui::GenericBox*> box) {
 				rpl::single(ktr("ktg_profiles_search"))),
 			st::boxRowPadding);
 
-		auto rows = std::vector<std::pair<Ui::SlideWrap<Button>*, QString>>();
+		auto rows = std::vector<std::pair<
+			Ui::SlideWrap<Ui::VerticalLayout>*,
+			QString>>();
 		rows.reserve(profiles.size());
 		for (const auto &profile : profiles) {
-			const auto row = layout->add(object_ptr<Ui::SlideWrap<Button>>(
-				box,
-				object_ptr<Button>(
+			const auto row = layout->add(
+				object_ptr<Ui::SlideWrap<Ui::VerticalLayout>>(
 					box,
-					profile.name,
-					st::settingsButtonNoIcon)));
-			const auto button = row->entity();
+					object_ptr<Ui::VerticalLayout>(box)));
+			const auto inner = row->entity();
+			const auto button = inner->add(object_ptr<Button>(
+				inner,
+				profile.name,
+				st::settingsButtonNoIcon));
+			const auto favorite = inner->add(
+				object_ptr<Ui::Checkbox>(
+					inner,
+					ktr("ktg_profiles_favorite"),
+					profile.favorite,
+					st::settingsCheckbox),
+				st::settingsCheckboxPadding);
 			rows.emplace_back(row, profile.name);
+			favorite->checkedChanges() | rpl::on_next(
+				[=](bool enabled) {
+					QString error;
+					if (!::LibreGram::Profiles::SetFavorite(
+							profile.id,
+							enabled,
+							&error)) {
+						Ui::show(Ui::MakeInformBox(error));
+					}
+				},
+				box->lifetime());
 			button->addClickHandler([=] {
 				QString error;
 				if (!::LibreGram::Profiles::Launch(profile.id, &error)) {

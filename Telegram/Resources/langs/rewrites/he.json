@@ -180,5 +180,6 @@
 	"ktg_profiles_create": "יצירת פרופיל",
 	"ktg_profiles_prompt": "שם הפרופיל",
 	"ktg_profiles_search": "חיפוש פרופילים שמורים",
-	"dummy_last_string": ""
+	"dummy_last_string": "",
+	"ktg_profiles_favorite": "מועדף"
 }

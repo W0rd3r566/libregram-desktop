@@ -17,6 +17,7 @@ struct Profile {
 	QString name;
 	QString createdAt;
 	QString lastLaunchedAt;
+	bool favorite = false;
 };
 
 [[nodiscard]] std::vector<Profile> List(QString *error = nullptr);
@@ -28,6 +29,11 @@ struct Profile {
 
 [[nodiscard]] bool Launch(
 	const QString &id,
+	QString *error = nullptr);
+
+[[nodiscard]] bool SetFavorite(
+	const QString &id,
+	bool favorite,
 	QString *error = nullptr);
 
 } // namespace LibreGram::Profiles

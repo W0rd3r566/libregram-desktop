@@ -180,5 +180,6 @@
 	"ktg_profiles_create": "ایجاد نمایه",
 	"ktg_profiles_prompt": "نام نمایه",
 	"ktg_profiles_search": "جست‌وجوی نمایه‌های ذخیره‌شده",
-	"dummy_last_string": ""
+	"dummy_last_string": "",
+	"ktg_profiles_favorite": "مورد علاقه"
 }

@@ -180,5 +180,6 @@
 	"ktg_profiles_create": "Créer un profil",
 	"ktg_profiles_prompt": "Nom du profil",
 	"ktg_profiles_search": "Rechercher des profils enregistrés",
-	"dummy_last_string": ""
+	"dummy_last_string": "",
+	"ktg_profiles_favorite": "Favori"
 }

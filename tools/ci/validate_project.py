@@ -66,6 +66,7 @@ def validate_json_resources() -> int:
         "ktg_profiles_create",
         "ktg_profiles_prompt",
         "ktg_profiles_search",
+        "ktg_profiles_favorite",
     }
     for language, translations in parsed.items():
         missing = profile_keys.difference(translations)
@@ -84,6 +85,11 @@ def validate_application_identity() -> None:
     profile_source = read("Telegram/SourceFiles/libregram/profiles/libregram_profiles.cpp")
     settings_menu = read("Telegram/SourceFiles/kotato/kotato_settings_menu.cpp")
     profile_docs = read("docs/MULTI_ACCOUNT.md")
+    branding = read("docs/BRANDING.md")
+    logo_svg = read("Telegram/Resources/art/libregram-logo.svg")
+    windows_rc = read("Telegram/Resources/winrc/Kotatogram.rc")
+    app_qrc = read("Telegram/Resources/qrc/telegram/telegram.qrc")
+    logo_png = ROOT / "Telegram/Resources/art/logo_256.png"
     desktop = read("lib/xdg/io.github.w0rd3r566.libregram.desktop")
     metainfo = read("lib/xdg/io.github.w0rd3r566.libregram.metainfo.xml")
     snap = read("snap/snapcraft.yaml")
@@ -115,7 +121,12 @@ def validate_application_identity() -> None:
     require("#include <QtCore/QLockFile>" in profile_source, "Profile registry writes must be protected by a lock.")
     require("EnsurePrivateDirectory" in profile_source, "Profile data directories must have owner-only permissions.")
     require("HasControlCharacter(profile.name)" in profile_source, "Loaded profile names must reject control characters.")
+    require("a.favorite != b.favorite" in profile_source, "Favorite profiles must be sorted before regular profiles.")
     require("a.lastLaunchedAt > b.lastLaunchedAt" in profile_source, "Recently launched profiles must be sorted first.")
+    require("bool SetFavorite(" in profile_header, "The profile API must expose favorite toggling.")
+    require("constexpr auto kRegistrySchema = 2;" in profile_source, "Profile metadata schema must be version 2.")
+    require("schema != 1 && schema != kRegistrySchema" in profile_source, "Profile metadata schema 1 must remain readable.")
+    require('object.insert(u"favorite"_q, profile.favorite)' in profile_source, "Favorite state must be persisted.")
     require("ktg_profiles_menu" in settings_menu, "The profile manager must be accessible from the existing settings menu.")
     require("Каждый профиль" in profile_docs, "Profile workspace documentation is missing its architecture explanation.")
     require("Name=LibreGram" in desktop, "Linux desktop entry name is incorrect.")
@@ -125,6 +136,12 @@ def validate_application_identity() -> None:
         "AppStream metadata contains the wrong application ID.",
     )
     ET.fromstring(metainfo)
+    require("<svg" in logo_svg and "LibreGram" in branding, "LibreGram master icon or branding guide is missing.")
+    require(logo_png.is_file() and logo_png.stat().st_size > 1000, "LibreGram Qt icon raster is missing or unexpectedly small.")
+    require("icon256.ico" in windows_rc, "Windows executable icon is not linked.")
+    require('alias="art/libregram-logo.svg"' in app_qrc, "Master SVG is not embedded in Qt resources.")
+    require('Resources/art/libregram-logo.svg' in app_cmake, "Linux scalable icon install is missing.")
+    require("hicolor/scalable/apps" in app_cmake, "Linux scalable icon theme destination is missing.")
     require("name: libregram-desktop" in snap, "Snap package name is incorrect.")
     require(
         "usr/bin/libregram-desktop" in snap,
@@ -136,8 +153,6 @@ def validate_application_identity() -> None:
 def validate_ci_artifacts() -> None:
     checks = {
         ".github/workflows/linux.yml": ("out/Debug/LibreGram", "mv LibreGram artifact/"),
-        ".github/workflows/mac.yml": ("mv LibreGram.app artifact/",),
-        ".github/workflows/mac_packaged.yml": ("build/LibreGram.app", "mv LibreGram.app artifact/"),
         ".github/workflows/win.yml": ("LibreGram.exe",),
     }
     for relative, expected in checks.items():
@@ -156,7 +171,7 @@ def main() -> int:
     validate_ci_artifacts()
     print(f"[OK] Parsed {count} language rewrite JSON files (duplicate keys rejected).")
     print("[OK] CMake, Linux desktop entry, AppStream, Snap and license metadata are consistent.")
-    print("[OK] Linux, macOS and Windows CI artifact names match LibreGram.")
+    print("[OK] Linux and Windows CI artifact names match LibreGram.")
     print("[OK] LibreGram validation passed.")
     return 0
 

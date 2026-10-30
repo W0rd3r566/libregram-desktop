@@ -180,5 +180,6 @@
 	"ktg_profiles_create": "Profil oluştur",
 	"ktg_profiles_prompt": "Profil adı",
 	"ktg_profiles_search": "Kayıtlı profillerde ara",
-	"dummy_last_string": ""
+	"dummy_last_string": "",
+	"ktg_profiles_favorite": "Favori"
 }

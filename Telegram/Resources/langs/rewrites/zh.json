@@ -158,5 +158,13 @@
 	"ktg_reminder_preview": "Remind with preview",
 	"ktg_schedule_preview": "Send preview scheduled",
 	"ktg_language_reloaded": "Kotatogram-specific language strings were reloaded.",
-	"dummy_last_string": ""
+	"dummy_last_string": "",
+	"ktg_profiles_menu": "LibreGram 配置文件",
+	"ktg_profiles_title": "LibreGram 配置文件",
+	"ktg_profiles_description": "每个配置文件都有独立的数据目录，并在单独的 LibreGram 实例中打开。这并不意味着可以同时建立 500 个连接。",
+	"ktg_profiles_empty": "暂无已保存的配置文件。",
+	"ktg_profiles_create": "创建配置文件",
+	"ktg_profiles_prompt": "配置文件名称",
+	"ktg_profiles_search": "搜索已保存的配置文件",
+	"ktg_profiles_favorite": "收藏"
 }

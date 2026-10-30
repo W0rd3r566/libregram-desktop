@@ -180,5 +180,6 @@
 	"ktg_profiles_create": "إنشاء ملف شخصي",
 	"ktg_profiles_prompt": "اسم الملف الشخصي",
 	"ktg_profiles_search": "البحث في الملفات الشخصية",
-	"dummy_last_string": ""
+	"dummy_last_string": "",
+	"ktg_profiles_favorite": "المفضلة"
 }

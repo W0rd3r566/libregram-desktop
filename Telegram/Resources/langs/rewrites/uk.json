@@ -173,5 +173,13 @@
 	"ktg_forward_force_old_unquoted_desc": "Старий метод копіює повідомлення на стороні клієнта, а не сервера. В даний час він використовується лише для режиму групування «Об'єднувати медіа», оскільки новий метод не підтримує його. Якщо пересилання не працює, змінить цю опцію.",
 	"ktg_disable_chat_themes": "Вимкнути теми чатів",
 	"ktg_settings_compress_images_default": "Compress images by default",
-	"dummy_last_string": ""
+	"dummy_last_string": "",
+	"ktg_profiles_menu": "Профілі LibreGram",
+	"ktg_profiles_title": "Профілі LibreGram",
+	"ktg_profiles_description": "Кожен профіль має власну папку з даними та відкривається в окремому екземплярі LibreGram. Це не означає 500 одночасних підключень.",
+	"ktg_profiles_empty": "Збережених профілів поки немає.",
+	"ktg_profiles_create": "Створити профіль",
+	"ktg_profiles_prompt": "Назва профілю",
+	"ktg_profiles_search": "Пошук збережених профілів",
+	"ktg_profiles_favorite": "В обраному"
 }
