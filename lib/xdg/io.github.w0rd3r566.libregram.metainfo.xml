@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component type="desktop">
+    <id>io.github.w0rd3r566.libregram</id>
+    <metadata_license>CC0-1.0</metadata_license>
+    <project_license>GPL-3.0-or-later</project_license>
+    <name>LibreGram Desktop</name>
+    <summary>Independent desktop Telegram client</summary>
+    <description>
+        <p>LibreGram Desktop is an unofficial desktop client built on an open Telegram Desktop codebase.</p>
+        <p>It preserves the familiar desktop messaging workflow while developing its own local features and customization tools.</p>
+    </description>
+    <categories>
+        <category>Network</category>
+        <category>InstantMessaging</category>
+    </categories>
+    <developer_name>LibreGram contributors</developer_name>
+    <url type="homepage">https://github.com/W0rd3r566/libregram-desktop</url>
+    <url type="bugtracker">https://github.com/W0rd3r566/libregram-desktop/issues</url>
+    <url type="vcs-browser">https://github.com/W0rd3r566/libregram-desktop</url>
+    <launchable type="desktop-id">io.github.w0rd3r566.libregram.desktop</launchable>
+    <branding>
+        <color type="primary" scheme_preference="light">#e1ccff</color>
+        <color type="primary" scheme_preference="dark">#35244d</color>
+    </branding>
+    <keywords>
+        <keyword>telegram</keyword>
+        <keyword>messaging</keyword>
+        <keyword>messenger</keyword>
+        <keyword>chat</keyword>
+        <keyword>libregram</keyword>
+    </keywords>
+    <supports>
+        <control>keyboard</control>
+        <control>pointing</control>
+        <control>touch</control>
+    </supports>
+</component>
