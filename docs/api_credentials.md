@@ -1,13 +1,37 @@
-## Obtaining your API credentials
+# Telegram API credentials
 
-To build your version of Telegram Desktop you're required to provide your own **api_id** and **api_hash** for the Telegram API access.
+LibreGram needs its own Telegram API `api_id` and `api_hash` to connect to Telegram.
 
-How to obtain your **api_id** and **api_hash** is described here: [https://core.telegram.org/api/obtaining_api_id](https://core.telegram.org/api/obtaining_api_id)
+Obtain an application ID and hash from the [Telegram API development tools](https://my.telegram.org/apps). Keep the hash private and never commit credentials to Git.
 
-If you're building the application not for deployment, but only for test purposes you can use TEST ONLY credentials, which are very limited by the Telegram API server:
+## Runtime environment variables
 
-**api_id**: 17349
-**api_hash**: 344583e45741c457fe1862106095a5eb
+The preferred environment variable names are:
 
-Your users will start getting internal server errors on login if you deploy an app using those **api_id** and **api_hash**.
+- `LIBREGRAM_API_ID`
+- `LIBREGRAM_API_HASH`
 
+Both must be set together. For example, in a shell:
+
+```bash
+export LIBREGRAM_API_ID="YOUR_API_ID"
+export LIBREGRAM_API_HASH="YOUR_API_HASH"
+./LibreGram
+```
+
+The application also accepts the legacy `KTGDESKTOP_API_ID` and `KTGDESKTOP_API_HASH` pair for compatibility with existing local setups. The complete LibreGram pair takes precedence when both pairs are present. Values from different prefixes are never mixed.
+
+The existing `-api-id` and `-api-hash` command-line options remain supported. Environment variables take precedence unless `-no-env-api` is passed.
+
+## Build-time CMake options
+
+The inherited build system continues to use these CMake cache variables:
+
+- `TDESKTOP_API_ID`
+- `TDESKTOP_API_HASH`
+
+Their names are retained for compatibility with the existing CMake and Telegram Desktop build infrastructure. Do not put real API credentials into tracked source files, public build logs or commits.
+
+## Important
+
+Use credentials belonging to your own Telegram application. Test credentials are intended only for limited development and must not be treated as production credentials. See the [official Telegram API documentation](https://core.telegram.org/api/obtaining_api_id).
