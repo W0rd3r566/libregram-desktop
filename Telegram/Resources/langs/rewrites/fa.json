@@ -173,5 +173,11 @@
 	"ktg_forward_force_old_unquoted_desc": "روش قدیمی محتوای پیام ها را به جای سرور، روی کلاینت کپی می کند. در حال حاضر فقط برای حالت گروه‌بندی «گروه بندی مجدد رسانه ها» استفاده می‌شود، زیرا حالت جدید آن را پشتیبانی نمی‌کند. اگر به دلایلی فوروارد بدون نقل قول درست کار نمی کند، این گزینه را تغییر دهید.",
 	"ktg_disable_chat_themes": "غیرفعال کردن تم های گفتگو",
 	"ktg_settings_compress_images_default": "فشرده سازی تصاویر به صورت پیش فرض",
+	"ktg_profiles_menu": "نمایه‌های LibreGram",
+	"ktg_profiles_title": "نمایه‌های LibreGram",
+	"ktg_profiles_description": "هر نمایه پوشهٔ دادهٔ جداگانه دارد و در نمونه‌ای مستقل از LibreGram باز می‌شود. این به معنی ۵۰۰ اتصال هم‌زمان نیست.",
+	"ktg_profiles_empty": "هنوز نمایه‌ای ذخیره نشده است.",
+	"ktg_profiles_create": "ایجاد نمایه",
+	"ktg_profiles_prompt": "نام نمایه",
 	"dummy_last_string": ""
 }
