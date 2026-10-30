@@ -71,13 +71,13 @@ jobs:
           enable-lvm-span: true
           lvm-span-mountpoint: /var/snap/lxd/common/lxd/storage-pools/default/containers
 
-      - name: Kotatogram Desktop snap build.
+      - name: LibreGram Desktop snap build.
         run: sudo -u $USER snap run snapcraft --verbosity=debug
 
       - name: Move artifact.
         if: env.UPLOAD_ARTIFACT == 'true'
         run: |
-          artifact_name=$(echo kotatogram-desktop_*.snap)
+          artifact_name=$(echo libregram-desktop_*.snap)
           echo "ARTIFACT_NAME=$artifact_name" >> $GITHUB_ENV
 
           mkdir artifact
