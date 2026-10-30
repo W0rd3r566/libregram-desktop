@@ -155,7 +155,7 @@ jobs:
           cmake --build build
           cmake --install build
 
-      - name: Kotatogram Desktop build.
+      - name: LibreGram Desktop build.
         if: env.ONLY_CACHE == 'false'
         run: |
           cd $REPO_NAME
@@ -165,22 +165,22 @@ jobs:
           if [ -n "${{ matrix.defines }}" ]; then
             DEFINE="-D ${{ matrix.defines }}=ON"
             echo Define from matrix: $DEFINE
-            echo "ARTIFACT_NAME=Kotatogram ${{ matrix.defines }}" >> $GITHUB_ENV
+            echo "ARTIFACT_NAME=LibreGram ${{ matrix.defines }}" >> $GITHUB_ENV
           else
-            echo "ARTIFACT_NAME=Kotatogram" >> $GITHUB_ENV
+            echo "ARTIFACT_NAME=LibreGram" >> $GITHUB_ENV
           fi
 
           cmake -Bbuild . -DTDESKTOP_API_TEST=ON $DEFINE
           cmake --build build
-          macdeployqt build/Kotatogram.app
-          codesign --remove-signature build/Kotatogram.app
+          macdeployqt build/LibreGram.app
+          codesign --remove-signature build/LibreGram.app
 
       - name: Move artifact.
         if: env.UPLOAD_ARTIFACT == 'true'
         run: |
           cd $REPO_NAME/build
           mkdir artifact
-          mv Kotatogram.app artifact/
+          mv LibreGram.app artifact/
       - uses: actions/upload-artifact@v7
         if: env.UPLOAD_ARTIFACT == 'true'
         name: Upload artifact.
