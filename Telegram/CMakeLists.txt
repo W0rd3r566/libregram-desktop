@@ -1438,6 +1438,8 @@ PRIVATE
     kotato/boxes/kotato_radio_box.h
     kotato/boxes/kotato_unpin_box.cpp
     kotato/boxes/kotato_unpin_box.h
+    libregram/profiles/libregram_profiles.cpp
+    libregram/profiles/libregram_profiles.h
     kotato/kotato_lang.cpp
     kotato/kotato_lang.h
     kotato/kotato_radius.cpp
