@@ -41,23 +41,37 @@ def reject_duplicate_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
 def validate_json_resources() -> int:
     files = sorted((ROOT / "Telegram/Resources/langs/rewrites").glob("*.json"))
     require(bool(files), "No language rewrite JSON files were found.")
+    parsed: dict[str, dict[str, Any]] = {}
 
     for path in files:
         try:
-            json.loads(
+            parsed[path.stem] = json.loads(
                 path.read_text(encoding="utf-8"),
                 object_pairs_hook=reject_duplicate_keys,
             )
         except (json.JSONDecodeError, ValueError) as error:
             fail(f"Invalid language resource {path.relative_to(ROOT)}: {error}")
 
-    ru = ROOT / "Telegram/Resources/langs/rewrites/ru.json"
-    require(ru.is_file(), "Russian language rewrite is missing.")
-    russian = json.loads(ru.read_text(encoding="utf-8"))
+    ru = parsed.get("ru")
+    require(ru is not None, "Russian language rewrite is missing.")
     require(
-        "LibreGram" in russian.get("ktg_settings_kotato", ""),
+        "LibreGram" in ru.get("ktg_settings_kotato", ""),
         "Russian settings section is not branded as LibreGram.",
     )
+    profile_keys = {
+        "ktg_profiles_menu",
+        "ktg_profiles_title",
+        "ktg_profiles_description",
+        "ktg_profiles_empty",
+        "ktg_profiles_create",
+        "ktg_profiles_prompt",
+    }
+    for language, translations in parsed.items():
+        missing = profile_keys.difference(translations)
+        require(
+            not missing,
+            f"Language resource {language} is missing profile strings: {', '.join(sorted(missing))}",
+        )
     return len(files)
 
 
@@ -65,6 +79,10 @@ def validate_application_identity() -> None:
     root_cmake = read("CMakeLists.txt")
     app_cmake = read("Telegram/CMakeLists.txt")
     settings_source = read("Telegram/SourceFiles/kotato/kotato_settings.cpp")
+    profile_header = read("Telegram/SourceFiles/libregram/profiles/libregram_profiles.h")
+    profile_source = read("Telegram/SourceFiles/libregram/profiles/libregram_profiles.cpp")
+    settings_menu = read("Telegram/SourceFiles/kotato/kotato_settings_menu.cpp")
+    profile_docs = read("docs/MULTI_ACCOUNT.md")
     desktop = read("lib/xdg/io.github.w0rd3r566.libregram.desktop")
     metainfo = read("lib/xdg/io.github.w0rd3r566.libregram.metainfo.xml")
     snap = read("snap/snapcraft.yaml")
@@ -90,6 +108,11 @@ def validate_application_identity() -> None:
         'QFile::copy(legacyPath, path)' in settings_source,
         "Legacy custom settings must be migrated without deleting the original.",
     )
+    require("kMaxSavedProfiles = 500" in profile_header, "The profile catalog limit must be 500.")
+    require('u"-workdir"_q' in profile_source, "Profiles must launch through the existing -workdir argument.")
+    require("QProcess::startDetached" in profile_source, "Profile launch must use a detached LibreGram process.")
+    require("ktg_profiles_menu" in settings_menu, "The profile manager must be accessible from the existing settings menu.")
+    require("Each profile" in profile_docs, "Profile workspace documentation is missing its architecture explanation.")
     require("Name=LibreGram" in desktop, "Linux desktop entry name is incorrect.")
     require("Exec=LibreGram -- %U" in desktop, "Linux desktop entry launches the wrong binary.")
     require(
