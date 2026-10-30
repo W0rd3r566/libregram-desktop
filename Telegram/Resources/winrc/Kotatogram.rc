@@ -57,7 +57,7 @@ BEGIN
             VALUE "CompanyName", "LibreGram contributors"
             VALUE "FileDescription", "LibreGram Desktop"
             VALUE "FileVersion", "7.2.9.0"
-            VALUE "LegalCopyright", "Copyright (C) 2019-2022"
+            VALUE "LegalCopyright", "Copyright (C) 2026 LibreGram contributors"
             VALUE "ProductName", "LibreGram Desktop"
             VALUE "ProductVersion", "7.2.9.0"
         END
