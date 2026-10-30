@@ -223,5 +223,11 @@
 		"many": "Connect {count} accounts with different mobile numbers in official apps",
 		"other": "Connect {count} accounts with different mobile numbers in official apps"
 	},
+	"ktg_profiles_menu": "LibreGram profiles",
+	"ktg_profiles_title": "LibreGram profiles",
+	"ktg_profiles_description": "Each profile has its own data folder and opens in a separate LibreGram instance. This does not mean 500 simultaneous connections.",
+	"ktg_profiles_empty": "No saved profiles yet.",
+	"ktg_profiles_create": "Create profile",
+	"ktg_profiles_prompt": "Profile name",
 	"dummy_last_string": ""
 }
