@@ -146,6 +146,8 @@ QString ChatIdLabel(int option) {
 	return QString();
 }
 
+void LibreGramProfilesBox(not_null<Ui::GenericBox*> box);
+
 void LibreGramCreateProfileBox(not_null<Ui::GenericBox*> box) {
 	box->setTitle(ktr("ktg_profiles_create"));
 	const auto input = box->addRow(
