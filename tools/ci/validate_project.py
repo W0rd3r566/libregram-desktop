@@ -114,7 +114,7 @@ def validate_application_identity() -> None:
     require("#include <QtCore/QLockFile>" in profile_source, "Profile registry writes must be protected by a lock.")
     require("EnsurePrivateDirectory" in profile_source, "Profile data directories must have owner-only permissions.")
     require("ktg_profiles_menu" in settings_menu, "The profile manager must be accessible from the existing settings menu.")
-    require("Each profile" in profile_docs, "Profile workspace documentation is missing its architecture explanation.")
+    require("Каждый профиль" in profile_docs, "Profile workspace documentation is missing its architecture explanation.")
     require("Name=LibreGram" in desktop, "Linux desktop entry name is incorrect.")
     require("Exec=LibreGram -- %U" in desktop, "Linux desktop entry launches the wrong binary.")
     require(
