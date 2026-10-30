@@ -4,9 +4,10 @@ This document records the intended direction for LibreGram. It is a design guide
 
 ## 1. Foundation
 
-- Keep the Kotatogram / Telegram Desktop Qt and C++ foundation.
+- LibreGram has its own product identity, UI direction and feature roadmap.
+- The current implementation uses an inherited Telegram Desktop-derived C++ / Qt codebase.
 - Prefer incremental changes over replacing core client infrastructure.
-- Keep upstream synchronization possible: isolate LibreGram-specific work and avoid unnecessary edits to inherited code.
+- Isolate LibreGram-specific work so upstream updates can be reviewed and integrated deliberately.
 - Treat Telegram X as a source of interaction ideas, not code that can be directly merged into this Qt desktop application.
 
 ## 2. Planned modules
@@ -65,7 +66,7 @@ Client-side convenience and appearance features only. They must not impersonate 
 
 ## 5. Upstream references
 
-- [Kotatogram Desktop](https://github.com/kotatogram/kotatogram-desktop)
+- [Kotatogram Desktop source project](https://github.com/kotatogram/kotatogram-desktop) — codebase origin and upstream reference.
 - [Telegram Desktop](https://github.com/telegramdesktop/tdesktop)
 - [Telegram X for Android](https://github.com/TGX-Android/Telegram-X)
 - [AyuGram Desktop](https://github.com/AyuGram/AyuGramDesktop)
