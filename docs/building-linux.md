@@ -1,60 +1,99 @@
-## Build instructions for Linux using Docker
+# Сборка LibreGram Desktop в Linux
 
-### Prepare folder
+Эта инструкция относится к ветке `libregram/dev`. Проект использует C++/Qt и собирается штатной системой CMake. Внешний вид приложения не требует отдельного фронтенда или веб-сборки.
 
-Choose a folder for the future build, for example **/home/user/TBuild**. It will be named ***BuildPath*** in the rest of this document. All commands will be launched from Terminal.
+## 1. Требования
 
-### Obtain your API credentials
+Для рекомендуемого контейнерного способа нужны:
 
-You will require **api_id** and **api_hash** to access the Telegram API servers. To learn how to obtain them [click here][api_credentials].
+- Git с поддержкой submodules;
+- Docker Engine и запущенный Docker daemon;
+- Python 3 и Poetry;
+- собственные Telegram API credentials: `api_id` и `api_hash`.
 
-### Clone source code and prepare libraries
+Получение credentials описано в [api_credentials.md](api_credentials.md). Не добавляйте реальные значения в Git, исходники или публичные логи.
 
-Install [poetry](https://python-poetry.org), go to ***BuildPath*** and run
+## 2. Получение исходников
 
-    git clone --recursive https://github.com/kotatogram/kotatogram-desktop.git
-    ./tdesktop/Telegram/build/prepare/linux.sh
+Клонируйте именно репозиторий LibreGram с подмодулями:
 
-### Building the project
+```bash
+git clone --recursive https://github.com/W0rd3r566/libregram-desktop.git
+cd libregram-desktop
+```
 
-Go to ***BuildPath*/kotatogram-desktop** and run (using [your **api_id** and **api_hash**](#obtain-your-api-credentials))
+Проверьте, что подмодули загружены:
 
-    docker run --rm -it \
-        -u $(id -u) \
-        -v "$PWD:/usr/src/tdesktop" \
-        kotatogram-desktop:centos_env \
-        /usr/src/tdesktop/Telegram/build/docker/centos_env/build.sh \
-        -D TDESKTOP_API_ID=YOUR_API_ID \
-        -D TDESKTOP_API_HASH=YOUR_API_HASH
+```bash
+git submodule status --recursive
+```
 
-Or, to create a debug build, run (also using [your **api_id** and **api_hash**](#obtain-your-api-credentials))
+Если репозиторий был клонирован без `--recursive`, выполните:
 
-    docker run --rm -it \
-        -u $(id -u) \
-        -v "$PWD:/usr/src/tdesktop" \
-        -e CONFIG=Debug \
-        kotatogram-desktop:centos_env \
-        /usr/src/tdesktop/Telegram/build/docker/centos_env/build.sh \
-        -D TDESKTOP_API_ID=YOUR_API_ID \
-        -D TDESKTOP_API_HASH=YOUR_API_HASH
+```bash
+git submodule update --init --recursive
+```
 
-The built files will be in the `out` directory.
+## 3. Подготовка контейнера сборки
 
-### Visual Studio Code integration
+Из корня репозитория запустите:
 
-Ensure you've followed the instruction up to the [**Clone source code and prepare libraries**](#clone-source-code-and-prepare-libraries) step at least.
+```bash
+./Telegram/build/prepare/linux.sh
+```
 
-Open the repository in Visual Studio Code, install the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension and add the following to `.vscode/settings.json` (using [your **api_id** and **api_hash**](#obtain-your-api-credentials)):
+Скрипт устанавливает Python-зависимости окружения через Poetry и собирает Docker-образ `tdesktop:centos_env`. Это унаследованное техническое имя образа сборочной среды, а не название приложения.
 
-    {
-        "cmake.configureSettings": {
-            "TDESKTOP_API_ID": "YOUR_API_ID",
-            "TDESKTOP_API_HASH": "YOUR_API_HASH"
-        }
-    }
+## 4. Сборка Release
 
-After that, choose **Reopen in Container** via the menu triggered by the green button in bottom left corner and you're done.
+Передайте свои credentials в CMake во время сборки:
 
-![Quick actions Status bar item](https://code.visualstudio.com/assets/docs/devcontainers/containers/remote-dev-status-bar.png)
+```bash
+docker run --rm -it \
+  -u "$(id -u)" \
+  -v "$PWD:/usr/src/tdesktop" \
+  -e CONFIG=Release \
+  tdesktop:centos_env \
+  /usr/src/tdesktop/Telegram/build/docker/centos_env/build.sh \
+  -D TDESKTOP_API_ID=YOUR_API_ID \
+  -D TDESKTOP_API_HASH=YOUR_API_HASH
+```
 
-[api_credentials]: api_credentials.md
+Замените оба заполнителя собственными значениями. Не публикуйте команду с настоящим `api_hash` в логах, скриншотах или публичных issue.
+
+Для Debug-сборки замените `CONFIG=Release` на `CONFIG=Debug`.
+
+## 5. Где находится результат
+
+CMake generator и конфигурация определяют точный каталог результата. Найти исполняемый файл можно командой:
+
+```bash
+find out -type f -name LibreGram -executable -print
+```
+
+Запускайте найденный бинарный файл из терминала, чтобы видеть диагностические сообщения.
+
+## 6. Особенности LibreGram
+
+- Исполняемый файл называется `LibreGram`.
+- Для сборки нужны credentials собственного приложения Telegram. Они не встроены в репозиторий.
+- Автоматическое обновление пока отключено: у LibreGram ещё нет собственного проверенного канала обновлений с подписанными релизами.
+- Внутренние имена унаследованных CMake-целей и сборочного контейнера могут оставаться прежними. Это не меняет имя приложения.
+- Существующие окна, компоновка и элементы Qt сохраняются. Новые возможности добавляются поверх текущего интерфейса.
+
+## 7. Частые проблемы
+
+**Docker daemon недоступен.** Убедитесь, что Docker Engine установлен и запущен, а текущий пользователь имеет право обращаться к Docker.
+
+**Не найдены библиотеки или подмодули.** Повторите `git submodule update --init --recursive`, затем снова запустите подготовку контейнера.
+
+**Ошибка API credentials.** Проверьте, что `api_id` является числом, `api_hash` введён полностью, а оба значения принадлежат одному Telegram-приложению.
+
+**Сборка падает после обновления ветки.** Сохраните полный вывод ошибки, commit SHA и конфигурацию CMake. Не удаляйте `tdata` и локальные сессии ради исправления ошибки сборки.
+
+## Ссылки
+
+- [LibreGram Desktop](https://github.com/W0rd3r566/libregram-desktop)
+- [Ветка разработки](https://github.com/W0rd3r566/libregram-desktop/tree/libregram/dev)
+- [Telegram API credentials](api_credentials.md)
+- [Аудит исходников](UPSTREAM_AUDIT.md)
