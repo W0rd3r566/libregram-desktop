@@ -166,5 +166,8 @@
 	"ktg_profiles_create": "创建配置文件",
 	"ktg_profiles_prompt": "配置文件名称",
 	"ktg_profiles_search": "搜索已保存的配置文件",
-	"ktg_profiles_favorite": "收藏"
+	"ktg_profiles_favorite": "收藏",
+	"ktg_profiles_edit": "编辑配置文件",
+	"ktg_profiles_group": "分组（可选）",
+	"ktg_profiles_tags": "用逗号分隔的标签（可选）"
 }

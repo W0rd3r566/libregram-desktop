@@ -151,6 +151,68 @@ QString ChatIdLabel(int option) {
 
 void LibreGramProfilesBox(not_null<Ui::GenericBox*> box);
 
+void LibreGramEditProfileBox(
+		not_null<Ui::GenericBox*> box,
+		const ::LibreGram::Profiles::Profile &profile) {
+	box->setTitle(ktr("ktg_profiles_edit"));
+
+	const auto name = box->addRow(
+		object_ptr<Ui::MaskedInputField>(
+			box,
+			st::defaultInputField,
+			rpl::single(ktr("ktg_profiles_prompt"))),
+		st::boxRowPadding);
+	name->setMaxLength(64);
+	name->setText(profile.name);
+
+	const auto group = box->addRow(
+		object_ptr<Ui::MaskedInputField>(
+			box,
+			st::defaultInputField,
+			rpl::single(ktr("ktg_profiles_group"))),
+		st::boxRowPadding);
+	group->setMaxLength(40);
+	group->setText(profile.group);
+
+	const auto tags = box->addRow(
+		object_ptr<Ui::MaskedInputField>(
+			box,
+			st::defaultInputField,
+			rpl::single(ktr("ktg_profiles_tags"))),
+		st::boxRowPadding);
+	tags->setMaxLength(8 * 24 + 7 * 2);
+	tags->setText(profile.tags.join(u", "_q));
+
+	box->setFocusCallback([=] {
+		name->setFocusFast();
+	});
+
+	const auto save = [=] {
+		QString error;
+		if (!::LibreGram::Profiles::Update(
+				profile.id,
+				name->text(),
+				group->text(),
+				tags->text().split(',', Qt::SkipEmptyParts),
+				&error)) {
+			Ui::show(Ui::MakeInformBox(error));
+			return;
+		}
+		box->closeBox();
+		Ui::show(Box<Ui::GenericBox>(LibreGramProfilesBox));
+	};
+	QObject::connect(
+		tags,
+		&Ui::MaskedInputField::submitted,
+		box,
+		[=](Qt::KeyboardModifiers) { save(); });
+	box->addButton(tr::lng_settings_save(), save);
+	box->addButton(tr::lng_cancel(), [=] {
+		box->closeBox();
+	});
+	box->setWidth(st::aboutWidth);
+}
+
 void LibreGramCreateProfileBox(not_null<Ui::GenericBox*> box) {
 	box->setTitle(ktr("ktg_profiles_create"));
 	const auto input = box->addRow(
@@ -237,6 +299,23 @@ void LibreGramProfilesBox(not_null<Ui::GenericBox*> box) {
 				inner,
 				profile.name,
 				st::settingsButtonNoIcon));
+
+			auto details = QStringList();
+			if (!profile.group.isEmpty()) {
+				details.push_back(profile.group);
+			}
+			if (!profile.tags.isEmpty()) {
+				details.push_back(profile.tags.join(u" · "_q));
+			}
+			if (!details.isEmpty()) {
+				inner->add(
+					object_ptr<Ui::FlatLabel>(
+						inner,
+						details.join(u"  •  "_q),
+						st::aboutLabel),
+					st::boxRowPadding);
+			}
+
 			const auto favorite = inner->add(
 				object_ptr<Ui::Checkbox>(
 					inner,
@@ -244,7 +323,6 @@ void LibreGramProfilesBox(not_null<Ui::GenericBox*> box) {
 					profile.favorite,
 					st::settingsCheckbox),
 				st::settingsCheckboxPadding);
-			rows.emplace_back(row, profile.name);
 			favorite->checkedChanges() | rpl::on_next(
 				[=](bool enabled) {
 					QString error;
@@ -256,6 +334,22 @@ void LibreGramProfilesBox(not_null<Ui::GenericBox*> box) {
 					}
 				},
 				box->lifetime());
+
+			const auto edit = inner->add(object_ptr<Button>(
+				inner,
+				ktr("ktg_profiles_edit"),
+				st::settingsButtonNoIcon));
+			edit->addClickHandler([=] {
+				box->closeBox();
+				Ui::show(Box<Ui::GenericBox>(
+					[=](not_null<Ui::GenericBox*> editBox) {
+						LibreGramEditProfileBox(editBox, profile);
+					}));
+			});
+
+			auto searchValue = profile.name + u" "_q + profile.group
+				+ u" "_q + profile.tags.join(u" "_q);
+			rows.emplace_back(row, searchValue);
 			button->addClickHandler([=] {
 				QString error;
 				if (!::LibreGram::Profiles::Launch(profile.id, &error)) {
@@ -268,10 +362,10 @@ void LibreGramProfilesBox(not_null<Ui::GenericBox*> box) {
 
 		const auto filterProfiles = [=] {
 			const auto query = search->text().trimmed();
-			for (const auto &[row, name] : rows) {
+			for (const auto &[row, searchValue] : rows) {
 				row->toggle(
 					query.isEmpty()
-					|| name.contains(query, Qt::CaseInsensitive),
+					|| searchValue.contains(query, Qt::CaseInsensitive),
 					anim::type::normal);
 			}
 		};

@@ -67,6 +67,9 @@ def validate_json_resources() -> int:
         "ktg_profiles_prompt",
         "ktg_profiles_search",
         "ktg_profiles_favorite",
+        "ktg_profiles_edit",
+        "ktg_profiles_group",
+        "ktg_profiles_tags",
     }
     for language, translations in parsed.items():
         missing = profile_keys.difference(translations)
@@ -124,8 +127,13 @@ def validate_application_identity() -> None:
     require("a.favorite != b.favorite" in profile_source, "Favorite profiles must be sorted before regular profiles.")
     require("a.lastLaunchedAt > b.lastLaunchedAt" in profile_source, "Recently launched profiles must be sorted first.")
     require("bool SetFavorite(" in profile_header, "The profile API must expose favorite toggling.")
-    require("constexpr auto kRegistrySchema = 2;" in profile_source, "Profile metadata schema must be version 2.")
-    require("schema != 1 && schema != kRegistrySchema" in profile_source, "Profile metadata schema 1 must remain readable.")
+    require("constexpr auto kRegistrySchema = 3;" in profile_source, "Profile metadata schema must be version 3.")
+    require("schema < 1 || schema > kRegistrySchema" in profile_source, "Older profile metadata schemas must remain readable.")
+    require("bool Update(" in profile_header, "Profiles must support metadata updates.")
+    require("ValidateGroupAndTags(" in profile_source, "Profile group and tag metadata must be validated.")
+    require('object.insert(u"group"_q, profile.group)' in profile_source, "Profile groups must be persisted.")
+    require('object.insert(u"tags"_q, tags)' in profile_source, "Profile tags must be persisted.")
+    require("kMaxProfileTags = 8" in profile_source, "Profiles must be limited to eight tags.")
     require('object.insert(u"favorite"_q, profile.favorite)' in profile_source, "Favorite state must be persisted.")
     require("ktg_profiles_menu" in settings_menu, "The profile manager must be accessible from the existing settings menu.")
     require("Каждый профиль" in profile_docs, "Profile workspace documentation is missing its architecture explanation.")

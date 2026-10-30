@@ -25,7 +25,10 @@ For license and copyright information, see the LICENSE file.
 namespace LibreGram::Profiles {
 namespace {
 
-constexpr auto kRegistrySchema = 2;
+constexpr auto kRegistrySchema = 3;
+constexpr auto kProfileGroupLimit = 40;
+constexpr auto kProfileTagLimit = 24;
+constexpr auto kMaxProfileTags = 8;
 constexpr auto kProfileNameLimit = 64;
 
 QString DataRoot() {
@@ -102,6 +105,13 @@ bool SetError(QString *error, const QString &message) {
 	return false;
 }
 
+bool ValidateGroupAndTags(
+	const QString &value,
+	const QStringList &inputTags,
+	QString *group,
+	QStringList *tags,
+	QString *error);
+
 bool ReadRegistry(std::vector<Profile> *profiles, QString *error) {
 	profiles->clear();
 
@@ -127,7 +137,7 @@ bool ReadRegistry(std::vector<Profile> *profiles, QString *error) {
 
 	const auto root = document.object();
 	const auto schema = root.value(u"schema"_q).toInt();
-	if ((schema != 1 && schema != kRegistrySchema)
+	if (schema < 1 || schema > kRegistrySchema
 		|| !root.value(u"profiles"_q).isArray()) {
 		return SetError(error, u"The profiles registry uses an unsupported format."_q);
 	}
@@ -156,8 +166,36 @@ bool ReadRegistry(std::vector<Profile> *profiles, QString *error) {
 			|| profile.name.size() > kProfileNameLimit
 			|| HasControlCharacter(profile.name)
 			|| (schema >= 2 && !object.value(u"favorite"_q).isBool())
+			|| (schema >= 3
+				&& (!object.value(u"group"_q).isString()
+					|| !object.value(u"tags"_q).isArray()))
 			|| seen.contains(profile.id.toLower())) {
 			return SetError(error, u"The profiles registry contains invalid profile metadata."_q);
+		}
+		if (schema >= 3) {
+			profile.group = object.value(u"group"_q).toString();
+			const auto tags = object.value(u"tags"_q).toArray();
+			if (tags.size() > kMaxProfileTags) {
+				return SetError(error, u"The profiles registry contains too many profile tags."_q);
+			}
+			for (const auto &tag : tags) {
+				if (!tag.isString()) {
+					return SetError(error, u"The profiles registry contains invalid profile tags."_q);
+				}
+				profile.tags.push_back(tag.toString());
+			}
+			auto normalizedGroup = QString();
+			auto normalizedTags = QStringList();
+			if (!ValidateGroupAndTags(
+					profile.group,
+					profile.tags,
+					&normalizedGroup,
+					&normalizedTags,
+					nullptr)) {
+				return SetError(error, u"The profiles registry contains invalid profile metadata."_q);
+			}
+			profile.group = normalizedGroup;
+			profile.tags = normalizedTags;
 		}
 		seen.insert(profile.id.toLower());
 		profiles->push_back(std::move(profile));
@@ -182,6 +220,12 @@ bool WriteRegistry(
 		object.insert(u"createdAt"_q, profile.createdAt);
 		object.insert(u"lastLaunchedAt"_q, profile.lastLaunchedAt);
 		object.insert(u"favorite"_q, profile.favorite);
+		object.insert(u"group"_q, profile.group);
+		auto tags = QJsonArray();
+		for (const auto &tag : profile.tags) {
+			tags.append(tag);
+		}
+		object.insert(u"tags"_q, tags);
 		array.append(object);
 	}
 
@@ -213,6 +257,46 @@ bool ValidateName(const QString &value, QString *name, QString *error) {
 	}
 	if (HasControlCharacter(*name)) {
 		return SetError(error, u"Profile names cannot contain control characters."_q);
+	}
+	return true;
+}
+
+bool ValidateGroupAndTags(
+		const QString &value,
+		const QStringList &inputTags,
+		QString *group,
+		QStringList *tags,
+		QString *error) {
+	*group = value.trimmed();
+	if (group->size() > kProfileGroupLimit) {
+		return SetError(error, u"Profile groups can contain up to 40 characters."_q);
+	}
+	if (HasControlCharacter(*group)) {
+		return SetError(error, u"Profile groups cannot contain control characters."_q);
+	}
+	if (inputTags.size() > kMaxProfileTags) {
+		return SetError(error, u"A profile can have up to 8 tags."_q);
+	}
+
+	auto seen = QSet<QString>();
+	tags->clear();
+	for (const auto &value : inputTags) {
+		const auto tag = value.trimmed();
+		if (tag.isEmpty()) {
+			return SetError(error, u"Profile tags cannot be empty."_q);
+		}
+		if (tag.size() > kProfileTagLimit) {
+			return SetError(error, u"Profile tags can contain up to 24 characters."_q);
+		}
+		if (HasControlCharacter(tag)) {
+			return SetError(error, u"Profile tags cannot contain control characters."_q);
+		}
+		const auto key = tag.toCaseFolded();
+		if (seen.contains(key)) {
+			return SetError(error, u"Profile tags must be unique."_q);
+		}
+		seen.insert(key);
+		tags->push_back(tag);
 	}
 	return true;
 }
@@ -321,6 +405,54 @@ bool SetFavorite(
 		return true;
 	}
 	i->favorite = favorite;
+	return WriteRegistry(profiles, error);
+}
+
+bool Update(
+		const QString &id,
+		const QString &value,
+		const QString &groupValue,
+		const QStringList &inputTags,
+		QString *error) {
+	if (!IsValidId(id)) {
+		return SetError(error, u"Invalid profile identifier."_q);
+	}
+
+	auto name = QString();
+	if (!ValidateName(value, &name, error)) {
+		return false;
+	}
+	auto group = QString();
+	auto tags = QStringList();
+	if (!ValidateGroupAndTags(groupValue, inputTags, &group, &tags, error)) {
+		return false;
+	}
+
+	if (!EnsurePrivateDirectory(DataRoot())) {
+		return SetError(error, u"Could not access the LibreGram data directory."_q);
+	}
+	const auto lock = RegistryLock(error);
+	if (!lock.locked()) {
+		return false;
+	}
+
+	auto profiles = std::vector<Profile>();
+	if (!ReadRegistry(&profiles, error)) {
+		return false;
+	}
+	const auto i = std::find_if(
+		profiles.begin(),
+		profiles.end(),
+		[&](const Profile &profile) {
+			return profile.id.compare(id, Qt::CaseInsensitive) == 0;
+		});
+	if (i == profiles.end()) {
+		return SetError(error, u"Profile not found."_q);
+	}
+
+	i->name = name;
+	i->group = group;
+	i->tags = tags;
 	return WriteRegistry(profiles, error);
 }
 

@@ -181,5 +181,8 @@
 	"ktg_profiles_prompt": "שם הפרופיל",
 	"ktg_profiles_search": "חיפוש פרופילים שמורים",
 	"dummy_last_string": "",
-	"ktg_profiles_favorite": "מועדף"
+	"ktg_profiles_favorite": "מועדף",
+	"ktg_profiles_edit": "עריכת פרופיל",
+	"ktg_profiles_group": "קבוצה (אופציונלי)",
+	"ktg_profiles_tags": "תגיות מופרדות בפסיקים (אופציונלי)"
 }

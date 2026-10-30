@@ -25,7 +25,7 @@ LibreGram — самостоятельный проект с собственн�
 
 - **LibreTheme** — мощная система оформления: цвета, шрифты, размеры, отступы, обои, анимации, пользовательские темы и CSS-подобная настройка.
 - **Local Premium** — набор расширенных локальных возможностей клиента. Не путать с Telegram Premium: серверные привилегии не разблокируются.
-- **Multi-account** — единый каталог до 500 отдельных рабочих профилей с изолированными данными. Создание, поиск и отдельный запуск уже реализованы; избранные и недавно использовавшиеся профили показываются первыми. Группы, метки и расширенное управление ещё в работе.
+- **Multi-account** — единый каталог до 500 отдельных рабочих профилей с изолированными данными. Создание, поиск и отдельный запуск уже реализованы; избранные и недавно использовавшиеся профили показываются первыми. Для каждого профиля доступны группа и до восьми меток.
 - **LibreProxy** — необязательный модуль управления локальным прокси на основе [Flowseal/tg-ws-proxy](https://github.com/Flowseal/tg-ws-proxy).
 - **Refined UX** — плавные анимации, продуманные переходы, улучшенная работа с медиа, быстрые действия и настраиваемые элементы интерфейса.
 - **Privacy controls** — понятное управление локальными данными, настройками и дополнительными инструментами подключения.
@@ -52,7 +52,7 @@ LibreGram Desktop is an independent desktop Telegram client with its own product
 
 - **LibreTheme:** extensive UI customization, wallpapers, animations, theme presets and a CSS-inspired styling format.
 - **Local Premium:** client-side enhancements only, not Telegram Premium entitlements.
-- **Multi-account:** account workspace with quick switching, search, favorites, groups and labels. Long-term target: up to 500 saved profiles.
+- **Multi-account:** account workspace with quick switching, search, favorites, one group and up to eight tags per profile. Long-term target: up to 500 saved profiles.
 - **LibreProxy:** optional integration with [Flowseal/tg-ws-proxy](https://github.com/Flowseal/tg-ws-proxy).
 - **Refined UX:** polished animations, media handling, shortcuts and customizable interface elements.
 - **Privacy controls:** clear management of local data and connection tools.
@@ -68,7 +68,7 @@ Read the [product specification](docs/PRODUCT.md), [architecture](docs/architect
 | Идентичность приложения | Логотип подключён к ресурсам Windows и Linux; сборка ожидает проверки |
 | Базовая сборка | Не проверена |
 | LibreTheme | Запланировано |
-| Multi-account | Каталог до 500 профилей, создание, поиск, запуск и избранное реализованы; группы и расширенное управление в работе |
+| Multi-account | Каталог до 500 профилей, создание, поиск, запуск, избранное, группы и метки реализованы; архивирование и импорт/экспорт в работе |
 | LibreProxy | Запланировано |
 | Local Premium | Запланировано |
 

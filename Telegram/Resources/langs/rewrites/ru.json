@@ -231,5 +231,8 @@
 	"ktg_profiles_prompt": "Название профиля",
 	"ktg_profiles_search": "Поиск сохранённых профилей",
 	"dummy_last_string": "",
-	"ktg_profiles_favorite": "В избранном"
+	"ktg_profiles_favorite": "В избранном",
+	"ktg_profiles_edit": "Изменить профиль",
+	"ktg_profiles_group": "Группа (необязательно)",
+	"ktg_profiles_tags": "Метки через запятую (необязательно)"
 }

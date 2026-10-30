@@ -181,5 +181,8 @@
 	"ktg_profiles_prompt": "Nome do perfil",
 	"ktg_profiles_search": "Buscar perfis salvos",
 	"dummy_last_string": "",
-	"ktg_profiles_favorite": "Favorito"
+	"ktg_profiles_favorite": "Favorito",
+	"ktg_profiles_edit": "Editar perfil",
+	"ktg_profiles_group": "Grupo (opcional)",
+	"ktg_profiles_tags": "Tags separados por vírgulas (opcional)"
 }

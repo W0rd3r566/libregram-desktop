@@ -181,5 +181,8 @@
 	"ktg_profiles_prompt": "Profil adı",
 	"ktg_profiles_search": "Kayıtlı profillerde ara",
 	"dummy_last_string": "",
-	"ktg_profiles_favorite": "Favori"
+	"ktg_profiles_favorite": "Favori",
+	"ktg_profiles_edit": "Profili düzenle",
+	"ktg_profiles_group": "Grup (isteğe bağlı)",
+	"ktg_profiles_tags": "Virgülle ayrılmış etiketler (isteğe bağlı)"
 }

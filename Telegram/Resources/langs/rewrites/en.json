@@ -231,5 +231,8 @@
 	"ktg_profiles_prompt": "Profile name",
 	"ktg_profiles_search": "Search saved profiles",
 	"dummy_last_string": "",
-	"ktg_profiles_favorite": "Favorite"
+	"ktg_profiles_favorite": "Favorite",
+	"ktg_profiles_edit": "Edit profile",
+	"ktg_profiles_group": "Group (optional)",
+	"ktg_profiles_tags": "Comma-separated tags (optional)"
 }
