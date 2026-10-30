@@ -70,3 +70,14 @@ Client-side convenience and appearance features only. They must not impersonate 
 - [Telegram X for Android](https://github.com/TGX-Android/Telegram-X)
 - [AyuGram Desktop](https://github.com/AyuGram/AyuGramDesktop)
 - [tg-ws-proxy](https://github.com/Flowseal/tg-ws-proxy)
+
+
+## 6. Proxy terminology
+
+LibreGram's planned **LibreProxy** integration with Flowseal/tg-ws-proxy is distinct from the inherited Telegram Desktop `WEB` proxy implementation documented in [web-proxy-plan.md](web-proxy-plan.md) and [web-proxy-test-plan.md](web-proxy-test-plan.md).
+
+Do not merge their settings, transports, assumptions or documentation under one name. Before implementation, audit both mechanisms and decide whether they should coexist, share any management UI, or remain entirely independent. Preserve the inherited WEB proxy implementation unless a separately reviewed change explicitly targets it.
+
+## 7. Product specification
+
+The feature scope, user-facing behavior, non-goals and open product questions are tracked in [PRODUCT.md](PRODUCT.md). Development milestones are tracked in [ROADMAP.md](ROADMAP.md). Those documents are the product-level source of truth; this file describes technical direction only.
