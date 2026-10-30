@@ -212,21 +212,45 @@ void LibreGramProfilesBox(not_null<Ui::GenericBox*> box) {
 				ktr("ktg_profiles_empty"),
 				st::aboutLabel),
 			st::boxRowPadding);
-	}
+	} else {
+		const auto search = layout->add(
+			object_ptr<Ui::MaskedInputField>(
+				box,
+				st::defaultInputField,
+				rpl::single(ktr("ktg_profiles_search"))),
+			st::boxRowPadding);
 
-	for (const auto &profile : profiles) {
-		const auto button = layout->add(object_ptr<Button>(
-			box,
-			profile.name,
-			st::settingsButtonNoIcon));
-		button->addClickHandler([=] {
-			QString error;
-			if (!::LibreGram::Profiles::Launch(profile.id, &error)) {
-				Ui::show(Ui::MakeInformBox(error));
-				return;
+		auto rows = std::vector<std::pair<Button*, QString>>();
+		rows.reserve(profiles.size());
+		for (const auto &profile : profiles) {
+			const auto button = layout->add(object_ptr<Button>(
+				box,
+				profile.name,
+				st::settingsButtonNoIcon));
+			rows.emplace_back(button, profile.name);
+			button->addClickHandler([=] {
+				QString error;
+				if (!::LibreGram::Profiles::Launch(profile.id, &error)) {
+					Ui::show(Ui::MakeInformBox(error));
+					return;
+				}
+				box->closeBox();
+			});
+		}
+
+		const auto filterProfiles = [=] {
+			const auto query = search->text().trimmed();
+			for (const auto &[button, name] : rows) {
+				button->setVisible(
+					query.isEmpty()
+					|| name.contains(query, Qt::CaseInsensitive));
 			}
-			box->closeBox();
-		});
+		};
+		QObject::connect(
+			search,
+			&Ui::MaskedInputField::changed,
+			box,
+			[=] { filterProfiles(); });
 	}
 
 	box->addButton(ktr("ktg_profiles_create"), [=] {
