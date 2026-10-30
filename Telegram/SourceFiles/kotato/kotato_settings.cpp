@@ -20,10 +20,14 @@ namespace Kotato {
 namespace JsonSettings {
 
 QString CustomFilePath() {
-	return cWorkingDir() + qsl("tdata/kotato-settings-custom.json");
+	return cWorkingDir() + qsl("tdata/libregram-settings-custom.json");
 }
 
 namespace {
+
+QString LegacyCustomFilePath() {
+	return cWorkingDir() + qsl("tdata/kotato-settings-custom.json");
+}
 
 constexpr auto kWriteJsonTimeout = crl::time(5000);
 
@@ -708,7 +712,21 @@ void Manager::resetAfterRestart(const QString &key, uint64 accountId, bool isTes
 }
 
 bool Manager::readCustomFile() {
-	QFile file(CustomFilePath());
+	auto path = CustomFilePath();
+	if (!QFile::exists(path)) {
+		// Keep existing Kotatogram installations compatible. Copy the legacy
+		// settings file without deleting it, then use the LibreGram path.
+		const auto legacyPath = LegacyCustomFilePath();
+		if (!QFile::exists(legacyPath)) {
+			return false;
+		}
+		if (!QFile::copy(legacyPath, path)) {
+			// If migration cannot create the new file, continue using the
+			// original file so the user's settings are not silently ignored.
+			path = legacyPath;
+		}
+	}
+	QFile file(path);
 	if (!file.exists()) {
 		return false;
 	}
