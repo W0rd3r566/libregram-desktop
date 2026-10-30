@@ -173,5 +173,11 @@
 	"ktg_forward_force_old_unquoted_desc": "Stara metoda kopiuje zawartość wiadomości na klienta, a nie na serwer. Ponieważ nowy tryb nie obsługuje tej metody, obecnie jest ona używana tylko dla trybu grupowania „Przegrupowane multimedia”. Jeśli z jakiegoś powodu metoda przekazywania bez cytowania nie działa poprawnie, spróbuj przełączyć tę opcję.",
 	"ktg_disable_chat_themes": "Wyłącz motywy czatów",
 	"ktg_settings_compress_images_default": "Domyślnie kompresuj obrazy",
+	"ktg_profiles_menu": "Profile LibreGram",
+	"ktg_profiles_title": "Profile LibreGram",
+	"ktg_profiles_description": "Każdy profil ma własny folder danych i otwiera się w osobnej instancji LibreGram. Nie oznacza to 500 jednoczesnych połączeń.",
+	"ktg_profiles_empty": "Brak zapisanych profili.",
+	"ktg_profiles_create": "Utwórz profil",
+	"ktg_profiles_prompt": "Nazwa profilu",
 	"dummy_last_string": ""
 }
