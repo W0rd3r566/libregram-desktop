@@ -1,0 +1,23 @@
+[Desktop Entry]
+Name=LibreGram
+GenericName=Telegram Desktop Client
+Comment=Independent desktop client for Telegram
+TryExec=LibreGram
+Exec=LibreGram -- %U
+Icon=io.github.w0rd3r566.libregram
+Terminal=false
+StartupWMClass=LibreGram
+Type=Application
+Categories=Chat;Network;InstantMessaging;Qt;
+MimeType=x-scheme-handler/tg;x-scheme-handler/tonsite;
+Keywords=tg;telegram;chat;im;messaging;messenger;sms;tdesktop;libregram;
+Actions=quit;
+DBusActivatable=true
+SingleMainWindow=true
+X-GNOME-UsesNotifications=true
+X-GNOME-SingleWindow=true
+
+[Desktop Action quit]
+Exec=LibreGram -quit
+Name=Quit LibreGram
+Icon=application-exit
