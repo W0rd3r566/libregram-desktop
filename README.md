@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="docs/assets/libregram-logo.svg" width="144" alt="LibreGram logo" />
+
 # LibreGram Desktop
 
 **Твой Telegram. Твои правила. Твой интерфейс.**
@@ -8,6 +10,7 @@
 
 [![Status](https://img.shields.io/badge/status-early%20development-orange?style=flat-square)](#статус-проекта)
 [![License](https://img.shields.io/badge/license-GPL--3.0-blue?style=flat-square)](LICENSE)
+[![Platforms](https://img.shields.io/badge/platforms-Linux%20%7C%20Windows-5865F2?style=flat-square)](#статус-проекта)
 
 </div>
 
@@ -37,6 +40,7 @@ LibreGram — самостоятельный проект с собственн�
 | [Аудит исходников](docs/UPSTREAM_AUDIT.md) | Что уже реализовано в базе и как расширять её без дублирования |
 | [Профили и аккаунты](docs/MULTI_ACCOUNT.md) | Изолированные профили рабочих областей и цель в 500 сохранённых профилей |
 | [Сборка Linux](docs/building-linux.md) | Инструкция по сборке исходной кодовой базы |
+| [Сборка Windows](docs/building-win.md) | Инструкция по сборке Windows |
 | [WEB proxy](docs/web-proxy-plan.md) | Отдельная документация унаследованного механизма WEB proxy |
 
 ## 🇬🇧 About
