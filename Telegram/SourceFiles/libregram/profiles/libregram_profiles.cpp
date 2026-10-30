@@ -13,6 +13,7 @@ For license and copyright information, see the LICENSE file.
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonParseError>
+#include <QtCore/QLockFile>
 #include <QtCore/QProcess>
 #include <QtCore/QSaveFile>
 #include <QtCore/QSet>
@@ -46,6 +47,40 @@ QString RegistryPath() {
 QString ProfileDirectory(const QString &id) {
 	return QDir(ProfilesDirectory()).filePath(id);
 }
+
+bool EnsurePrivateDirectory(const QString &path) {
+	if (path.isEmpty() || !QDir().mkpath(path)) {
+		return false;
+	}
+	return QFile::setPermissions(
+		path,
+		QFileDevice::ReadOwner
+			| QFileDevice::WriteOwner
+			| QFileDevice::ExeOwner);
+}
+
+class RegistryLock final {
+public:
+	explicit RegistryLock(QString *error)
+	: _lock(RegistryPath() + u".lock"_q) {
+		_lock.setStaleLockTime(30000);
+		if (!_lock.tryLock(5000)) {
+			if (error) {
+				*error = u"The profile registry is busy. Try again in a moment."_q;
+			}
+			return;
+		}
+		_locked = true;
+	}
+
+	[[nodiscard]] bool locked() const {
+		return _locked;
+	}
+
+private:
+	QLockFile _lock;
+	bool _locked = false;
+};
 
 bool IsValidId(const QString &id) {
 	const auto uuid = QUuid(id);
@@ -191,6 +226,15 @@ bool Create(const QString &value, Profile *created, QString *error) {
 		return false;
 	}
 
+	if (!EnsurePrivateDirectory(DataRoot())
+		|| !EnsurePrivateDirectory(ProfilesDirectory())) {
+		return SetError(error, u"Could not create the profiles directory."_q);
+	}
+	const auto lock = RegistryLock(error);
+	if (!lock.locked()) {
+		return false;
+	}
+
 	auto profiles = std::vector<Profile>();
 	if (!ReadRegistry(&profiles, error)) {
 		return false;
@@ -199,23 +243,11 @@ bool Create(const QString &value, Profile *created, QString *error) {
 		return SetError(error, u"You have reached the limit of 500 saved profiles."_q);
 	}
 
-	const auto root = DataRoot();
-	if (root.isEmpty()
-		|| !QDir().mkpath(root)
-		|| !QDir().mkpath(ProfilesDirectory())) {
-		return SetError(error, u"Could not create the profiles directory."_q);
-	}
-
 	const auto id = QUuid::createUuid().toString(QUuid::WithoutBraces).toLower();
 	const auto path = ProfileDirectory(id);
-	if (!QDir().mkpath(path)) {
+	if (!EnsurePrivateDirectory(path)) {
 		return SetError(error, u"Could not create the profile data directory."_q);
 	}
-	QFile::setPermissions(
-		path,
-		QFileDevice::ReadOwner
-			| QFileDevice::WriteOwner
-			| QFileDevice::ExeOwner);
 
 	const auto profile = Profile{
 		.id = id,
@@ -239,6 +271,14 @@ bool Launch(const QString &id, QString *error) {
 		return SetError(error, u"Invalid profile identifier."_q);
 	}
 
+	if (!EnsurePrivateDirectory(DataRoot())) {
+		return SetError(error, u"Could not access the LibreGram data directory."_q);
+	}
+	const auto lock = RegistryLock(error);
+	if (!lock.locked()) {
+		return false;
+	}
+
 	auto profiles = std::vector<Profile>();
 	if (!ReadRegistry(&profiles, error)) {
 		return false;
@@ -254,7 +294,7 @@ bool Launch(const QString &id, QString *error) {
 	}
 
 	const auto path = ProfileDirectory(i->id);
-	if (!QDir().mkpath(path)) {
+	if (!EnsurePrivateDirectory(path)) {
 		return SetError(error, u"Could not open the profile data directory."_q);
 	}
 
