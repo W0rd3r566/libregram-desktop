@@ -173,5 +173,11 @@
 	"ktg_forward_force_old_unquoted_desc": "Il vecchio metodo copia i contenuti dei messaggi sul client piuttosto che sul server. Al momento è usato solo per la modalità di raggruppamento \"Raggruppa media\", poiché il nuovo non lo supporta. Se per qualche motivo l'inoltro senza citazione non funziona correttamente, prova a cambiare questa opzione.",
 	"ktg_disable_chat_themes": "Disabilita temi chat",
 	"ktg_settings_compress_images_default": "Compress images by default",
+	"ktg_profiles_menu": "Profili LibreGram",
+	"ktg_profiles_title": "Profili LibreGram",
+	"ktg_profiles_description": "Ogni profilo ha una cartella dati separata e si apre in un'istanza LibreGram distinta. Non significa 500 connessioni simultanee.",
+	"ktg_profiles_empty": "Non ci sono ancora profili salvati.",
+	"ktg_profiles_create": "Crea profilo",
+	"ktg_profiles_prompt": "Nome del profilo",
 	"dummy_last_string": ""
 }
