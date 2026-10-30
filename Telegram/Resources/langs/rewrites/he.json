@@ -173,5 +173,11 @@
 	"ktg_forward_force_old_unquoted_desc": "השיטה הישנה מעתיקה את תוכן ההודעות בלקוח ולא בשרת. נכון לעכשיו הוא משמש רק למצב קבוצה, מכיוון שהוא כבר לא נתמך. אם מסיבה כלשהי העברה ללא קרדיט אינה פועלת כראוי, נסה להחליף אפשרות זו.",
 	"ktg_disable_chat_themes": "בטל את ערכת הנושא של הצ'אט",
 	"ktg_settings_compress_images_default": "Compress images by default",
+	"ktg_profiles_menu": "פרופילי LibreGram",
+	"ktg_profiles_title": "פרופילי LibreGram",
+	"ktg_profiles_description": "לכל פרופיל יש תיקיית נתונים נפרדת והוא נפתח במופע LibreGram משלו. אין פירוש הדבר 500 חיבורים בו־זמנית.",
+	"ktg_profiles_empty": "עדיין אין פרופילים שמורים.",
+	"ktg_profiles_create": "יצירת פרופיל",
+	"ktg_profiles_prompt": "שם הפרופיל",
 	"dummy_last_string": ""
 }
