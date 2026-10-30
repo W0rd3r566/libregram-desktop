@@ -9,6 +9,7 @@ https://github.com/kotatogram/kotatogram-desktop/blob/dev/LEGAL
 
 #include "kotato/kotato_lang.h"
 #include "kotato/kotato_settings.h"
+#include "libregram/profiles/libregram_profiles.h"
 #include "base/options.h"
 #include "base/platform/base_platform_info.h"
 #include "settings/settings_common.h"
@@ -46,6 +47,9 @@ https://github.com/kotatogram/kotatogram-desktop/blob/dev/LEGAL
 #include "ui/platform/ui_platform_utility.h"
 #include "ui/vertical_list.h"
 #include "styles/style_menu_icons.h"
+
+#include <QtWidgets/QInputDialog>
+#include <QtWidgets/QLineEdit>
 
 namespace Settings {
 
@@ -141,6 +145,79 @@ QString ChatIdLabel(int option) {
 			Unexpected("Option in Settings::ChatIdLabel.");
 	}
 	return QString();
+}
+
+void LibreGramProfilesBox(not_null<Ui::GenericBox*> box) {
+	box->setTitle(ktr("ktg_profiles_title"));
+	auto layout = box->verticalLayout();
+	layout->add(
+		object_ptr<Ui::FlatLabel>(
+			box,
+			ktr("ktg_profiles_description"),
+			st::aboutLabel),
+		st::boxRowPadding);
+
+	QString loadError;
+	const auto profiles = ::LibreGram::Profiles::List(&loadError);
+	if (!loadError.isEmpty()) {
+		layout->add(
+			object_ptr<Ui::FlatLabel>(
+				box,
+				loadError,
+				st::aboutLabel),
+			st::boxRowPadding);
+	} else if (profiles.empty()) {
+		layout->add(
+			object_ptr<Ui::FlatLabel>(
+				box,
+				ktr("ktg_profiles_empty"),
+				st::aboutLabel),
+			st::boxRowPadding);
+	}
+
+	for (const auto &profile : profiles) {
+		const auto button = layout->add(object_ptr<Button>(
+			box,
+			profile.name,
+			st::settingsButtonNoIcon));
+		button->addClickHandler([=] {
+			QString error;
+			if (!::LibreGram::Profiles::Launch(profile.id, &error)) {
+				Ui::show(Ui::MakeInformBox(error));
+				return;
+			}
+			box->closeBox();
+		});
+	}
+
+	box->addButton(ktr("ktg_profiles_create"), [=] {
+		if (!loadError.isEmpty()) {
+			Ui::show(Ui::MakeInformBox(loadError));
+			return;
+		}
+		bool accepted = false;
+		const auto name = QInputDialog::getText(
+			box,
+			ktr("ktg_profiles_create"),
+			ktr("ktg_profiles_prompt"),
+			QLineEdit::Normal,
+			QString(),
+			&accepted);
+		if (!accepted) {
+			return;
+		}
+		QString error;
+		if (!::LibreGram::Profiles::Create(name, nullptr, &error)) {
+			Ui::show(Ui::MakeInformBox(error));
+			return;
+		}
+		box->closeBox();
+		Ui::show(Box<Ui::GenericBox>(LibreGramProfilesBox));
+	});
+	box->addButton(tr::lng_close(), [=] {
+		box->closeBox();
+	});
+	box->setWidth(st::aboutWidth);
 }
 
 } // namespace
@@ -694,6 +771,10 @@ void KotatoTopBarOptions(const Ui::Menu::MenuCallback &addAction) {
 	addAction(
 		ktr("ktg_settings_show_json_settings"),
 		[] { File::ShowInFolder(::Kotato::JsonSettings::CustomFilePath()); },
+		&st::menuIconSettings);
+	addAction(
+		ktr("ktg_profiles_menu"),
+		[] { Ui::show(Box<Ui::GenericBox>(LibreGramProfilesBox)); },
 		&st::menuIconSettings);
 	addAction(
 		ktr("ktg_settings_restart"),
