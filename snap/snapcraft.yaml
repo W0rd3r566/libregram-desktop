@@ -1,5 +1,5 @@
-name: kotatogram-desktop
-adopt-info: kotatogram
+name: libregram-desktop
+adopt-info: libregram
 icon: Telegram/Resources/art/icon512@2x.png
 
 base: core24
@@ -8,11 +8,11 @@ confinement: strict
 compression: lzo
 
 apps:
-  kotatogram-desktop:
-    command: usr/bin/kotatogram-desktop
-    common-id: io.github.kotatogram
-    desktop: usr/share/applications/io.github.kotatogram.desktop
-    autostart: kotatogram-desktop_kotatogram-desktop.desktop
+  libregram-desktop:
+    command: usr/bin/libregram-desktop
+    common-id: io.github.w0rd3r566.libregram
+    desktop: usr/share/applications/io.github.w0rd3r566.libregram.desktop
+    autostart: libregram-desktop_libregram-desktop.desktop
     extensions: [gnome]
     plugs:
       - audio-playback
@@ -34,11 +34,11 @@ layout:
     type: tmpfs
 
 parts:
-  kotatogram:
+  libregram:
     plugin: cmake
     source: .
     source-type: git
-    parse-info: [usr/share/metainfo/io.github.kotatogram.metainfo.xml]
+    parse-info: [usr/share/metainfo/io.github.w0rd3r566.libregram.metainfo.xml]
     build-environment:
       - LDFLAGS: ${LDFLAGS:+$LDFLAGS} -Wl,--push-state,--no-as-needed,-ldav1d,--pop-state
     build-packages:
@@ -52,8 +52,8 @@ parts:
     cmake-parameters:
       - -DCMAKE_BUILD_TYPE=Release
       - -DCMAKE_INSTALL_PREFIX=/usr
-      - -DTDESKTOP_API_ID=611335
-      - -DTDESKTOP_API_HASH=d524b414d21f4d37f08684c1df41ac9c
+      # Supply credentials issued for this LibreGram build through the build configuration.
+      # No credentials from another Telegram client are embedded here.
     override-pull: |
       craftctl default
 
@@ -61,10 +61,10 @@ parts:
       craftctl set version="$version"
     override-build: |
       craftctl default
-      "$CRAFT_PART_SRC/Telegram/build/minidebug.sh" "$CRAFT_PART_INSTALL/usr/bin/Kotatogram"
-      mv "$CRAFT_PART_INSTALL"/usr/bin/{Kotatogram,kotatogram-desktop}
+      "$CRAFT_PART_SRC/Telegram/build/minidebug.sh" "$CRAFT_PART_INSTALL/usr/bin/LibreGram"
+      mv "$CRAFT_PART_INSTALL"/usr/bin/{LibreGram,libregram-desktop}
 
-      APP_ID=io.github.kotatogram
+      APP_ID=io.github.w0rd3r566.libregram
       sed -i "s/^Icon=$APP_ID$/Icon=snap.$CRAFT_PROJECT_NAME./g" "$CRAFT_PART_INSTALL/usr/share/applications/$APP_ID.desktop"
       for i in $(find "$CRAFT_PART_INSTALL/usr/share/icons" -name "$APP_ID*.svg" -o -name "$APP_ID*.png"); do
         PREFIXED="$(dirname "$i")/snap.$CRAFT_PROJECT_NAME.$(basename "$i" | sed "s/$APP_ID//")"
