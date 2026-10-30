@@ -50,6 +50,9 @@ https://github.com/kotatogram/kotatogram-desktop/blob/dev/LEGAL
 
 #include "ui/widgets/fields/special_fields.h"
 
+#include <utility>
+#include <vector>
+
 namespace Settings {
 
 namespace {

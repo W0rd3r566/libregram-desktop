@@ -179,5 +179,6 @@
 	"ktg_profiles_empty": "Non ci sono ancora profili salvati.",
 	"ktg_profiles_create": "Crea profilo",
 	"ktg_profiles_prompt": "Nome del profilo",
+	"ktg_profiles_search": "Cerca profili salvati",
 	"dummy_last_string": ""
 }

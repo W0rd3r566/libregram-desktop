@@ -179,5 +179,6 @@
 	"ktg_profiles_empty": "Henüz kayıtlı profil yok.",
 	"ktg_profiles_create": "Profil oluştur",
 	"ktg_profiles_prompt": "Profil adı",
+	"ktg_profiles_search": "Kayıtlı profillerde ara",
 	"dummy_last_string": ""
 }

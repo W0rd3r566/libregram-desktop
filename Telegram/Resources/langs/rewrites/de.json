@@ -179,5 +179,6 @@
 	"ktg_profiles_empty": "Noch keine Profile gespeichert.",
 	"ktg_profiles_create": "Profil erstellen",
 	"ktg_profiles_prompt": "Profilname",
+	"ktg_profiles_search": "Gespeicherte Profile suchen",
 	"dummy_last_string": ""
 }

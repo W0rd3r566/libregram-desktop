@@ -164,5 +164,6 @@
 	"ktg_profiles_empty": "Todavía no hay perfiles guardados.",
 	"ktg_profiles_create": "Crear perfil",
 	"ktg_profiles_prompt": "Nombre del perfil",
+	"ktg_profiles_search": "Buscar perfiles guardados",
 	"dummy_last_string": ""
 }

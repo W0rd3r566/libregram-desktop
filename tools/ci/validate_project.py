@@ -65,6 +65,7 @@ def validate_json_resources() -> int:
         "ktg_profiles_empty",
         "ktg_profiles_create",
         "ktg_profiles_prompt",
+        "ktg_profiles_search",
     }
     for language, translations in parsed.items():
         missing = profile_keys.difference(translations)

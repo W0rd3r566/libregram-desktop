@@ -229,5 +229,6 @@
 	"ktg_profiles_empty": "Пока нет сохранённых профилей.",
 	"ktg_profiles_create": "Создать профиль",
 	"ktg_profiles_prompt": "Название профиля",
+	"ktg_profiles_search": "Поиск сохранённых профилей",
 	"dummy_last_string": ""
 }

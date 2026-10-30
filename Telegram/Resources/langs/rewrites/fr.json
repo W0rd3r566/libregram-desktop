@@ -179,5 +179,6 @@
 	"ktg_profiles_empty": "Aucun profil enregistré pour le moment.",
 	"ktg_profiles_create": "Créer un profil",
 	"ktg_profiles_prompt": "Nom du profil",
+	"ktg_profiles_search": "Rechercher des profils enregistrés",
 	"dummy_last_string": ""
 }
