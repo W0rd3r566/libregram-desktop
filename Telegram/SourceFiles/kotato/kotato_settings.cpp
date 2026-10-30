@@ -192,27 +192,23 @@ const std::map<QString, Definition, std::greater<QString>> DefinitionMap {
 
 	// Non-stored settings
 
-	// To build your version of Kotatogram Desktop you're required to provide
-	// your own 'api_id' and 'api_hash' for the Telegram API access.
+	// LibreGram builds require their own 'api_id' and 'api_hash' for Telegram API access.
 	//
-	// How to obtain your 'api_id' and 'api_hash' is described here:
+	// Obtain credentials here:
 	// https://core.telegram.org/api/obtaining_api_id
 	//
-	// By default Kotatogram provides empty 'api_id' and 'api_hash'
-	// since you can set it them in runtime. They can be set with
-	// KTGDESKTOP_API_ID and KTGDESKTOP_API_HASH environment variables.
-	// You must set both variables for it to work.
+	// You can provide them at runtime through the LIBREGRAM_API_ID and
+	// LIBREGRAM_API_HASH environment variables. Both variables must be set.
+	// For backwards compatibility, the legacy KTGDESKTOP_API_ID and
+	// KTGDESKTOP_API_HASH pair is also accepted when the LibreGram pair
+	// is not available. A complete LibreGram pair always takes priority.
 	//
-	// As an alternative, you can use -api-id <id> and -api-hash <hash>
-	// start parameters. Note that environment variables have priority
-	// over start parameters, so you should use -no-env-api if you don't
-	// want them. And as with environment variables, both -api-id and
-	// -api-hash must be set for it to work.
+	// Alternatively, use -api-id <id> and -api-hash <hash> start parameters.
+	// Environment variables have priority over start parameters, unless
+	// -no-env-api is passed. Both command-line values must be provided.
 	//
-	// If 'api_id' and 'api_hash' are empty, and they're not set by any
-	// of these parameters, you won't be able to connect to Telegram at all.
-	// Sessions created on TDesktop + forks (including Kotatogram) might
-	// work, but it could be risky, so be careful with it.
+	// If 'api_id' and 'api_hash' are empty and no credentials are provided
+	// through the supported options, the application cannot connect to Telegram.
 	{ "api_id", {
 		.storage = SettingStorage::None,
 		.type = SettingType::IntSetting,
