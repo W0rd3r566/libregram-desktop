@@ -1,3 +1,0 @@
-[D-BUS Service]
-Name=io.github.kotatogram
-Exec=@CMAKE_INSTALL_FULL_BINDIR@/Kotatogram
