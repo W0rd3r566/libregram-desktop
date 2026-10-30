@@ -34,6 +34,7 @@ LibreGram — самостоятельный проект с собственн�
 | [Концепция и функции](docs/PRODUCT.md) | Полное описание идеи, модулей, поведения и ограничений |
 | [Архитектура](docs/architecture.md) | Техническое устройство и принципы разработки |
 | [Дорожная карта](docs/ROADMAP.md) | Этапы от концепции до первой публичной версии |
+| [Аудит исходников](docs/UPSTREAM_AUDIT.md) | Что уже реализовано в базе и как расширять её без дублирования |
 | [Сборка Linux](docs/building-linux.md) | Инструкция по сборке исходной кодовой базы |
 | [WEB proxy](docs/web-proxy-plan.md) | Отдельная документация унаследованного механизма WEB proxy |
 
@@ -50,14 +51,15 @@ LibreGram Desktop is an independent desktop Telegram client with its own product
 - **Refined UX:** polished animations, media handling, shortcuts and customizable interface elements.
 - **Privacy controls:** clear management of local data and connection tools.
 
-Read the [product specification](docs/PRODUCT.md), [architecture](docs/architecture.md) and [roadmap](docs/ROADMAP.md).
+Read the [product specification](docs/PRODUCT.md), [architecture](docs/architecture.md), [roadmap](docs/ROADMAP.md) and [source audit](docs/UPSTREAM_AUDIT.md).
 
 ## Статус проекта
 
 | Направление | Состояние |
 |---|---|
 | Концепция и документация | В работе |
-| Аудит исходной кодовой базы | Не начат |
+| Аудит исходной кодовой базы | Выполнен, см. UPSTREAM_AUDIT.md |
+| Идентичность приложения | Настроена в метаданных, сборка не проверена |
 | Базовая сборка | Не проверена |
 | LibreTheme | Запланировано |
 | Multi-account | Запланировано |
