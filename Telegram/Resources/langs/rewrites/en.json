@@ -234,5 +234,7 @@
 	"ktg_profiles_favorite": "Favorite",
 	"ktg_profiles_edit": "Edit profile",
 	"ktg_profiles_group": "Group (optional)",
-	"ktg_profiles_tags": "Comma-separated tags (optional)"
+	"ktg_profiles_tags": "Comma-separated tags (optional)",
+	"ktg_profiles_last_launched": "Last launched: {time}",
+	"ktg_profiles_never_launched": "Never launched"
 }

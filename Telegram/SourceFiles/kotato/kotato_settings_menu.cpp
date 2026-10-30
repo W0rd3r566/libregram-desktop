@@ -50,6 +50,9 @@ https://github.com/kotatogram/kotatogram-desktop/blob/dev/LEGAL
 
 #include "ui/widgets/fields/special_fields.h"
 
+#include <QtCore/QDateTime>
+#include <QtCore/QLocale>
+
 #include <utility>
 #include <vector>
 
@@ -306,6 +309,23 @@ void LibreGramProfilesBox(not_null<Ui::GenericBox*> box) {
 			}
 			if (!profile.tags.isEmpty()) {
 				details.push_back(profile.tags.join(u" · "_q));
+			}
+			if (profile.lastLaunchedAt.isEmpty()) {
+				details.push_back(ktr("ktg_profiles_never_launched"));
+			} else {
+				const auto lastLaunchedAt = QDateTime::fromString(
+					profile.lastLaunchedAt,
+					Qt::ISODateWithMs);
+				if (lastLaunchedAt.isValid()) {
+					details.push_back(ktr(
+						"ktg_profiles_last_launched",
+						{
+							"time",
+							QLocale().toString(
+								lastLaunchedAt.toLocalTime(),
+								QLocale::ShortFormat)
+						}));
+				}
 			}
 			if (!details.isEmpty()) {
 				inner->add(

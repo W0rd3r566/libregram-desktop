@@ -184,5 +184,7 @@
 	"ktg_profiles_favorite": "Избранное",
 	"ktg_profiles_edit": "Изменить профиль",
 	"ktg_profiles_group": "Группа (необязательно)",
-	"ktg_profiles_tags": "Метки через запятую (необязательно)"
+	"ktg_profiles_tags": "Метки через запятую (необязательно)",
+	"ktg_profiles_last_launched": "Последний запуск: {time}",
+	"ktg_profiles_never_launched": "Ещё не запускался"
 }

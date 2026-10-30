@@ -184,5 +184,7 @@
 	"ktg_profiles_favorite": "Ulubione",
 	"ktg_profiles_edit": "Edytuj profil",
 	"ktg_profiles_group": "Grupa (opcjonalnie)",
-	"ktg_profiles_tags": "Tagi oddzielone przecinkami (opcjonalnie)"
+	"ktg_profiles_tags": "Tagi oddzielone przecinkami (opcjonalnie)",
+	"ktg_profiles_last_launched": "Ostatnio uruchomiono: {time}",
+	"ktg_profiles_never_launched": "Jeszcze nie uruchomiono"
 }

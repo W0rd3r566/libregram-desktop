@@ -184,5 +184,7 @@
 	"ktg_profiles_favorite": "مورد علاقه",
 	"ktg_profiles_edit": "ویرایش نمایه",
 	"ktg_profiles_group": "گروه (اختیاری)",
-	"ktg_profiles_tags": "برچسب‌ها با ویرگول جدا شوند (اختیاری)"
+	"ktg_profiles_tags": "برچسب‌ها با ویرگول جدا شوند (اختیاری)",
+	"ktg_profiles_last_launched": "آخرین اجرا: {time}",
+	"ktg_profiles_never_launched": "هنوز اجرا نشده است"
 }

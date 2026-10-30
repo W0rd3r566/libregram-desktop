@@ -184,5 +184,7 @@
 	"ktg_profiles_favorite": "Favorit",
 	"ktg_profiles_edit": "Profil bearbeiten",
 	"ktg_profiles_group": "Gruppe (optional)",
-	"ktg_profiles_tags": "Tags, durch Kommas getrennt (optional)"
+	"ktg_profiles_tags": "Tags, durch Kommas getrennt (optional)",
+	"ktg_profiles_last_launched": "Zuletzt gestartet: {time}",
+	"ktg_profiles_never_launched": "Noch nicht gestartet"
 }

@@ -184,5 +184,7 @@
 	"ktg_profiles_favorite": "Preferito",
 	"ktg_profiles_edit": "Modifica profilo",
 	"ktg_profiles_group": "Gruppo (facoltativo)",
-	"ktg_profiles_tags": "Tag separati da virgole (facoltativo)"
+	"ktg_profiles_tags": "Tag separati da virgole (facoltativo)",
+	"ktg_profiles_last_launched": "Ultimo avvio: {time}",
+	"ktg_profiles_never_launched": "Mai avviato"
 }

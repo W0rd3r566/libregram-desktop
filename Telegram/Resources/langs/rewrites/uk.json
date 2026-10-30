@@ -184,5 +184,7 @@
 	"ktg_profiles_favorite": "В обраному",
 	"ktg_profiles_edit": "Редагувати профіль",
 	"ktg_profiles_group": "Група (необов’язково)",
-	"ktg_profiles_tags": "Мітки через кому (необов’язково)"
+	"ktg_profiles_tags": "Мітки через кому (необов’язково)",
+	"ktg_profiles_last_launched": "Останній запуск: {time}",
+	"ktg_profiles_never_launched": "Ще не запускався"
 }

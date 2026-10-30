@@ -169,5 +169,7 @@
 	"ktg_profiles_favorite": "收藏",
 	"ktg_profiles_edit": "编辑配置文件",
 	"ktg_profiles_group": "分组（可选）",
-	"ktg_profiles_tags": "用逗号分隔的标签（可选）"
+	"ktg_profiles_tags": "用逗号分隔的标签（可选）",
+	"ktg_profiles_last_launched": "上次启动：{time}",
+	"ktg_profiles_never_launched": "尚未启动"
 }

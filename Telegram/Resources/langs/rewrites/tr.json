@@ -184,5 +184,7 @@
 	"ktg_profiles_favorite": "Favori",
 	"ktg_profiles_edit": "Profili düzenle",
 	"ktg_profiles_group": "Grup (isteğe bağlı)",
-	"ktg_profiles_tags": "Virgülle ayrılmış etiketler (isteğe bağlı)"
+	"ktg_profiles_tags": "Virgülle ayrılmış etiketler (isteğe bağlı)",
+	"ktg_profiles_last_launched": "Son başlatma: {time}",
+	"ktg_profiles_never_launched": "Henüz başlatılmadı"
 }

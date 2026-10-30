@@ -184,5 +184,7 @@
 	"ktg_profiles_favorite": "מועדף",
 	"ktg_profiles_edit": "עריכת פרופיל",
 	"ktg_profiles_group": "קבוצה (אופציונלי)",
-	"ktg_profiles_tags": "תגיות מופרדות בפסיקים (אופציונלי)"
+	"ktg_profiles_tags": "תגיות מופרדות בפסיקים (אופציונלי)",
+	"ktg_profiles_last_launched": "הופעל לאחרונה: {time}",
+	"ktg_profiles_never_launched": "טרם הופעל"
 }
