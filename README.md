@@ -2,63 +2,63 @@
 
 # LibreGram Desktop
 
-**Telegram-клиент, который можно настроить под себя.**
+**Твой Telegram. Твои правила. Твой интерфейс.**
 
-Независимый настольный клиент на основе Kotatogram Desktop. Цель LibreGram — объединить глубокую настройку интерфейса, локальные расширения, удобное управление аккаунтами и дополнительные инструменты подключения в одном цельном приложении.
+Независимый настольный Telegram-клиент с упором на глубокую персонализацию, удобное управление аккаунтами, локальные расширения и контроль над подключением.
 
-[![Base](https://img.shields.io/badge/base-Kotatogram-7965d8?style=flat-square)](https://github.com/kotatogram/kotatogram-desktop)
 [![Status](https://img.shields.io/badge/status-early%20development-orange?style=flat-square)](#статус-проекта)
 [![License](https://img.shields.io/badge/license-GPL--3.0-blue?style=flat-square)](LICENSE)
 
 </div>
 
 > [!WARNING]
-> **Проект находится на ранней стадии разработки.** Описанные ниже функции являются планами, пока не отмечены как реализованные и не прошли тестирование. Это не готовая замена Telegram Desktop.
+> **LibreGram находится на ранней стадии разработки.** Возможности, описанные в документации, являются планами, пока они не реализованы и не прошли тестирование.
 
 ## 🇷🇺 О проекте
 
-LibreGram строится на кодовой базе Kotatogram Desktop (C++ / Qt). Мы хотим взять стабильную основу Telegram-клиента и развить её в сторону гибкой персонализации и удобства.
+LibreGram — самостоятельный проект с собственным видением настольного Telegram-клиента. Мы хотим создать не просто очередной форк, а цельное приложение, в котором интерфейс, инструменты и дополнительные функции подчиняются единой концепции.
 
-### Основные направления
+### Что планируется
 
-- **LibreTheme** — глубокая настройка интерфейса: цвета, шрифты, отступы, фоны, темы и CSS-подобный формат пользовательского оформления.
-- **Local Premium** — дополнительные локальные функции клиента. Это не Telegram Premium и не разблокировка серверных возможностей.
-- **Multi-account** — удобный менеджер сохранённых аккаунтов с быстрым переключением. Долгосрочная цель — до 500 сохранённых профилей, а не 500 одновременных подключений.
-- **LibreProxy** — необязательная интеграция с [Flowseal/tg-ws-proxy](https://github.com/Flowseal/tg-ws-proxy).
-- **UX improvements** — аккуратные анимации, улучшенная работа с медиа, быстрые действия и другие улучшения повседневного использования.
+- **LibreTheme** — мощная система оформления: цвета, шрифты, размеры, отступы, обои, анимации, пользовательские темы и CSS-подобная настройка.
+- **Local Premium** — набор расширенных локальных возможностей клиента. Не путать с Telegram Premium: серверные привилегии не разблокируются.
+- **Multi-account** — удобное пространство для управления аккаунтами, быстрый переключатель, поиск, группы и метки. Долгосрочная цель — до 500 сохранённых профилей.
+- **LibreProxy** — необязательный модуль управления локальным прокси на основе [Flowseal/tg-ws-proxy](https://github.com/Flowseal/tg-ws-proxy).
+- **Refined UX** — плавные анимации, продуманные переходы, улучшенная работа с медиа, быстрые действия и настраиваемые элементы интерфейса.
+- **Privacy controls** — понятное управление локальными данными, настройками и дополнительными инструментами подключения.
 
 ### Документация
 
-| Документ | Описание |
+| Документ | Содержание |
 |---|---|
-| [Концепция и функции](docs/PRODUCT.md) | Подробное описание идеи, модулей и ограничений |
-| [Архитектура](docs/architecture.md) | Технические принципы и предполагаемое устройство |
-| [Дорожная карта](docs/ROADMAP.md) | Этапы разработки |
-| [Сборка Linux](docs/building-linux.md) | Унаследованная инструкция сборки |
-| [WEB proxy](docs/web-proxy-plan.md) | Документация отдельного механизма WEB proxy из базовой кодовой базы |
+| [Концепция и функции](docs/PRODUCT.md) | Полное описание идеи, модулей, поведения и ограничений |
+| [Архитектура](docs/architecture.md) | Техническое устройство и принципы разработки |
+| [Дорожная карта](docs/ROADMAP.md) | Этапы от концепции до первой публичной версии |
+| [Сборка Linux](docs/building-linux.md) | Инструкция по сборке исходной кодовой базы |
+| [WEB proxy](docs/web-proxy-plan.md) | Отдельная документация унаследованного механизма WEB proxy |
 
 ## 🇬🇧 About
 
-LibreGram Desktop is an independent desktop Telegram client based on Kotatogram Desktop. The project aims to combine deep interface customization, local client-side enhancements, convenient multi-account management and optional connectivity tools in one cohesive application.
+LibreGram Desktop is an independent desktop Telegram client with its own product vision. The goal is to build a cohesive application focused on deep customization, convenient account management, local enhancements and transparent connection controls.
 
-### Main goals
+### Planned highlights
 
-- **LibreTheme:** extensive UI customization, custom themes and a CSS-inspired styling format.
+- **LibreTheme:** extensive UI customization, wallpapers, animations, theme presets and a CSS-inspired styling format.
 - **Local Premium:** client-side enhancements only, not Telegram Premium entitlements.
-- **Multi-account:** convenient management of saved profiles, with a long-term target of up to 500 stored accounts.
+- **Multi-account:** account workspace with quick switching, search, groups and labels. Long-term target: up to 500 saved profiles.
 - **LibreProxy:** optional integration with [Flowseal/tg-ws-proxy](https://github.com/Flowseal/tg-ws-proxy).
-- **UX improvements:** refined animations, media handling, shortcuts and everyday workflow improvements.
+- **Refined UX:** polished animations, media handling, shortcuts and customizable interface elements.
+- **Privacy controls:** clear management of local data and connection tools.
 
-See the [full product specification](docs/PRODUCT.md), [architecture](docs/architecture.md) and [roadmap](docs/ROADMAP.md).
+Read the [product specification](docs/PRODUCT.md), [architecture](docs/architecture.md) and [roadmap](docs/ROADMAP.md).
 
 ## Статус проекта
 
 | Направление | Состояние |
 |---|---|
-| Выбор основы Kotatogram | Готово |
-| Рабочая ветка LibreGram | Готово |
-| Первичная документация | В работе |
-| Аудит и проверка сборки | Не начато |
+| Концепция и документация | В работе |
+| Аудит исходной кодовой базы | Не начат |
+| Базовая сборка | Не проверена |
 | LibreTheme | Запланировано |
 | Multi-account | Запланировано |
 | LibreProxy | Запланировано |
@@ -66,18 +66,18 @@ See the [full product specification](docs/PRODUCT.md), [architecture](docs/archi
 
 ## Принципы
 
-1. **Сначала стабильность.** Сначала подтверждаем базовую сборку, затем добавляем функции.
-2. **Локальное значит локальное.** Не выдаём функции клиента за серверные привилегии Telegram.
-3. **Безопасность аккаунтов.** Не публикуем сессии, ключи и секреты.
-4. **Уважение к upstream.** Сохраняем обязательные уведомления, проверяем лицензии и требования Telegram API.
-5. **Никаких фиктивных обещаний.** Функция считается готовой только после тестирования.
+1. **Самостоятельная идентичность.** LibreGram имеет собственное название, интерфейс, документацию и направление развития.
+2. **Сначала стабильность.** Новые функции не должны ломать базовую работу клиента.
+3. **Локальное значит локальное.** Не выдаём возможности приложения за серверные привилегии Telegram.
+4. **Безопасность аккаунтов.** Не публикуем сессии, ключи и секреты.
+5. **Открытая разработка.** Изменения должны быть понятными, проверяемыми и документированными.
 
-## Лицензия и независимость
+## Лицензия и происхождение
 
-LibreGram основан на Kotatogram Desktop и Telegram Desktop. Проект распространяется с соблюдением **GNU GPL v3.0** и применимых уведомлений об авторских правах. Перед распространением производных сборок необходимо соблюдать условия лицензии и сохранять атрибуцию.
+LibreGram использует открытую кодовую базу Telegram Desktop и компоненты проекта Kotatogram Desktop. Поэтому при распространении необходимо соблюдать применимые условия **GNU GPL v3.0**, сохранять авторские уведомления и указывать происхождение заимствованных компонентов. См. [LICENSE](LICENSE).
 
-LibreGram — независимый проект сообщества. Он не связан с Telegram и не является официальным продуктом Telegram.
+LibreGram — независимый проект. Он не связан с Telegram и не является официальным продуктом Telegram.
 
 ---
 
-<sub>Development branch: `libregram/dev` · Project documentation is evolving alongside the codebase.</sub>
+<sub>Development branch: `libregram/dev` · Independent community project.</sub>
