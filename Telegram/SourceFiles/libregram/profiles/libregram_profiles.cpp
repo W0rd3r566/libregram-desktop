@@ -88,6 +88,13 @@ bool IsValidId(const QString &id) {
 		&& (uuid.toString(QUuid::WithoutBraces).toLower() == id.toLower());
 }
 
+bool HasControlCharacter(const QString &value) {
+	return std::any_of(
+		value.cbegin(),
+		value.cend(),
+		[](QChar ch) { return ch.isControl(); });
+}
+
 bool SetError(QString *error, const QString &message) {
 	if (error) {
 		*error = message;
@@ -145,6 +152,7 @@ bool ReadRegistry(std::vector<Profile> *profiles, QString *error) {
 		if (!IsValidId(profile.id)
 			|| profile.name.isEmpty()
 			|| profile.name.size() > kProfileNameLimit
+			|| HasControlCharacter(profile.name)
 			|| seen.contains(profile.id.toLower())) {
 			return SetError(error, u"The profiles registry contains invalid profile metadata."_q);
 		}
@@ -199,10 +207,8 @@ bool ValidateName(const QString &value, QString *name, QString *error) {
 	if (name->size() > kProfileNameLimit) {
 		return SetError(error, u"Profile names can contain up to 64 characters."_q);
 	}
-	for (const auto ch : *name) {
-		if (ch.isControl()) {
-			return SetError(error, u"Profile names cannot contain control characters."_q);
-		}
+	if (HasControlCharacter(*name)) {
+		return SetError(error, u"Profile names cannot contain control characters."_q);
 	}
 	return true;
 }
@@ -215,6 +221,15 @@ std::vector<Profile> List(QString *error) {
 		return {};
 	}
 	std::sort(result.begin(), result.end(), [](const Profile &a, const Profile &b) {
+		if (a.lastLaunchedAt != b.lastLaunchedAt) {
+			if (a.lastLaunchedAt.isEmpty()) {
+				return false;
+			}
+			if (b.lastLaunchedAt.isEmpty()) {
+				return true;
+			}
+			return a.lastLaunchedAt > b.lastLaunchedAt;
+		}
 		return a.name.toCaseFolded() < b.name.toCaseFolded();
 	});
 	return result;

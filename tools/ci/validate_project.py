@@ -114,6 +114,8 @@ def validate_application_identity() -> None:
     require("QProcess::startDetached" in profile_source, "Profile launch must use a detached LibreGram process.")
     require("#include <QtCore/QLockFile>" in profile_source, "Profile registry writes must be protected by a lock.")
     require("EnsurePrivateDirectory" in profile_source, "Profile data directories must have owner-only permissions.")
+    require("HasControlCharacter(profile.name)" in profile_source, "Loaded profile names must reject control characters.")
+    require("a.lastLaunchedAt > b.lastLaunchedAt" in profile_source, "Recently launched profiles must be sorted first.")
     require("ktg_profiles_menu" in settings_menu, "The profile manager must be accessible from the existing settings menu.")
     require("Каждый профиль" in profile_docs, "Profile workspace documentation is missing its architecture explanation.")
     require("Name=LibreGram" in desktop, "Linux desktop entry name is incorrect.")
