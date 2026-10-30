@@ -173,5 +173,11 @@
 	"ktg_forward_force_old_unquoted_desc": "O método antigo copia o conteúdo das mensagens no cliente em vez do servidor. Atualmente é usado apenas para o modo de agrupamento \"Reagrupar mídia\", já que o novo não o suporta. Se, por algum motivo, o encaminhamento sem aspas não funcionar corretamente, tente alternar esta opção.",
 	"ktg_disable_chat_themes": "Desativar temas de chat",
 	"ktg_settings_compress_images_default": "Comprimir imagens por padrão",
+	"ktg_profiles_menu": "Perfis do LibreGram",
+	"ktg_profiles_title": "Perfis do LibreGram",
+	"ktg_profiles_description": "Cada perfil tem sua própria pasta de dados e abre em uma instância separada do LibreGram. Isso não significa 500 conexões simultâneas.",
+	"ktg_profiles_empty": "Ainda não há perfis salvos.",
+	"ktg_profiles_create": "Criar perfil",
+	"ktg_profiles_prompt": "Nome do perfil",
 	"dummy_last_string": ""
 }
