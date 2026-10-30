@@ -48,8 +48,7 @@ https://github.com/kotatogram/kotatogram-desktop/blob/dev/LEGAL
 #include "ui/vertical_list.h"
 #include "styles/style_menu_icons.h"
 
-#include <QtWidgets/QInputDialog>
-#include <QtWidgets/QLineEdit>
+#include "ui/widgets/fields/special_fields.h"
 
 namespace Settings {
 
@@ -147,6 +146,44 @@ QString ChatIdLabel(int option) {
 	return QString();
 }
 
+void LibreGramCreateProfileBox(not_null<Ui::GenericBox*> box) {
+	box->setTitle(ktr("ktg_profiles_create"));
+	const auto input = box->addRow(
+		object_ptr<Ui::MaskedInputField>(
+			box,
+			st::defaultInputField,
+			rpl::single(ktr("ktg_profiles_prompt"))),
+		st::boxRowPadding);
+	input->setMaxLength(64);
+	box->setFocusCallback([=] {
+		input->setFocusFast();
+	});
+
+	const auto create = [=] {
+		QString error;
+		if (!::LibreGram::Profiles::Create(
+				input->text(),
+				nullptr,
+				&error)) {
+			input->showError();
+			Ui::show(Ui::MakeInformBox(error));
+			return;
+		}
+		box->closeBox();
+		Ui::show(Box<Ui::GenericBox>(LibreGramProfilesBox));
+	};
+	QObject::connect(
+		input,
+		&Ui::MaskedInputField::submitted,
+		box,
+		[=](Qt::KeyboardModifiers) { create(); });
+	box->addButton(ktr("ktg_profiles_create"), create);
+	box->addButton(tr::lng_cancel(), [=] {
+		box->closeBox();
+	});
+	box->setWidth(st::aboutWidth);
+}
+
 void LibreGramProfilesBox(not_null<Ui::GenericBox*> box) {
 	box->setTitle(ktr("ktg_profiles_title"));
 	auto layout = box->verticalLayout();
@@ -195,24 +232,8 @@ void LibreGramProfilesBox(not_null<Ui::GenericBox*> box) {
 			Ui::show(Ui::MakeInformBox(loadError));
 			return;
 		}
-		bool accepted = false;
-		const auto name = QInputDialog::getText(
-			box,
-			ktr("ktg_profiles_create"),
-			ktr("ktg_profiles_prompt"),
-			QLineEdit::Normal,
-			QString(),
-			&accepted);
-		if (!accepted) {
-			return;
-		}
-		QString error;
-		if (!::LibreGram::Profiles::Create(name, nullptr, &error)) {
-			Ui::show(Ui::MakeInformBox(error));
-			return;
-		}
 		box->closeBox();
-		Ui::show(Box<Ui::GenericBox>(LibreGramProfilesBox));
+		Ui::show(Box<Ui::GenericBox>(LibreGramCreateProfileBox));
 	});
 	box->addButton(tr::lng_close(), [=] {
 		box->closeBox();
