@@ -50,11 +50,11 @@ rpl::producer<TextWithEntities> Text2() {
 		lt_gpl_link,
 		rpl::single(tr::link(
 			"GNU GPL",
-			"https://github.com/kotatogram/kotatogram-desktop/blob/master/LICENSE")),
+			"https://github.com/W0rd3r566/libregram-desktop/blob/libregram/dev/LICENSE")),
 		lt_github_link,
 		rpl::single(tr::link(
 			"GitHub",
-			"https://github.com/kotatogram/kotatogram-desktop")),
+			"https://github.com/W0rd3r566/libregram-desktop")),
 		tr::marked);
 }
 
@@ -65,13 +65,13 @@ rpl::producer<TextWithEntities> Text3() {
 
 	for (const auto language : { "ru", "uk", "be" }) {
 		if (baseLang.startsWith(QLatin1String(language)) || currentLang == QString(language)) {
-			channelLink = "https://t.me/kotatogram_ru";
+			channelLink = "https://github.com/W0rd3r566/libregram-desktop/releases";
 			break;
 		}
 	}
 
 	if (channelLink.isEmpty()) {
-		channelLink = "https://t.me/kotatogram";
+		channelLink = "https://github.com/W0rd3r566/libregram-desktop/releases";
 	}
 
 	return rktre("ktg_about_text3", {
@@ -86,7 +86,7 @@ rpl::producer<TextWithEntities> Text3() {
 } // namespace
 
 void AboutBox(not_null<Ui::GenericBox*> box) {
-	box->setTitle(u"Kotatogram Desktop"_q);
+	box->setTitle(u"LibreGram Desktop"_q);
 
 	auto layout = box->verticalLayout();
 
