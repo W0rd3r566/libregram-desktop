@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=io.github.w0rd3r566.libregram
+Exec=@CMAKE_INSTALL_FULL_BINDIR@/LibreGram
