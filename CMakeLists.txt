@@ -55,6 +55,11 @@ include(cmake/validate_d3d_compiler.cmake)
 include(cmake/target_prepare_qrc.cmake)
 
 include(cmake/options.cmake)
+
+# LibreGram must not consume Kotatogram update manifests or signing keys.
+# Auto-updates stay disabled until LibreGram ships its own signed update channel.
+set(DESKTOP_APP_DISABLE_AUTOUPDATE ON CACHE BOOL
+    "Disable auto-updates until LibreGram has its own signed update channel." FORCE)
 include(cmake/external/qt/package.cmake)
 
 set(desktop_app_skip_libs
