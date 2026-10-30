@@ -860,7 +860,7 @@ void Manager::writeDefaultFile() {
 		return;
 	}
 	const char *defaultHeader = R"HEADER(
-// This is a list of default options for Kotatogram Desktop
+// This is a list of default options for LibreGram Desktop
 // Please don't modify it, its content is not used in any way
 // You can place your own options in the 'kotato-settings-custom.json' file
 
