@@ -34,7 +34,7 @@ Read the credentials without echoing the hash into the terminal, then export the
 ```bash
 read -rp "Telegram API ID: " LIBREGRAM_API_ID
 read -rsp "Telegram API hash: " LIBREGRAM_API_HASH
-printf '\\n'
+printf '\n'
 export LIBREGRAM_API_ID LIBREGRAM_API_HASH
 ```
 
