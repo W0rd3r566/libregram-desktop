@@ -35,5 +35,5 @@ jobs:
               bash -n PKGBUILD
               useradd --create-home builder
               chown -R builder:builder /workspace
-              runuser -u builder -- bash -lc 'cd /workspace/packaging/arch && makepkg --printsrcinfo >/dev/null'
+              runuser -u builder -- env HOME=/home/builder USER=builder LOGNAME=builder makepkg --printsrcinfo >/dev/null
             '
