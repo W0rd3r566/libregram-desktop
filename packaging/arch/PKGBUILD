@@ -1,6 +1,6 @@
 # Maintainer: LibreGram contributors
-# Build this package locally with your own Telegram API credentials.
-# Do not publish the resulting binary: it contains the credentials used at build time.
+# Build with credentials dedicated to the LibreGram Telegram application.
+# The resulting binary contains the API credentials used at build time.
 
 pkgname=libregram
 pkgver=0.1.0
