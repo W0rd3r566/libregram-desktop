@@ -72,6 +72,11 @@ def validate_json_resources() -> int:
         "ktg_profiles_tags",
         "ktg_profiles_last_launched",
         "ktg_profiles_never_launched",
+        "ktg_profiles_show_archived",
+        "ktg_profiles_archive",
+        "ktg_profiles_restore",
+        "ktg_profiles_archived_empty",
+        "ktg_profiles_back_to_active",
     }
     for language, translations in parsed.items():
         missing = profile_keys.difference(translations)
@@ -129,7 +134,11 @@ def validate_application_identity() -> None:
     require("a.favorite != b.favorite" in profile_source, "Favorite profiles must be sorted before regular profiles.")
     require("a.lastLaunchedAt > b.lastLaunchedAt" in profile_source, "Recently launched profiles must be sorted first.")
     require("bool SetFavorite(" in profile_header, "The profile API must expose favorite toggling.")
-    require("constexpr auto kRegistrySchema = 3;" in profile_source, "Profile metadata schema must be version 3.")
+    require("bool SetArchived(" in profile_header, "The profile API must expose reversible archiving.")
+    require("ListArchived(" in profile_header, "The profile API must expose archived profiles separately.")
+    require('object.insert(u"archived"_q, profile.archived)' in profile_source, "Archive state must be persisted.")
+    require("Restore this archived profile before launching it." in profile_source, "Archived workspaces must be restored before launch.")
+    require("constexpr auto kRegistrySchema = 4;" in profile_source, "Profile metadata schema must be version 4.")
     require("schema < 1 || schema > kRegistrySchema" in profile_source, "Older profile metadata schemas must remain readable.")
     require("bool Update(" in profile_header, "Profiles must support metadata updates.")
     require("ValidateGroupAndTags(" in profile_source, "Profile group and tag metadata must be validated.")
