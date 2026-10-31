@@ -32,7 +32,7 @@ sudo pacman -S --needed base-devel git
 Create the repository-root `.env` file once. The build reads it automatically, so you will not need to enter the credentials on every build:
 
 ```bash
-cd libregram-desktop
+cd ../..
 cat > .env <<'EOF'
 LIBREGRAM_API_ID=your_api_id
 LIBREGRAM_API_HASH=your_api_hash
