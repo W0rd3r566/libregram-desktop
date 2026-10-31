@@ -30,7 +30,7 @@ The inherited build system continues to use these CMake cache variables:
 - `TDESKTOP_API_ID`
 - `TDESKTOP_API_HASH`
 
-Their names are retained for compatibility with the existing CMake and Telegram Desktop build infrastructure. Do not put real API credentials into tracked source files, public build logs or commits.
+Their names are retained for compatibility with the existing CMake and Telegram Desktop build infrastructure. Do not put real API credentials into tracked source files, public build logs or commits. The build defines them as compile-time values, so a distributed client binary contains the API hash and it may be recoverable by recipients. Use credentials dedicated to this application for a public binary release; do not reuse credentials from another project.
 
 ## Important
 
