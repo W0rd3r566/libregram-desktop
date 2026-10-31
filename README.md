@@ -40,7 +40,7 @@ LibreGram — самостоятельный проект с собственн�
 | [Дорожная карта](docs/ROADMAP.md) | Этапы от концепции до первой публичной версии |
 | [Аудит исходников](docs/UPSTREAM_AUDIT.md) | Что уже реализовано в базе и как расширять её без дублирования |
 | [Профили и аккаунты](docs/MULTI_ACCOUNT.md) | Изолированные профили рабочих областей и цель в 500 сохранённых профилей |
-| [Сборка Linux](docs/building-linux.md) | Инструкция по сборке исходной кодовой базы |
+| [Первый релиз для CachyOS](docs/CACHYOS_RELEASE.md) | Целевая платформа, условия готовности и порядок первого выпуска |\n| [Пакет Arch / CachyOS](packaging/arch/README.md) | Локальная сборка и установка через pacman |\n| [Сборка Linux](docs/building-linux.md) | Контейнерная инструкция для сборки исходной кодовой базы |
 | [Сборка Windows](docs/building-win.md) | Инструкция по сборке Windows |
 | [WEB proxy](docs/web-proxy-plan.md) | Отдельная документация унаследованного механизма WEB proxy |
 
@@ -52,7 +52,7 @@ LibreGram Desktop is an independent desktop Telegram client with its own product
 
 - **LibreTheme:** extensive UI customization, wallpapers, animations, theme presets and a CSS-inspired styling format.
 - **Local Premium:** client-side enhancements only, not Telegram Premium entitlements.
-- **Multi-account:** account workspace with quick switching, search, favorites, one group and up to eight tags per profile. Long-term target: up to 500 saved profiles.
+- **Multi-account:** account workspace with quick switching, search, favorites, groups, tags, archive and restore. Long-term target: up to 500 saved profiles.
 - **LibreProxy:** optional integration with [Flowseal/tg-ws-proxy](https://github.com/Flowseal/tg-ws-proxy).
 - **Refined UX:** polished animations, media handling, shortcuts and customizable interface elements.
 - **Privacy controls:** clear management of local data and connection tools.
@@ -68,7 +68,7 @@ Read the [product specification](docs/PRODUCT.md), [architecture](docs/architect
 | Идентичность приложения | Логотип подключён к ресурсам Windows и Linux; сборка ожидает проверки |
 | Базовая сборка | Не проверена |
 | LibreTheme | Запланировано |
-| Multi-account | Каталог до 500 профилей, создание, поиск, запуск, избранное, группы и метки реализованы; архивирование и импорт/экспорт в работе |
+| Multi-account | Создание, поиск, запуск, избранное, группы/метки и архивирование/восстановление реализованы; безопасное удаление и импорт/экспорт впереди |\n| CachyOS package | PKGBUILD 0.1.0 preview добавлен; сборка и проверки ещё не выполнены |
 | LibreProxy | Запланировано |
 | Local Premium | Запланировано |
 
