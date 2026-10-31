@@ -1,0 +1,61 @@
+name: Build LibreGram Arch package
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build package on Arch Linux
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Verify build secrets
+        env:
+          LIBREGRAM_API_ID: ${{ secrets.LIBREGRAM_API_ID }}
+          LIBREGRAM_API_HASH: ${{ secrets.LIBREGRAM_API_HASH }}
+        run: |
+          if [[ -z "$LIBREGRAM_API_ID" || -z "$LIBREGRAM_API_HASH" ]]; then
+            echo "::error::Add LIBREGRAM_API_ID and LIBREGRAM_API_HASH in Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+
+      - name: Build package in Arch Linux container
+        env:
+          LIBREGRAM_API_ID: ${{ secrets.LIBREGRAM_API_ID }}
+          LIBREGRAM_API_HASH: ${{ secrets.LIBREGRAM_API_HASH }}
+        run: |
+          docker run --rm \
+            -e LIBREGRAM_API_ID \
+            -e LIBREGRAM_API_HASH \
+            -v "$GITHUB_WORKSPACE:/workspace" \
+            -w /workspace/packaging/arch \
+            archlinux:base-devel \
+            bash -euo pipefail -c '
+              pacman -Syu --noconfirm
+              useradd --create-home builder
+              printf 'builder ALL=(ALL:ALL) NOPASSWD: ALL\\n' > /etc/sudoers.d/builder
+              chmod 440 /etc/sudoers.d/builder
+              chown -R builder:builder /workspace
+              runuser -u builder -- env \
+                HOME=/home/builder USER=builder LOGNAME=builder \
+                LIBREGRAM_API_ID="$LIBREGRAM_API_ID" \
+                LIBREGRAM_API_HASH="$LIBREGRAM_API_HASH" \
+                CMAKE_BUILD_PARALLEL_LEVEL=2 \
+                makepkg --noconfirm --syncdeps --clean --cleanbuild
+            '
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: libregram-arch-x86_64
+          path: packaging/arch/*.pkg.tar.zst
+          if-no-files-found: error
+          retention-days: 14
