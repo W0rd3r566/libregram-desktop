@@ -153,10 +153,13 @@ QString ChatIdLabel(int option) {
 }
 
 void LibreGramProfilesBox(not_null<Ui::GenericBox*> box);
+void LibreGramArchivedProfilesBox(not_null<Ui::GenericBox*> box);
+void LibreGramProfilesBoxImpl(not_null<Ui::GenericBox*> box, bool archivedView);
 
 void LibreGramEditProfileBox(
 		not_null<Ui::GenericBox*> box,
-		const ::LibreGram::Profiles::Profile &profile) {
+		const ::LibreGram::Profiles::Profile &profile,
+		bool archivedView) {
 	box->setTitle(ktr("ktg_profiles_edit"));
 
 	const auto name = box->addRow(
@@ -202,7 +205,8 @@ void LibreGramEditProfileBox(
 			return;
 		}
 		box->closeBox();
-		Ui::show(Box<Ui::GenericBox>(LibreGramProfilesBox));
+		Ui::show(Box<Ui::GenericBox>(
+			archivedView ? LibreGramArchivedProfilesBox : LibreGramProfilesBox));
 	};
 	QObject::connect(
 		tags,
@@ -254,7 +258,9 @@ void LibreGramCreateProfileBox(not_null<Ui::GenericBox*> box) {
 	box->setWidth(st::aboutWidth);
 }
 
-void LibreGramProfilesBox(not_null<Ui::GenericBox*> box) {
+void LibreGramProfilesBoxImpl(
+		not_null<Ui::GenericBox*> box,
+		bool archivedView) {
 	box->setTitle(ktr("ktg_profiles_title"));
 	auto layout = box->verticalLayout();
 	layout->add(
@@ -264,8 +270,22 @@ void LibreGramProfilesBox(not_null<Ui::GenericBox*> box) {
 			st::aboutLabel),
 		st::boxRowPadding);
 
+	const auto navigation = layout->add(object_ptr<Button>(
+		box,
+		archivedView
+			? ktr("ktg_profiles_back_to_active")
+			: ktr("ktg_profiles_show_archived"),
+		st::settingsButtonNoIcon), st::boxRowPadding);
+	navigation->addClickHandler([=] {
+		box->closeBox();
+		Ui::show(Box<Ui::GenericBox>(
+			archivedView ? LibreGramProfilesBox : LibreGramArchivedProfilesBox));
+	});
+
 	QString loadError;
-	const auto profiles = ::LibreGram::Profiles::List(&loadError);
+	const auto profiles = archivedView
+		? ::LibreGram::Profiles::ListArchived(&loadError)
+		: ::LibreGram::Profiles::List(&loadError);
 	if (!loadError.isEmpty()) {
 		layout->add(
 			object_ptr<Ui::FlatLabel>(
@@ -277,7 +297,9 @@ void LibreGramProfilesBox(not_null<Ui::GenericBox*> box) {
 		layout->add(
 			object_ptr<Ui::FlatLabel>(
 				box,
-				ktr("ktg_profiles_empty"),
+				ktr(archivedView
+					? "ktg_profiles_archived_empty"
+					: "ktg_profiles_empty"),
 				st::aboutLabel),
 			st::boxRowPadding);
 	} else {
@@ -363,8 +385,30 @@ void LibreGramProfilesBox(not_null<Ui::GenericBox*> box) {
 				box->closeBox();
 				Ui::show(Box<Ui::GenericBox>(
 					[=](not_null<Ui::GenericBox*> editBox) {
-						LibreGramEditProfileBox(editBox, profile);
+						LibreGramEditProfileBox(editBox, profile, archivedView);
 					}));
+			});
+
+			const auto archive = inner->add(object_ptr<Button>(
+				inner,
+				archivedView
+					? ktr("ktg_profiles_restore")
+					: ktr("ktg_profiles_archive"),
+				st::settingsButtonNoIcon));
+			archive->addClickHandler([=] {
+				QString error;
+				if (!::LibreGram::Profiles::SetArchived(
+						profile.id,
+						!archivedView,
+						&error)) {
+					Ui::show(Ui::MakeInformBox(error));
+					return;
+				}
+				box->closeBox();
+				Ui::show(Box<Ui::GenericBox>(
+					archivedView
+						? LibreGramArchivedProfilesBox
+						: LibreGramProfilesBox));
 			});
 
 			auto searchValue = profile.name + u" "_q + profile.group
@@ -396,18 +440,28 @@ void LibreGramProfilesBox(not_null<Ui::GenericBox*> box) {
 			[=] { filterProfiles(); });
 	}
 
-	box->addButton(ktr("ktg_profiles_create"), [=] {
-		if (!loadError.isEmpty()) {
-			Ui::show(Ui::MakeInformBox(loadError));
-			return;
-		}
-		box->closeBox();
-		Ui::show(Box<Ui::GenericBox>(LibreGramCreateProfileBox));
-	});
+	if (!archivedView) {
+		box->addButton(ktr("ktg_profiles_create"), [=] {
+			if (!loadError.isEmpty()) {
+				Ui::show(Ui::MakeInformBox(loadError));
+				return;
+			}
+			box->closeBox();
+			Ui::show(Box<Ui::GenericBox>(LibreGramCreateProfileBox));
+		});
+	}
 	box->addButton(tr::lng_close(), [=] {
 		box->closeBox();
 	});
 	box->setWidth(st::aboutWidth);
+}
+
+void LibreGramProfilesBox(not_null<Ui::GenericBox*> box) {
+	LibreGramProfilesBoxImpl(box, false);
+}
+
+void LibreGramArchivedProfilesBox(not_null<Ui::GenericBox*> box) {
+	LibreGramProfilesBoxImpl(box, true);
 }
 
 } // namespace
