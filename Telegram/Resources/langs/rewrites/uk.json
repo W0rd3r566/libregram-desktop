@@ -186,5 +186,10 @@
 	"ktg_profiles_group": "Група (необов’язково)",
 	"ktg_profiles_tags": "Мітки через кому (необов’язково)",
 	"ktg_profiles_last_launched": "Останній запуск: {time}",
-	"ktg_profiles_never_launched": "Ще не запускався"
+	"ktg_profiles_never_launched": "Ще не запускався",
+	"ktg_profiles_show_archived": "Архів профілів",
+	"ktg_profiles_archive": "До архіву",
+	"ktg_profiles_restore": "Відновити",
+	"ktg_profiles_archived_empty": "Архів порожній.",
+	"ktg_profiles_back_to_active": "До активних профілів"
 }

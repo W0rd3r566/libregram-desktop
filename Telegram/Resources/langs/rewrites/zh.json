@@ -171,5 +171,10 @@
 	"ktg_profiles_group": "分组（可选）",
 	"ktg_profiles_tags": "用逗号分隔的标签（可选）",
 	"ktg_profiles_last_launched": "上次启动：{time}",
-	"ktg_profiles_never_launched": "尚未启动"
+	"ktg_profiles_never_launched": "尚未启动",
+	"ktg_profiles_show_archived": "已归档的配置文件",
+	"ktg_profiles_archive": "归档配置文件",
+	"ktg_profiles_restore": "恢复配置文件",
+	"ktg_profiles_archived_empty": "归档为空。",
+	"ktg_profiles_back_to_active": "返回活动配置文件"
 }

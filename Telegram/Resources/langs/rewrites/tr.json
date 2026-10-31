@@ -186,5 +186,10 @@
 	"ktg_profiles_group": "Grup (isteğe bağlı)",
 	"ktg_profiles_tags": "Virgülle ayrılmış etiketler (isteğe bağlı)",
 	"ktg_profiles_last_launched": "Son başlatma: {time}",
-	"ktg_profiles_never_launched": "Henüz başlatılmadı"
+	"ktg_profiles_never_launched": "Henüz başlatılmadı",
+	"ktg_profiles_show_archived": "Arşivlenmiş profiller",
+	"ktg_profiles_archive": "Profili arşivle",
+	"ktg_profiles_restore": "Profili geri yükle",
+	"ktg_profiles_archived_empty": "Arşiv boş.",
+	"ktg_profiles_back_to_active": "Etkin profillere dön"
 }

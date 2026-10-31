@@ -186,5 +186,10 @@
 	"ktg_profiles_group": "Grupo (opcional)",
 	"ktg_profiles_tags": "Tags separados por vírgulas (opcional)",
 	"ktg_profiles_last_launched": "Última execução: {time}",
-	"ktg_profiles_never_launched": "Ainda não foi iniciado"
+	"ktg_profiles_never_launched": "Ainda não foi iniciado",
+	"ktg_profiles_show_archived": "Perfis arquivados",
+	"ktg_profiles_archive": "Arquivar perfil",
+	"ktg_profiles_restore": "Restaurar perfil",
+	"ktg_profiles_archived_empty": "O arquivo está vazio.",
+	"ktg_profiles_back_to_active": "Voltar aos perfis ativos"
 }
