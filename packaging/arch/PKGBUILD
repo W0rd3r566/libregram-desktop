@@ -64,6 +64,7 @@ optdepends=(
   'xdg-desktop-portal: desktop integration'
 )
 makedepends=(
+  'libtg_owt'
   'boost'
   'cargo'
   'cmake'
