@@ -82,12 +82,18 @@ makedepends=(
   'vulkan-headers'
 )
 _source_commit='99e0427362f4be7f44db6122ba0ae3a6c89d2d05'
-source=("${pkgname}::git+https://github.com/W0rd3r566/libregram-desktop.git#commit=${_source_commit}")
-sha256sums=('SKIP')
+# TDLib revision used to build the standalone tde2e CMake package.
+_td_commit='4c6377aa7386c39217878a9a56d581922ad37ca4'
+source=(
+  "${pkgname}::git+https://github.com/W0rd3r566/libregram-desktop.git#commit=${_source_commit}"
+  "td::git+https://github.com/tdlib/td.git#commit=${_td_commit}"
+)
+sha256sums=('SKIP' 'SKIP')
 
 
 prepare() {
   git -C "$srcdir/$pkgname" submodule update --init --recursive
+  git -C "$srcdir/td" submodule update --init --recursive
 }
 
 _load_libregram_env() {
@@ -116,6 +122,8 @@ _load_libregram_env() {
 
 build() {
   local _builddir="$srcdir/${pkgname}-build"
+  local _td_builddir="$srcdir/td-build"
+  local _td_prefix="$srcdir/td-install"
   _load_libregram_env
   : "${LIBREGRAM_API_ID:?Set LIBREGRAM_API_ID in the repository .env file}"
   : "${LIBREGRAM_API_HASH:?Set LIBREGRAM_API_HASH in the repository .env file}"
@@ -129,6 +137,19 @@ build() {
     return 1
   }
 
+  # Build TDLib's E2E library separately. Packaged Linux builds expect the
+  # tde2e CMake package to be installed before configuring Telegram Desktop.
+  cmake -S "$srcdir/td" -B "$_td_builddir" -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX="$_td_prefix" \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DBUILD_TESTING=OFF \
+    -DTD_E2E_ONLY=ON
+
+  cmake --build "$_td_builddir" \
+    --parallel "${CMAKE_BUILD_PARALLEL_LEVEL:-2}"
+  cmake --install "$_td_builddir"
+
   cmake -S "$srcdir/$pkgname" -B "$_builddir" -G Ninja \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr \
@@ -136,6 +157,7 @@ build() {
     -DLIBREGRAM_VERSION="${pkgver}" \
     -DDESKTOP_APP_USE_PACKAGED=ON \
     -DDESKTOP_APP_DISABLE_AUTOUPDATE=ON \
+    -Dtde2e_DIR="$_td_prefix/lib/cmake/tde2e" \
     -DTDESKTOP_API_ID="$LIBREGRAM_API_ID" \
     -DTDESKTOP_API_HASH="$LIBREGRAM_API_HASH"
 
