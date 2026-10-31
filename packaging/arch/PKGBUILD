@@ -82,7 +82,7 @@ makedepends=(
   'tl-expected'
   'vulkan-headers'
 )
-_source_commit='99e0427362f4be7f44db6122ba0ae3a6c89d2d05'
+_source_commit='dd4f90002099de8dae4d9c885c702e4fdd7db528'
 # TDLib revision used to build the standalone tde2e CMake package.
 _td_commit='4c6377aa7386c39217878a9a56d581922ad37ca4'
 source=(
