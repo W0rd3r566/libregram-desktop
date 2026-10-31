@@ -41,9 +41,9 @@ jobs:
             bash -euo pipefail -c '
               pacman -Syu --noconfirm sudo
               useradd --create-home builder
-              printf "%s\\n" "builder ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/builder
+              echo "builder ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/builder
               chmod 440 /etc/sudoers.d/builder
-              chown -R builder:builder /workspace
+              chown -R builder:builder /workspace/packaging/arch
               runuser -u builder -- env \
                 HOME=/home/builder USER=builder LOGNAME=builder \
                 LIBREGRAM_API_ID="$LIBREGRAM_API_ID" \
