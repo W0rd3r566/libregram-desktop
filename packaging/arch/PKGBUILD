@@ -91,9 +91,74 @@ prepare() {
   git -C "$srcdir/$pkgname" submodule update --init --recursive
 }
 
+_load_libregram_env() {
+  local env_file="${startdir}/../../.env"
+  local line key value
+
+  [[ -f "$env_file" ]] || return 0
+
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    line="${line%
+  [[ "$LIBREGRAM_API_ID" =~ ^[0-9]+$ ]] || {
+    printf '%s\n' 'LIBREGRAM_API_ID must contain digits only.' >&2
+    return 1
+  }
+  [[ "$LIBREGRAM_API_HASH" =~ ^[[:xdigit:]]{32}$ ]] || {
+    printf '%s\n' 'LIBREGRAM_API_HASH must be a 32-character hexadecimal value.' >&2
+    return 1
+  }
+
+  cmake -S "$srcdir/$pkgname" -B "$_builddir" -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DLIBREGRAM_VERSION="${pkgver}" \
+    -DDESKTOP_APP_USE_PACKAGED=ON \
+    -DDESKTOP_APP_DISABLE_AUTOUPDATE=ON \
+    -DTDESKTOP_API_ID="$LIBREGRAM_API_ID" \
+    -DTDESKTOP_API_HASH="$LIBREGRAM_API_HASH"
+
+  cmake --build "$_builddir" --target Telegram \
+    --parallel "${CMAKE_BUILD_PARALLEL_LEVEL:-2}"
+}
+
+package() {
+  DESTDIR="$pkgdir" cmake --install "$_builddir"
+
+  install -Dm644 "$srcdir/$pkgname/LICENSE" \
+    "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+
+  if [[ ! -x "$pkgdir/usr/bin/LibreGram" ]]; then
+    printf '%s\n' 'Expected executable /usr/bin/LibreGram was not installed.' >&2
+    return 1
+  fi
+
+  # CMakeCache.txt stores the API credentials in plain text. Remove the
+  # build tree after staging the package so the credentials are not left
+  # in makepkg's temporary directory after a successful build.
+  rm -rf -- "$_builddir"
+}
+\\r'}"
+    [[ "$line" =~ ^[[:space:]]*$ || "$line" =~ ^[[:space:]]*# ]] && continue
+
+    if [[ "$line" =~ ^(LIBREGRAM_API_ID|LIBREGRAM_API_HASH)=([^[:space:]]+)$ ]]; then
+      key="${BASH_REMATCH[1]}"
+      value="${BASH_REMATCH[2]}"
+      if [[ -z "${!key:-}" ]]; then
+        printf -v "$key" '%s' "$value"
+        export "$key"
+      fi
+    else
+      printf 'Invalid line in %s. Use KEY=value without spaces or quotes.\\n' "$env_file" >&2
+      return 1
+    fi
+  done < "$env_file"
+}
+
 build() {
-  : "${LIBREGRAM_API_ID:?Export LIBREGRAM_API_ID before running makepkg}"
-  : "${LIBREGRAM_API_HASH:?Export LIBREGRAM_API_HASH before running makepkg}"
+  _load_libregram_env
+  : "${LIBREGRAM_API_ID:?Set LIBREGRAM_API_ID in the repository .env file}"
+  : "${LIBREGRAM_API_HASH:?Set LIBREGRAM_API_HASH in the repository .env file}"
 
   [[ "$LIBREGRAM_API_ID" =~ ^[0-9]+$ ]] || {
     printf '%s\n' 'LIBREGRAM_API_ID must contain digits only.' >&2
