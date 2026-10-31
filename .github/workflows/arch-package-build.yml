@@ -41,13 +41,15 @@ jobs:
             bash -euo pipefail -c '
               pacman -Syu --noconfirm
               useradd --create-home builder
+              printf 'builder ALL=(ALL:ALL) NOPASSWD: ALL\\n' > /etc/sudoers.d/builder
+              chmod 440 /etc/sudoers.d/builder
               chown -R builder:builder /workspace
               runuser -u builder -- env \
                 HOME=/home/builder USER=builder LOGNAME=builder \
                 LIBREGRAM_API_ID="$LIBREGRAM_API_ID" \
                 LIBREGRAM_API_HASH="$LIBREGRAM_API_HASH" \
                 CMAKE_BUILD_PARALLEL_LEVEL=2 \
-                makepkg --syncdeps --clean --cleanbuild
+                makepkg --noconfirm --syncdeps --clean --cleanbuild
             '
 
       - name: Upload package artifact
