@@ -25,8 +25,8 @@ CachyOS основан на Arch Linux и использует pacman/makepkg. �
 
 1. Клонировать ветку `libregram/dev`.
 2. Перейти в `packaging/arch`.
-3. Подготовить собственные API credentials в переменных `LIBREGRAM_API_ID` и `LIBREGRAM_API_HASH`.
-4. Выполнить `makepkg --syncdeps --clean --cleanbuild`.
+3. Один раз создать `.env` в корне репозитория с `LIBREGRAM_API_ID` и `LIBREGRAM_API_HASH` (файл исключён из Git).
+4. Перейти в `packaging/arch` и выполнить `makepkg --syncdeps --clean --cleanbuild`.
 5. Установить пакет через `sudo pacman -U`.
 
 Не используйте для публичной сборки credentials от другого проекта. Для LibreGram нужна отдельная пара; она попадёт в бинарный файл и может быть извлечена. Не добавляйте её в PKGBUILD, исходники, issue или CI-логи.
