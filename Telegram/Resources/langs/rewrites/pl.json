@@ -186,5 +186,10 @@
 	"ktg_profiles_group": "Grupa (opcjonalnie)",
 	"ktg_profiles_tags": "Tagi oddzielone przecinkami (opcjonalnie)",
 	"ktg_profiles_last_launched": "Ostatnio uruchomiono: {time}",
-	"ktg_profiles_never_launched": "Jeszcze nie uruchomiono"
+	"ktg_profiles_never_launched": "Jeszcze nie uruchomiono",
+	"ktg_profiles_show_archived": "Zarchiwizowane profile",
+	"ktg_profiles_archive": "Archiwizuj profil",
+	"ktg_profiles_restore": "Przywróć profil",
+	"ktg_profiles_archived_empty": "Archiwum jest puste.",
+	"ktg_profiles_back_to_active": "Wróć do aktywnych profili"
 }

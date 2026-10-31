@@ -171,5 +171,10 @@
 	"ktg_profiles_group": "Grupo (opcional)",
 	"ktg_profiles_tags": "Etiquetas separadas por comas (opcional)",
 	"ktg_profiles_last_launched": "Último inicio: {time}",
-	"ktg_profiles_never_launched": "Aún no se ha iniciado"
+	"ktg_profiles_never_launched": "Aún no se ha iniciado",
+	"ktg_profiles_show_archived": "Perfiles archivados",
+	"ktg_profiles_archive": "Archivar perfil",
+	"ktg_profiles_restore": "Restaurar perfil",
+	"ktg_profiles_archived_empty": "El archivo está vacío.",
+	"ktg_profiles_back_to_active": "Volver a los perfiles activos"
 }
