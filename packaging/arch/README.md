@@ -29,14 +29,19 @@ Install the basic packaging tools:
 sudo pacman -S --needed base-devel git
 ```
 
-Read the credentials without echoing the hash into the terminal, then export them for this build:
+Create the repository-root `.env` file once. The build reads it automatically, so you will not need to enter the credentials on every build:
 
 ```bash
-read -rp "Telegram API ID: " LIBREGRAM_API_ID
-read -rsp "Telegram API hash: " LIBREGRAM_API_HASH
-printf '\n'
-export LIBREGRAM_API_ID LIBREGRAM_API_HASH
+cd libregram-desktop
+cat > .env <<'EOF'
+LIBREGRAM_API_ID=your_api_id
+LIBREGRAM_API_HASH=your_api_hash
+EOF
+chmod 600 .env
+cd packaging/arch
 ```
+
+Replace the example values with your Telegram application's own API credentials. Keep `.env` private; it is ignored by Git. You can also export either variable in the shell to override the corresponding value from `.env`.
 
 Build the package. The default parallelism is limited to two jobs to keep memory use reasonable; override it when your machine has enough RAM:
 
