@@ -25,7 +25,7 @@ For license and copyright information, see the LICENSE file.
 namespace LibreGram::Profiles {
 namespace {
 
-constexpr auto kRegistrySchema = 3;
+constexpr auto kRegistrySchema = 4;
 constexpr auto kProfileGroupLimit = 40;
 constexpr auto kProfileTagLimit = 24;
 constexpr auto kMaxProfileTags = 8;
@@ -161,6 +161,9 @@ bool ReadRegistry(std::vector<Profile> *profiles, QString *error) {
 			.lastLaunchedAt = object.value(u"lastLaunchedAt"_q).toString(),
 			.favorite = object.value(u"favorite"_q).toBool(),
 		};
+		profile.archived = schema >= 4
+			? object.value(u"archived"_q).toBool()
+			: false;
 		if (!IsValidId(profile.id)
 			|| profile.name.isEmpty()
 			|| profile.name.size() > kProfileNameLimit
@@ -169,6 +172,7 @@ bool ReadRegistry(std::vector<Profile> *profiles, QString *error) {
 			|| (schema >= 3
 				&& (!object.value(u"group"_q).isString()
 					|| !object.value(u"tags"_q).isArray()))
+			|| (schema >= 4 && !object.value(u"archived"_q).isBool())
 			|| seen.contains(profile.id.toLower())) {
 			return SetError(error, u"The profiles registry contains invalid profile metadata."_q);
 		}
@@ -220,6 +224,7 @@ bool WriteRegistry(
 		object.insert(u"createdAt"_q, profile.createdAt);
 		object.insert(u"lastLaunchedAt"_q, profile.lastLaunchedAt);
 		object.insert(u"favorite"_q, profile.favorite);
+		object.insert(u"archived"_q, profile.archived);
 		object.insert(u"group"_q, profile.group);
 		auto tags = QJsonArray();
 		for (const auto &tag : profile.tags) {
@@ -301,13 +306,21 @@ bool ValidateGroupAndTags(
 	return true;
 }
 
-} // namespace
-
-std::vector<Profile> List(QString *error) {
+std::vector<Profile> ListWithArchiveState(
+		bool archived,
+		QString *error) {
 	auto result = std::vector<Profile>();
 	if (!ReadRegistry(&result, error)) {
 		return {};
 	}
+	result.erase(
+		std::remove_if(
+			result.begin(),
+			result.end(),
+			[=](const Profile &profile) {
+				return profile.archived != archived;
+			}),
+		result.end());
 	std::sort(result.begin(), result.end(), [](const Profile &a, const Profile &b) {
 		if (a.favorite != b.favorite) {
 			return a.favorite;
@@ -324,6 +337,16 @@ std::vector<Profile> List(QString *error) {
 		return a.name.toCaseFolded() < b.name.toCaseFolded();
 	});
 	return result;
+}
+
+} // namespace
+
+std::vector<Profile> List(QString *error) {
+	return ListWithArchiveState(false, error);
+}
+
+std::vector<Profile> ListArchived(QString *error) {
+	return ListWithArchiveState(true, error);
 }
 
 bool Create(const QString &value, Profile *created, QString *error) {
@@ -408,6 +431,40 @@ bool SetFavorite(
 	return WriteRegistry(profiles, error);
 }
 
+bool SetArchived(
+		const QString &id,
+		bool archived,
+		QString *error) {
+	if (!IsValidId(id)) {
+		return SetError(error, u"Invalid profile identifier."_q);
+	}
+	if (!EnsurePrivateDirectory(DataRoot())) {
+		return SetError(error, u"Could not access the LibreGram data directory."_q);
+	}
+	const auto lock = RegistryLock(error);
+	if (!lock.locked()) {
+		return false;
+	}
+	auto profiles = std::vector<Profile>();
+	if (!ReadRegistry(&profiles, error)) {
+		return false;
+	}
+	const auto i = std::find_if(
+		profiles.begin(),
+		profiles.end(),
+		[&](const Profile &profile) {
+			return profile.id.compare(id, Qt::CaseInsensitive) == 0;
+		});
+	if (i == profiles.end()) {
+		return SetError(error, u"Profile not found."_q);
+	}
+	if (i->archived == archived) {
+		return true;
+	}
+	i->archived = archived;
+	return WriteRegistry(profiles, error);
+}
+
 bool Update(
 		const QString &id,
 		const QString &value,
@@ -481,6 +538,9 @@ bool Launch(const QString &id, QString *error) {
 		});
 	if (i == profiles.end()) {
 		return SetError(error, u"Profile not found."_q);
+	}
+	if (i->archived) {
+		return SetError(error, u"Restore this archived profile before launching it."_q);
 	}
 
 	const auto path = ProfileDirectory(i->id);

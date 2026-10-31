@@ -21,9 +21,12 @@ struct Profile {
 	bool favorite = false;
 	QString group;
 	QStringList tags;
+	bool archived = false;
 };
 
 [[nodiscard]] std::vector<Profile> List(QString *error = nullptr);
+
+[[nodiscard]] std::vector<Profile> ListArchived(QString *error = nullptr);
 
 [[nodiscard]] bool Create(
 	const QString &name,
@@ -44,6 +47,11 @@ struct Profile {
 [[nodiscard]] bool SetFavorite(
 	const QString &id,
 	bool favorite,
+	QString *error = nullptr);
+
+[[nodiscard]] bool SetArchived(
+	const QString &id,
+	bool archived,
 	QString *error = nullptr);
 
 } // namespace LibreGram::Profiles
