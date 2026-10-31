@@ -39,9 +39,9 @@ jobs:
             -w /workspace/packaging/arch \
             archlinux:base-devel \
             bash -euo pipefail -c '
-              pacman -Syu --noconfirm
+              pacman -Syu --noconfirm sudo
               useradd --create-home builder
-              printf 'builder ALL=(ALL:ALL) NOPASSWD: ALL\\n' > /etc/sudoers.d/builder
+              printf "%s\\n" "builder ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/builder
               chmod 440 /etc/sudoers.d/builder
               chown -R builder:builder /workspace
               runuser -u builder -- env \
