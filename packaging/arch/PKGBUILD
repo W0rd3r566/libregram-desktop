@@ -85,7 +85,6 @@ _source_commit='99e0427362f4be7f44db6122ba0ae3a6c89d2d05'
 source=("${pkgname}::git+https://github.com/W0rd3r566/libregram-desktop.git#commit=${_source_commit}")
 sha256sums=('SKIP')
 
-_builddir="$srcdir/libregram-build"
 
 prepare() {
   git -C "$srcdir/$pkgname" submodule update --init --recursive
@@ -116,6 +115,7 @@ _load_libregram_env() {
 }
 
 build() {
+  local _builddir="$srcdir/${pkgname}-build"
   _load_libregram_env
   : "${LIBREGRAM_API_ID:?Set LIBREGRAM_API_ID in the repository .env file}"
   : "${LIBREGRAM_API_HASH:?Set LIBREGRAM_API_HASH in the repository .env file}"
@@ -144,6 +144,7 @@ build() {
 }
 
 package() {
+  local _builddir="$srcdir/${pkgname}-build"
   DESTDIR="$pkgdir" cmake --install "$_builddir"
 
   install -Dm644 "$srcdir/$pkgname/LICENSE" \
