@@ -186,5 +186,10 @@
 	"ktg_profiles_group": "קבוצה (אופציונלי)",
 	"ktg_profiles_tags": "תגיות מופרדות בפסיקים (אופציונלי)",
 	"ktg_profiles_last_launched": "הופעל לאחרונה: {time}",
-	"ktg_profiles_never_launched": "טרם הופעל"
+	"ktg_profiles_never_launched": "טרם הופעל",
+	"ktg_profiles_show_archived": "פרופילים בארכיון",
+	"ktg_profiles_archive": "העבר לארכיון",
+	"ktg_profiles_restore": "שחזור פרופיל",
+	"ktg_profiles_archived_empty": "הארכיון ריק.",
+	"ktg_profiles_back_to_active": "חזרה לפרופילים פעילים"
 }

@@ -186,5 +186,10 @@
 	"ktg_profiles_group": "گروه (اختیاری)",
 	"ktg_profiles_tags": "برچسب‌ها با ویرگول جدا شوند (اختیاری)",
 	"ktg_profiles_last_launched": "آخرین اجرا: {time}",
-	"ktg_profiles_never_launched": "هنوز اجرا نشده است"
+	"ktg_profiles_never_launched": "هنوز اجرا نشده است",
+	"ktg_profiles_show_archived": "نمایه‌های بایگانی‌شده",
+	"ktg_profiles_archive": "بایگانی نمایه",
+	"ktg_profiles_restore": "بازیابی نمایه",
+	"ktg_profiles_archived_empty": "بایگانی خالی است.",
+	"ktg_profiles_back_to_active": "بازگشت به نمایه‌های فعال"
 }

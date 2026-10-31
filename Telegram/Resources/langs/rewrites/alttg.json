@@ -186,5 +186,10 @@
 	"ktg_profiles_group": "Группа (необязательно)",
 	"ktg_profiles_tags": "Метки через запятую (необязательно)",
 	"ktg_profiles_last_launched": "Последний запуск: {time}",
-	"ktg_profiles_never_launched": "Ещё не запускался"
+	"ktg_profiles_never_launched": "Ещё не запускался",
+	"ktg_profiles_show_archived": "Архив профилей",
+	"ktg_profiles_archive": "В архив",
+	"ktg_profiles_restore": "Восстановить",
+	"ktg_profiles_archived_empty": "Архив пуст.",
+	"ktg_profiles_back_to_active": "К активным профилям"
 }
