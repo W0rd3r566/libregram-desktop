@@ -3,7 +3,7 @@
 The first packaging target is **x86_64 Arch Linux**, including CachyOS. The package uses the native CMake build and system Qt/libraries, then installs through pacman as a normal `.pkg.tar.zst` package.
 
 > [!WARNING]
-> Build LibreGram locally with your own Telegram API `api_id` and `api_hash`. CMake stores these values in its build cache, and they are compiled into the client. Do not upload your locally built package, build directory, logs or credentials to a public repository or release.
+> Build LibreGram with API credentials dedicated to the LibreGram Telegram application. CMake stores them in its build cache, and the client binary contains them. Anyone who receives a prebuilt binary may be able to recover its `api_hash`. Never commit credentials or upload the build directory/cache. For a public binary release, use a dedicated LibreGram app pair, not credentials reused by another project.
 
 ## Requirements
 
