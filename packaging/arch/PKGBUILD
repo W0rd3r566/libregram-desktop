@@ -92,19 +92,19 @@ prepare() {
 }
 
 _load_libregram_env() {
-  local env_file="\${startdir}/../../.env"
+  local env_file="${startdir}/../../.env"
   local line key value
 
   [[ -f "$env_file" ]] || return 0
 
   while IFS= read -r line || [[ -n "$line" ]]; do
-    line="\${line%$'\r'}"
+    line="${line%$'\r'}"
     [[ "$line" =~ ^[[:space:]]*$ || "$line" =~ ^[[:space:]]*# ]] && continue
 
     if [[ "$line" =~ ^(LIBREGRAM_API_ID|LIBREGRAM_API_HASH)=([^[:space:]]+)$ ]]; then
-      key="\${BASH_REMATCH[1]}"
-      value="\${BASH_REMATCH[2]}"
-      if [[ -z "\${!key:-}" ]]; then
+      key="${BASH_REMATCH[1]}"
+      value="${BASH_REMATCH[2]}"
+      if [[ -z "${!key:-}" ]]; then
         printf -v "$key" '%s' "$value"
         export "$key"
       fi
@@ -117,8 +117,8 @@ _load_libregram_env() {
 
 build() {
   _load_libregram_env
-  : "\${LIBREGRAM_API_ID:?Set LIBREGRAM_API_ID in the repository .env file}"
-  : "\${LIBREGRAM_API_HASH:?Set LIBREGRAM_API_HASH in the repository .env file}"
+  : "${LIBREGRAM_API_ID:?Set LIBREGRAM_API_ID in the repository .env file}"
+  : "${LIBREGRAM_API_HASH:?Set LIBREGRAM_API_HASH in the repository .env file}"
 
   [[ "$LIBREGRAM_API_ID" =~ ^[0-9]+$ ]] || {
     printf '%s\n' 'LIBREGRAM_API_ID must contain digits only.' >&2
