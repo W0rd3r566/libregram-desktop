@@ -1,0 +1,39 @@
+name: Arch package metadata
+
+on:
+  push:
+    branches: [libregram/dev]
+    paths:
+      - "packaging/arch/**"
+      - ".github/workflows/arch-package-check.yml"
+  pull_request:
+    branches: [libregram/dev]
+    paths:
+      - "packaging/arch/**"
+      - ".github/workflows/arch-package-check.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-pkgbuild:
+    name: Validate PKGBUILD on Arch Linux
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Check shell syntax and makepkg metadata
+        run: |
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:/workspace" \
+            -w /workspace/packaging/arch \
+            archlinux:base-devel \
+            bash -euo pipefail -c '
+              pacman -Syu --noconfirm
+              bash -n PKGBUILD
+              useradd --create-home builder
+              chown -R builder:builder /workspace
+              runuser -u builder -- makepkg --printsrcinfo >/dev/null
+            '
