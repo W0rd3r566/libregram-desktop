@@ -3,6 +3,8 @@ name: Build LibreGram Arch package
 on:
   workflow_dispatch:
   push:
+    branches:
+      - "libregram/dev"
     tags:
       - "v*"
 
