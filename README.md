@@ -4,7 +4,6 @@
 
 **An experimental Telegram Desktop fork with a familiar Kotatogram-inspired experience.**
 
-[![Arch package workflow](https://img.shields.io/github/actions/workflow/status/W0rd3r566/libregram-desktop/arch-package-build.yml?branch=dev&style=flat-square&label=Arch%20package)](https://github.com/W0rd3r566/libregram-desktop/actions/workflows/arch-package-build.yml)
 [![Development branch](https://img.shields.io/badge/development-dev-20242B?style=flat-square)](https://github.com/W0rd3r566/libregram-desktop/tree/dev)
 [![License](https://img.shields.io/badge/license-see%20LICENSE-20242B?style=flat-square)](LICENSE)
 
