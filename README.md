@@ -1,66 +1,67 @@
-# Kotatogram – experimental [Telegram Desktop][telegram_desktop] fork.
+<div align="center">
 
-[![GitHub release (latest by date including pre-releases)](https://badgen.net/github/release/kotatogram/kotatogram-desktop?label=Latest%20release)][releases]
-[![GitHub Workflow Status: Windows](https://github.com/kotatogram/kotatogram-desktop/workflows/Windows./badge.svg?event=push)][actions]
-[![GitHub Workflow Status: Linux](https://github.com/kotatogram/kotatogram-desktop/workflows/Linux%20Kotato./badge.svg?event=push)][actions]
-[![GitHub Workflow Status: macOS](https://github.com/kotatogram/kotatogram-desktop/workflows/MacOS./badge.svg?event=push)][actions]
-[![Crowdin](https://badges.crowdin.net/kotatogram-desktop/localized.svg)](https://crowdin.com/project/kotatogram-desktop)
+# LibreGram Desktop
 
-[![Preview of Kotatogram Desktop][preview_image]][preview_image_url]
+**An experimental Telegram Desktop fork with a familiar Kotatogram-inspired experience.**
 
-Build instructions can be found [in `docs` folder][build]. Please note: only [Windows][win] and [Linux][linux] build instructions are updated.
+[![Arch package workflow](https://img.shields.io/github/actions/workflow/status/W0rd3r566/libregram-desktop/arch-package-build.yml?branch=dev&style=flat-square&label=Arch%20package)](https://github.com/W0rd3r566/libregram-desktop/actions/workflows/arch-package-build.yml)
+[![Development branch](https://img.shields.io/badge/development-dev-20242B?style=flat-square)](https://github.com/W0rd3r566/libregram-desktop/tree/dev)
+[![License](https://img.shields.io/badge/license-see%20LICENSE-20242B?style=flat-square)](LICENSE)
 
-Original README with licenses could be found in [Telegram Desktop repository][telegram_desktop_readme].
+</div>
 
-## Download
-Binaries can be downloaded from releases: https://github.com/kotatogram/kotatogram-desktop/releases
+> **Project status:** experimental. LibreGram is under active development. Interfaces, build steps, and project structure may change.
 
-Latest stable version can be found here: https://github.com/kotatogram/kotatogram-desktop/releases/latest
+LibreGram Desktop is an independent project based on the Telegram Desktop codebase and the Kotatogram fork. The goal is to build on the familiar desktop experience while developing LibreGram-specific improvements.
 
-## Builds
-* Windows (installer and portable)
-* Linux (64-bit)
-  * [Flathub][flatpak]
-  * Other repositories:<br>[![Packaging status](https://repology.org/badge/vertical-allrepos/kotatogram-desktop.svg)][repology]
-* macOS
+LibreGram is **not affiliated with Telegram** or Telegram FZ-LLC.
 
-## Features
-* Local folders
-* Forward to multiple chats and forward without author
-* Custom font
-* Compact chat list
-* Custom text replaces
-* Change sticker size
-* Adaptive chat bubbles
-* and other smaller features.
+## What the current codebase brings
 
-Full list of features will rewritten later. Control branches were used to list features, but they are now deprecated and archived in [separate repo][archive].
+The inherited Kotatogram feature set includes:
+
+- Local chat folders
+- Forwarding to multiple chats
+- Compact chat list
+- Custom fonts and text replacements
+- Adjustable sticker size
+- Adaptive chat bubbles
+
+These describe capabilities from the upstream base. They are not a promise that every feature has been redesigned or independently maintained by LibreGram.
+
+## Build from source
+
+Build instructions currently focus on Linux and Windows:
+
+| Platform | Guide |
+|:--|:--|
+| Linux | [Build with Docker](docs/building-linux.md) |
+| Windows | [Build with Visual Studio](docs/building-win.md) |
+
+You need your own Telegram API credentials (**api_id** and **api_hash**) to build the application. See [how to obtain them](docs/api_credentials.md).
+
+**Keep credentials private.** Do not commit API values, local secrets, or credential-filled configuration files.
+
+## Downloads
+
+There are currently no public binary releases. Prebuilt packages will be linked here when they are ready.
+
+## Project structure
+
+- `Telegram/` — application source and build system
+- `docs/` — build notes and project documentation
+- `.github/workflows/` — automation and package workflows
 
 ## Contributing
-Read [CONTRIBUTING.md][contributing].
 
-## Other links
-* Website: https://kotatogram.github.io
-* English Telegram channel: https://t.me/kotatogram
-* Russian Telegram channel: https://t.me/kotatogram_ru
-* Trello (on Russian, abandoned): https://trello.com/b/G6zetXOH/kotatogram-desktop
+Issues and focused pull requests are welcome. Before proposing a change, check the existing source and documentation so work stays aligned with the upstream codebase and LibreGram's current direction.
 
-## Attribution
-* Ghost icon (for deleted accounts) is taken from [official Android app](https://github.com/DrKLO/Telegram).
-* Icons for local folders mostly are [Material Design Icons](https://materialdesignicons.com/).
+## Credits
 
-[//]: # (LINKS)
-[telegram_desktop]: https://desktop.telegram.org
-[releases]: https://github.com/kotatogram/kotatogram-desktop/releases
-[actions]: https://github.com/kotatogram/kotatogram-desktop/actions
-[telegram_desktop_readme]: https://github.com/telegramdesktop/tdesktop/blob/dev/README.md
-[repology]: https://repology.org/project/kotatogram-desktop/versions
-[flatpak]: https://flathub.org/apps/details/io.github.kotatogram
-[changelog]: https://github.com/kotatogram/kotatogram-desktop/blob/dev/kotatogram_changes.txt
-[preview_image]: https://github.com/kotatogram/kotatogram-desktop/blob/dev/docs/assets/ktg_preview.png "Preview of Kotatogram Desktop"
-[preview_image_url]: https://github.com/kotatogram/kotatogram-desktop/blob/dev/docs/assets/ktg_preview.png
-[contributing]: https://github.com/kotatogram/kotatogram-desktop/blob/dev/.github/CONTRIBUTING.md
-[archive]: https://github.com/kotatogram/kotatogram-archived
-[build]: https://github.com/kotatogram/kotatogram-desktop/blob/dev/docs
-[win]: https://github.com/kotatogram/kotatogram-desktop/blob/dev/docs/building-win.md
-[linux]: https://github.com/kotatogram/kotatogram-desktop/blob/dev/docs/building-linux.md
+LibreGram builds on the work of the [Telegram Desktop](https://github.com/telegramdesktop/tdesktop) and [Kotatogram](https://github.com/kotatogram/kotatogram-desktop) projects. Please see [LICENSE](LICENSE) and the upstream project notices for license and attribution details.
+
+---
+
+<div align="center">
+  <sub>LibreGram Desktop · Built in the open by W0rd3r</sub>
+</div>
