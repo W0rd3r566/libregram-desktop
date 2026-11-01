@@ -1,60 +1,74 @@
-## Build instructions for Linux using Docker
+# Build LibreGram Desktop on Linux
 
-### Prepare folder
+This guide builds the **development branch** of this repository inside the included Docker build environment.
 
-Choose a folder for the future build, for example **/home/user/TBuild**. It will be named ***BuildPath*** in the rest of this document. All commands will be launched from Terminal.
+## Requirements
 
-### Obtain your API credentials
+- Git
+- Docker
+- [Poetry](https://python-poetry.org/)
+- Your own Telegram API credentials: `api_id` and `api_hash`
 
-You will require **api_id** and **api_hash** to access the Telegram API servers. To learn how to obtain them [click here][api_credentials].
+See [API credentials](api_credentials.md) for the official instructions. Keep these values private and never commit them.
 
-### Clone source code and prepare libraries
+## 1. Clone LibreGram
 
-Install [poetry](https://python-poetry.org), go to ***BuildPath*** and run
+From the directory where you keep your projects, run:
 
-    git clone --recursive https://github.com/kotatogram/kotatogram-desktop.git
-    ./tdesktop/Telegram/build/prepare/linux.sh
+```bash
+git clone --recursive https://github.com/W0rd3r566/libregram-desktop.git
+cd libregram-desktop
+```
 
-### Building the project
+The repository's default branch is `dev`.
 
-Go to ***BuildPath*/kotatogram-desktop** and run (using [your **api_id** and **api_hash**](#obtain-your-api-credentials))
+## 2. Prepare the Docker build environment
 
-    docker run --rm -it \
-        -u $(id -u) \
-        -v "$PWD:/usr/src/tdesktop" \
-        kotatogram-desktop:centos_env \
-        /usr/src/tdesktop/Telegram/build/docker/centos_env/build.sh \
-        -D TDESKTOP_API_ID=YOUR_API_ID \
-        -D TDESKTOP_API_HASH=YOUR_API_HASH
+From the repository root:
 
-Or, to create a debug build, run (also using [your **api_id** and **api_hash**](#obtain-your-api-credentials))
+```bash
+./Telegram/build/prepare/linux.sh
+```
 
-    docker run --rm -it \
-        -u $(id -u) \
-        -v "$PWD:/usr/src/tdesktop" \
-        -e CONFIG=Debug \
-        kotatogram-desktop:centos_env \
-        /usr/src/tdesktop/Telegram/build/docker/centos_env/build.sh \
-        -D TDESKTOP_API_ID=YOUR_API_ID \
-        -D TDESKTOP_API_HASH=YOUR_API_HASH
+The script installs the Python build dependencies with Poetry and builds the Docker image named `tdesktop:centos_env`.
 
-The built files will be in the `out` directory.
+## 3. Build a release version
 
-### Visual Studio Code integration
+Run this from the **LibreGram repository root**. Replace the placeholders with your own API credentials:
 
-Ensure you've followed the instruction up to the [**Clone source code and prepare libraries**](#clone-source-code-and-prepare-libraries) step at least.
+```bash
+docker run --rm -it \
+  -u "$(id -u)" \
+  -v "$PWD:/usr/src/tdesktop" \
+  tdesktop:centos_env \
+  /usr/src/tdesktop/Telegram/build/docker/centos_env/build.sh \
+  -D TDESKTOP_API_ID=YOUR_API_ID \
+  -D TDESKTOP_API_HASH=YOUR_API_HASH
+```
 
-Open the repository in Visual Studio Code, install the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension and add the following to `.vscode/settings.json` (using [your **api_id** and **api_hash**](#obtain-your-api-credentials)):
+## 4. Build a debug version
 
-    {
-        "cmake.configureSettings": {
-            "TDESKTOP_API_ID": "YOUR_API_ID",
-            "TDESKTOP_API_HASH": "YOUR_API_HASH"
-        }
-    }
+Use the same command with `CONFIG=Debug` added to the container environment:
 
-After that, choose **Reopen in Container** via the menu triggered by the green button in bottom left corner and you're done.
+```bash
+docker run --rm -it \
+  -u "$(id -u)" \
+  -e CONFIG=Debug \
+  -v "$PWD:/usr/src/tdesktop" \
+  tdesktop:centos_env \
+  /usr/src/tdesktop/Telegram/build/docker/centos_env/build.sh \
+  -D TDESKTOP_API_ID=YOUR_API_ID \
+  -D TDESKTOP_API_HASH=YOUR_API_HASH
+```
 
-![Quick actions Status bar item](https://code.visualstudio.com/assets/docs/devcontainers/containers/remote-dev-status-bar.png)
+Build output is written to the repository's `out` directory.
 
-[api_credentials]: api_credentials.md
+## API credentials and secrets
+
+- Obtain your own credentials using the [official Telegram instructions](https://core.telegram.org/api/obtaining_api_id).
+- Do not paste real values into public issues, pull requests, screenshots, or committed files.
+- If you use an IDE configuration file for local credentials, make sure it stays untracked.
+
+## Notes
+
+The build scripts and Docker environment are inherited from the Telegram Desktop/Kotatogram build system. LibreGram-specific packaging and build steps may evolve; please report outdated instructions through the repository issue tracker.
