@@ -1,74 +1,90 @@
-# Build instructions for Windows
+# Build LibreGram Desktop on Windows
 
-- [Prepare folder](#prepare-folder)
-- [Install third party software](#install-third-party-software)
-- [Choose architecture and initialize terminal](#choose-architecture-and-initialize-terminal)
-- [Clone source code and prepare libraries](#clone-source-code-and-prepare-libraries)
-- [Build the project](#build-the-project)
-- [Qt Visual Studio Tools](#qt-visual-studio-tools)
+The build is performed with **Visual Studio 2026** and the **10.0.26100.0 SDK**.
 
-## Prepare folder
+## Prepare the build folder
 
-The build is done in **Visual Studio 2026** with **10.0.26100.0** SDK version.
+Choose an empty directory for the build, for example `D:\\TBuild`. It will be called `BuildPath` below.
 
-Choose an empty folder for the future build, for example **D:\\TBuild**. It will be named ***BuildPath*** in the rest of this document. Create two folders there, ***BuildPath*\\ThirdParty** and ***BuildPath*\\Libraries**.
+Create these directories:
 
-The default modern toolset from Visual Studio 2026 (`v145`) does not support Windows 7, so for Telegram Desktop you must use `-vcvars_ver=14.44` (`v144.4`, based on `v143` with Windows 7 support).
+- `BuildPath\\ThirdParty`
+- `BuildPath\\Libraries`
 
-### Obtain your API credentials
+The default Visual Studio 2026 toolset (`v145`) does not support Windows 7. The inherited Telegram Desktop build configuration uses `-vcvars_ver=14.44` (`v144.4`, based on `v143`).
 
-You will require **api_id** and **api_hash** to access the Telegram API servers. To learn how to obtain them [click here][api_credentials].
+## Obtain API credentials
 
-## Install third party software
+You need your own `api_id` and `api_hash` to access the Telegram API. Follow the [official instructions](https://core.telegram.org/api/obtaining_api_id).
 
-* Download **Python 3.10** installer from [https://www.python.org/downloads/](https://www.python.org/downloads/) and install it with adding to PATH.
-* Download **Git** installer from [https://git-scm.com/download/win](https://git-scm.com/download/win) and install it.
+Keep these values private. Do not commit them or share them in public logs and screenshots.
 
-## Choose architecture and initialize terminal
+## Install required tools
 
-Before preparing libraries and running build commands, initialize the Visual Studio environment for your target architecture.
-The default modern toolset from Visual Studio 2026 (`v145`) does not support Windows 7, so for Telegram Desktop you must use `-vcvars_ver=14.44` (`v144.4`, based on `v143` with Windows 7 support).
+- [Python 3.10](https://www.python.org/downloads/) (enable **Add Python to PATH**)
+- [Git for Windows](https://git-scm.com/download/win)
+- Visual Studio 2026 with the required C++ desktop development components and Windows SDK
 
-For `win` (32-bit):
+## Initialize the developer command prompt
 
-    %comspec% /k "C:\Program Files\Microsoft Visual Studio\18\Community\VC\Auxiliary\Build\vcvars32.bat" -vcvars_ver=14.44
+Open a command prompt initialized for your target architecture.
 
-For `win64` (64-bit):
+For 32-bit builds:
 
-    %comspec% /k "C:\Program Files\Microsoft Visual Studio\18\Community\VC\Auxiliary\Build\vcvars64.bat" -vcvars_ver=14.44
+```bat
+%comspec% /k "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Auxiliary\\Build\\vcvars32.bat" -vcvars_ver=14.44
+```
 
-Run both `Clone source code and prepare libraries` and `Build the project` sections in the terminal initialized with one of the commands above.
+For 64-bit builds:
 
-## Clone source code and prepare libraries
+```bat
+%comspec% /k "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Auxiliary\\Build\\vcvars64.bat" -vcvars_ver=14.44
+```
 
-In the initialized terminal, go to ***BuildPath*** and run
+Use the initialized terminal for the remaining steps.
 
-    git clone --recursive https://github.com/kotatogram/kotatogram-desktop.git
-    kotatogram-desktop\Telegram\build\prepare\win.bat
+## Clone LibreGram and prepare dependencies
 
-## Build the project
+Go to `BuildPath` and run:
 
-Go to ***BuildPath*\\kotatogram-desktop\\Telegram** and run (using [your **api_id** and **api_hash**](#obtain-your-api-credentials)):
+```bat
+git clone --recursive https://github.com/W0rd3r566/libregram-desktop.git
+cd libregram-desktop
+Telegram\\build\\prepare\\win.bat
+```
 
-For `win` (32-bit):
+## Configure the build
 
-    configure.bat -D TDESKTOP_API_ID=YOUR_API_ID -D TDESKTOP_API_HASH=YOUR_API_HASH
+Go to `BuildPath\\libregram-desktop\\Telegram`.
 
-For `win64` (64-bit):
+For 32-bit:
 
-    configure.bat x64 -D TDESKTOP_API_ID=YOUR_API_ID -D TDESKTOP_API_HASH=YOUR_API_HASH
+```bat
+configure.bat -D TDESKTOP_API_ID=YOUR_API_ID -D TDESKTOP_API_HASH=YOUR_API_HASH
+```
 
-* Open ***BuildPath*\\kotatogram-desktop\\out\\Telegram.slnx** in Visual Studio 2026
-* Select Telegram project and press Build > Build Telegram (Debug and Release configurations)
-* The result Kotatogram.exe will be located in **D:\TBuild\kotatogram-desktop\out\Debug** (and **Release**)
+For 64-bit:
 
-### Qt Visual Studio Tools
+```bat
+configure.bat x64 -D TDESKTOP_API_ID=YOUR_API_ID -D TDESKTOP_API_HASH=YOUR_API_HASH
+```
 
-For better debugging you may want to install Qt Visual Studio Tools:
+Replace the placeholders with your own API credentials.
 
-* Open **Extensions** -> **Manage Extensions**
-* Go to **Online** tab
-* Search for **Qt**
-* Install **Qt Visual Studio Tools** extension
+## Build
 
-[api_credentials]: api_credentials.md
+Open `BuildPath\\libregram-desktop\\out\\Telegram.slnx` in Visual Studio.
+
+Select the **Telegram** project and build it using the Debug or Release configuration. The executable is generated in the corresponding configuration directory under `out`.
+
+## Qt Visual Studio Tools (optional)
+
+For additional Qt debugging support:
+
+1. Open **Extensions → Manage Extensions** in Visual Studio.
+2. Search for **Qt Visual Studio Tools**.
+3. Install the extension and follow its setup instructions.
+
+## Notes
+
+These instructions follow the inherited Telegram Desktop build system. LibreGram-specific build details may change during development. If a step becomes outdated, please open an issue with the error message and relevant build environment details.
