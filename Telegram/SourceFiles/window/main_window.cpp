@@ -261,7 +261,7 @@ QIcon CreateIcon(Main::Session *session, bool returnNullIfDefault) {
 	}
 
 	const auto iconFromTheme = QIcon::fromTheme(
-		u"libregram"_q,
+		Platform::ApplicationIconName(),
 		officialIcon);
 
 	if (!Platform::IsX11()) {
@@ -948,7 +948,7 @@ void MainWindow::updateTitle() {
 		: Dialogs::Key();
 	const auto thread = key ? key.thread() : nullptr;
 	if (!thread) {
-		setTitle((user.isEmpty() ? u"Kotatogram"_q : user) + added + suffix);
+		setTitle((user.isEmpty() ? u"LibreGram"_q : user) + added + suffix);
 		return;
 	}
 	const auto history = thread->owningHistory();

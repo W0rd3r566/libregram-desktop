@@ -1006,7 +1006,7 @@ void Notification::updateNotifyDisplay() {
 				: TextWithEntities{ name };
 		};
 		auto title = options.hideNameAndPhoto
-			? TextWithEntities{ u"Kotatogram Desktop"_q }
+			? TextWithEntities{ u"LibreGram Desktop"_q }
 			: reminder
 			? tr::lng_notification_reminder(tr::now, tr::marked)
 			: topicWithChat();

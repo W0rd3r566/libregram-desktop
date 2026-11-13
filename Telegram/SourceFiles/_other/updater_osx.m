@@ -8,7 +8,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #import <Cocoa/Cocoa.h>
 #include <sys/xattr.h>
 
-NSString *appName = @"Kotatogram.app";
+NSString *appName = @"LibreGram.app";
 NSString *appDir = nil;
 NSString *workDir = nil;
 
@@ -56,7 +56,7 @@ void RemoveQuarantineAttribute(NSString *path) {
 
 void RemoveQuarantineFromBundle(NSString *path) {
 	RemoveQuarantineAttribute(path);
-	RemoveQuarantineAttribute([path stringByAppendingString:@"/Contents/MacOS/Kotatogram"]);
+	RemoveQuarantineAttribute([path stringByAppendingString:@"/Contents/MacOS/LibreGram"]);
 	RemoveQuarantineAttribute([path stringByAppendingString:@"/Contents/Helpers/crashpad_handler"]);
 	RemoveQuarantineAttribute([path stringByAppendingString:@"/Contents/Frameworks/Updater"]);
 }

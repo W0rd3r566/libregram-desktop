@@ -432,11 +432,9 @@ void BuildSectionButtons(SectionBuilder &builder) {
 	});
 
 	builder.addSectionButton({
-		.title = rktr("ktg_settings_kotato"),
+		.title = tr::lng_libregram_upstream_settings(),
 		.targetSection = Kotato::Id(),
-		.icon = { (::Kotato::JsonSettings::GetInt("custom_app_icon") == 5
-			? &st::settingsIconKotatoOld
-			: &st::settingsIconKotato) },
+		.icon = { &st::menuIconSettings },
 		.keywords = { u"kotato"_q },
 	});
 

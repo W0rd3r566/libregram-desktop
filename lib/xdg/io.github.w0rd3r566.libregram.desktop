@@ -1,15 +1,15 @@
 [Desktop Entry]
-Name=Kotatogram
+Name=LibreGram
 Comment=Experimental Telegram Desktop fork
-TryExec=Kotatogram
-Exec=Kotatogram -- %U
-Icon=io.github.kotatogram
+TryExec=LibreGram
+Exec=LibreGram -- %U
+Icon=io.github.w0rd3r566.libregram
 Terminal=false
-StartupWMClass=KotatogramDesktop
+StartupWMClass=LibreGramDesktop
 Type=Application
 Categories=Chat;Network;InstantMessaging;Qt;
 MimeType=x-scheme-handler/tg;x-scheme-handler/tonsite;
-Keywords=tg;chat;im;messaging;messenger;sms;tdesktop;kotatogram;
+Keywords=tg;chat;im;messaging;messenger;sms;tdesktop;libregram;
 Actions=quit;
 DBusActivatable=true
 SingleMainWindow=true
@@ -17,6 +17,6 @@ X-GNOME-UsesNotifications=true
 X-GNOME-SingleWindow=true
 
 [Desktop Action quit]
-Exec=Kotatogram -quit
-Name=Quit Kotatogram
+Exec=LibreGram -quit
+Name=Quit LibreGram
 Icon=application-exit

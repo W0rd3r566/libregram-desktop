@@ -2306,7 +2306,7 @@ bool checkReadyUpdate() {
 	QFileInfo updater(cWorkingDir() + u"tupdates/temp/Updater.exe"_q);
 #elif defined Q_OS_MAC // Q_OS_WIN
 	QString curUpdater = (cExeDir() + cExeName() + u"/Contents/Frameworks/Updater"_q);
-	QFileInfo updater(cWorkingDir() + u"tupdates/temp/Kotatogram.app/Contents/Frameworks/Updater"_q);
+	QFileInfo updater(cWorkingDir() + u"tupdates/temp/LibreGram.app/Contents/Frameworks/Updater"_q);
 #else // Q_OS_MAC
 	QString curUpdater = (cExeDir() + u"Updater"_q);
 	QFileInfo updater(cWorkingDir() + u"tupdates/temp/Updater"_q);
@@ -2391,7 +2391,7 @@ void UpdateApplication() {
 			return "https://itunes.apple.com/ae/app/telegram-desktop/id946399090";
 #else // OS_WIN_STORE || OS_MAC_STORE
 			if (KSandbox::isFlatpak()) {
-				return "https://flathub.org/apps/details/io.github.kotatogram";
+				return "https://github.com/W0rd3r566/libregram-desktop/releases";
 			//} else if (KSandbox::isSnap()) {
 			//	return "https://snapcraft.io/telegram-desktop";
 			}

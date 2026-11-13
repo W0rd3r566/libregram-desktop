@@ -84,7 +84,7 @@ void PreviewWindowTitle(Painter &p, const style::palette &palette, QRect body, i
 			: style::FontFlags()),
 		font.family()));
 
-	p.drawText(titleRect, u"Kotatogram"_q, style::al_center);
+	p.drawText(titleRect, u"LibreGram"_q, style::al_center);
 
 	auto isGraphite = ([NSColor currentControlTint] == NSGraphiteControlTint);
 	auto buttonSkip = 8;

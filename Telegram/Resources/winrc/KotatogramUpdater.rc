@@ -40,11 +40,11 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "CompanyName", "Kotatogram"
-            VALUE "FileDescription", "Kotatogram Desktop Updater"
+            VALUE "CompanyName", "LibreGram"
+            VALUE "FileDescription", "LibreGram Desktop Updater"
             VALUE "FileVersion", "1.4.9.0"
             VALUE "LegalCopyright", "Copyright (C) 2019-2022"
-            VALUE "ProductName", "Kotatogram Desktop"
+            VALUE "ProductName", "LibreGram Desktop"
             VALUE "ProductVersion", "1.4.9.0"
         END
     END

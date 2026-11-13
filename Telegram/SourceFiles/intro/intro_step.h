@@ -201,7 +201,6 @@ private:
 	[[nodiscard]] QPixmap prepareSlideAnimation();
 	void showFinished();
 
-	void prepareCoverMask();
 	void paintCover(QPainter &p, int top);
 
 	const not_null<Main::Account*> _account;
@@ -228,7 +227,6 @@ private:
 	Ui::Animations::Simple _a_show;
 	CoverAnimation _coverAnimation;
 	std::unique_ptr<Ui::SlideAnimation> _slideAnimation;
-	QPixmap _coverMask;
 
 };
 

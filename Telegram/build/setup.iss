@@ -1,9 +1,9 @@
-#define MyAppShortName "Kotatogram"
-#define MyAppName "Kotatogram Desktop"
-#define MyAppPublisher "Kotatogram"
-#define MyAppURL "https://kotatogram.github.io"
-#define MyAppExeName "Kotatogram.exe"
-#define MyAppId "C4A4AE8F-B9F7-4CC7-8A6C-BF7EEE87ACA5"
+#define MyAppShortName "LibreGram"
+#define MyAppName "LibreGram Desktop"
+#define MyAppPublisher "LibreGram"
+#define MyAppURL "https://github.com/W0rd3r566/libregram-desktop"
+#define MyAppExeName "LibreGram.exe"
+#define MyAppId "8FE679AA-C824-4775-97AB-ECC1044F78E5"
 #define CurrentYear GetDateTimeString('yyyy','','')
 
 [Setup]
@@ -24,7 +24,7 @@ AllowNoIcons=yes
 OutputDir={#ReleasePath}
 SetupIconFile={#SourcePath}..\Resources\art\icon256.ico
 UninstallDisplayName={#MyAppName}
-UninstallDisplayIcon={app}\Kotatogram.exe
+UninstallDisplayIcon={app}\LibreGram.exe
 Compression=lzma
 SolidCompression=yes
 DisableStartupPrompt=yes
@@ -78,7 +78,7 @@ Name: "ua";      MessagesFile: "compiler:Languages\Ukrainian.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 
 [Files]
-Source: "{#ReleasePath}\Kotatogram.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#ReleasePath}\LibreGram.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#ReleasePath}\Updater.exe"; DestDir: "{app}"; Flags: ignoreversion
 #if MyBuildTarget != "winarm"
 Source: "{#ReleasePath}\{#ModulesFolder}\d3d\d3dcompiler_47.dll"; DestDir: "{app}\{#ModulesFolder}\d3d"; Flags: ignoreversion

@@ -709,7 +709,7 @@ Kotato::Kotato(
 }
 
 rpl::producer<QString> Kotato::title() {
-	return rktr("ktg_settings_kotato");
+	return tr::lng_libregram_upstream_settings();
 }
 
 void Kotato::fillTopBarMenu(const Ui::Menu::MenuCallback &addAction) {

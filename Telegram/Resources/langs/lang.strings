@@ -8785,7 +8785,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 "lng_libregram_compact" = "Compact chat list";
 "lng_libregram_motion" = "Animations and power saving";
 "lng_libregram_client" = "Client preferences";
-"lng_libregram_upstream_settings" = "Kotatogram features";
+"lng_libregram_upstream_settings" = "Additional settings";
 "lng_libregram_about" = "LibreGram Desktop is an independent client based on Telegram Desktop and Kotatogram. Appearance and compact layout apply to this installation.";
 "lng_libregram_reduced_motion" = "Reduce interface animations";
 "lng_libregram_reduced_motion_about" = "Applies to interface transitions. Stickers and other effects can be configured below. System battery saving may also reduce animations.";

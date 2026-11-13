@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component type="desktop">
+    <id>io.github.w0rd3r566.libregram</id>
+    <metadata_license>CC0-1.0</metadata_license>
+    <project_license>GPL-3.0</project_license>
+    <name>LibreGram</name>
+    <summary>Experimental Telegram messenger</summary>
+    <description>
+        <p>Unofficial messaging app based on Telegram Desktop and Kotatogram.</p>
+        <p>Telegram is a popular messaging protocol with encryption and security as its key focus.</p>
+    </description>
+    <categories>
+        <category>Network</category>
+        <category>InstantMessaging</category>
+    </categories>
+    <developer_name>LibreGram contributors</developer_name>
+    <url type="homepage">https://github.com/W0rd3r566/libregram-desktop</url>
+    <url type="bugtracker">https://github.com/W0rd3r566/libregram-desktop</url>
+    <url type="vcs-browser">https://github.com/W0rd3r566/libregram-desktop</url>
+    <url type="contribute">https://github.com/W0rd3r566/libregram-desktop</url>
+    <branding>
+        <color type="primary" scheme_preference="light">#10b9df</color>
+        <color type="primary" scheme_preference="dark">#20242b</color>
+    </branding>
+    <keywords>
+        <keyword>tg</keyword>
+        <keyword>telegram</keyword>
+        <keyword>libregram</keyword>
+        <keyword>tdesktop</keyword>
+        <keyword>messaging</keyword>
+        <keyword>messenger</keyword>
+        <keyword>chat</keyword>
+        <keyword>sms</keyword>
+        <keyword>im</keyword>
+    </keywords>
+    <requires>
+        <!-- windowMinHeight from Telegram/SourceFiles/window/window.style -->
+        <display_length compare="ge">480</display_length>
+        <internet>always</internet>
+        <!-- on-screen keyboards are too big for current minimal display height -->
+        <control>keyboard</control>
+    </requires>
+    <supports>
+        <control>pointing</control>
+        <control>touch</control>
+    </supports>
+    <content_rating type="oars-1.1">
+        <content_attribute id="violence-cartoon">none</content_attribute>
+        <content_attribute id="violence-fantasy">none</content_attribute>
+        <content_attribute id="violence-realistic">none</content_attribute>
+        <content_attribute id="violence-bloodshed">none</content_attribute>
+        <content_attribute id="violence-sexual">none</content_attribute>
+        <content_attribute id="violence-desecration">none</content_attribute>
+        <content_attribute id="violence-slavery">none</content_attribute>
+        <content_attribute id="violence-worship">none</content_attribute>
+        <content_attribute id="drugs-alcohol">none</content_attribute>
+        <content_attribute id="drugs-narcotics">none</content_attribute>
+        <content_attribute id="drugs-tobacco">none</content_attribute>
+        <content_attribute id="sex-nudity">none</content_attribute>
+        <content_attribute id="sex-themes">none</content_attribute>
+        <content_attribute id="sex-homosexuality">none</content_attribute>
+        <content_attribute id="sex-prostitution">none</content_attribute>
+        <content_attribute id="sex-adultery">none</content_attribute>
+        <content_attribute id="sex-appearance">none</content_attribute>
+        <content_attribute id="language-profanity">none</content_attribute>
+        <content_attribute id="language-humor">none</content_attribute>
+        <content_attribute id="language-discrimination">none</content_attribute>
+        <content_attribute id="social-chat">intense</content_attribute>
+        <content_attribute id="social-info">none</content_attribute>
+        <content_attribute id="social-audio">intense</content_attribute>
+        <content_attribute id="social-location">none</content_attribute>
+        <content_attribute id="social-contacts">intense</content_attribute>
+        <content_attribute id="money-purchasing">intense</content_attribute>
+        <content_attribute id="money-gambling">none</content_attribute>
+        <content_attribute id="money-advertising">moderate</content_attribute>
+    </content_rating>
+    <launchable type="desktop-id">io.github.w0rd3r566.libregram.desktop</launchable>
+    <provides>
+        <binary>LibreGram</binary>
+        <dbus type="session">io.github.w0rd3r566.libregram</dbus>
+        <mediatype>x-scheme-handler/tg</mediatype>
+        <mediatype>x-scheme-handler/tonsite</mediatype>
+    </provides>
+</component>

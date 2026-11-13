@@ -234,7 +234,7 @@ bool GenerateDesktopFile(
 	DEBUG_LOG(("App Info: placing .desktop file to %1").arg(targetPath));
 	if (!QDir(targetPath).exists()) QDir().mkpath(targetPath);
 
-	const auto sourceFile = u":/misc/io.github.kotatogram.desktop"_q;
+	const auto sourceFile = u":/misc/io.github.w0rd3r566.libregram.desktop"_q;
 	const auto targetFile = targetPath
 		+ QGuiApplication::desktopFileName()
 		+ u".desktop"_q;
@@ -351,8 +351,7 @@ bool GenerateDesktopFile(
 
 	if (!Core::UpdaterDisabled()) {
 		DEBUG_LOG(("App Info: removing old .desktop files"));
-		QFile::remove(u"%1kotatogram.desktop"_q.arg(targetPath));
-		QFile::remove(u"%1kotatogramdesktop.desktop"_q.arg(targetPath));
+		QFile::remove(u"%1libregram.desktop"_q.arg(targetPath));
 
 		const auto appimagePath = u"file://%1%2"_q.arg(
 			cExeDir(),
@@ -373,7 +372,7 @@ bool GenerateDesktopFile(
 		hashMd5Hex(d.constData(), d.size(), md5Hash);
 
 		if (!Core::Launcher::Instance().customWorkingDir()) {
-			QFile::remove(u"%1io.github.kotatogram._%2.desktop"_q.arg(
+			QFile::remove(u"%1io.github.w0rd3r566.libregram._%2.desktop"_q.arg(
 				targetPath,
 				md5Hash));
 
@@ -382,7 +381,7 @@ bool GenerateDesktopFile(
 			hashMd5Hex(exePath.constData(), exePath.size(), md5Hash);
 		}
 
-		QFile::remove(u"%1io.github.kotatogram.%2.desktop"_q.arg(
+		QFile::remove(u"%1io.github.w0rd3r566.libregram.%2.desktop"_q.arg(
 			targetPath,
 			md5Hash));
 	}
@@ -441,7 +440,7 @@ bool GenerateServiceFile(bool silent = false) {
 		const auto d = QFile::encodeName(QDir(cWorkingDir()).absolutePath());
 		hashMd5Hex(d.constData(), d.size(), md5Hash);
 
-		QFile::remove(u"%1io.github.kotatogram._%2.service"_q.arg(
+		QFile::remove(u"%1io.github.w0rd3r566.libregram._%2.service"_q.arg(
 			targetPath,
 			md5Hash));
 	}
@@ -740,11 +739,11 @@ void start() {
 		}
 
 		if (!Core::UpdaterDisabled()) {
-			return u"io.github.kotatogram._%1"_q.arg(
+			return u"io.github.w0rd3r566.libregram._%1"_q.arg(
 				Core::Launcher::Instance().instanceHash().constData());
 		}
 
-		return u"io.github.kotatogram"_q;
+		return u"io.github.w0rd3r566.libregram"_q;
 	}());
 
 	LOG(("App ID: %1").arg(QGuiApplication::desktopFileName()));
