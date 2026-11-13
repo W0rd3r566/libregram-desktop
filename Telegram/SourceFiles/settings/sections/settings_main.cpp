@@ -57,6 +57,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "settings/sections/settings_credits.h"
 #include "settings/sections/settings_folders.h"
 #include "settings/sections/settings_information.h"
+#include "settings/sections/settings_libregram.h"
 #include "settings/sections/settings_notifications.h"
 #include "settings/settings_power_saving.h"
 #include "settings/sections/settings_premium.h"
@@ -367,6 +368,13 @@ void BuildSectionButtons(SectionBuilder &builder) {
 	const auto session = builder.session();
 	const auto controller = builder.controller();
 	const auto showOther = builder.showOther();
+
+	builder.addSectionButton({
+		.title = tr::lng_libregram_settings(),
+		.targetSection = LibreGramId(),
+		.icon = { &st::menuIconSettings },
+		.keywords = { u"libregram"_q, u"graphite"_q },
+	});
 
 	if (!session->supportMode()) {
 		builder.addSectionButton({

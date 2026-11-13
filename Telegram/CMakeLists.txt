@@ -1880,6 +1880,8 @@ PRIVATE
     settings/sections/settings_information.h
     settings/settings_intro.cpp
     settings/settings_intro.h
+    settings/sections/settings_libregram.cpp
+    settings/sections/settings_libregram.h
     settings/sections/settings_local_passcode.cpp
     settings/sections/settings_local_passcode.h
     settings/sections/settings_local_storage.cpp

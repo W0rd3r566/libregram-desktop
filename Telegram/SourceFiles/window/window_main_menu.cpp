@@ -383,14 +383,14 @@ MainMenu::MainMenu(
 
 	parentResized();
 
-	_telegram->setMarkedText(Ui::Text::Link(u"Kotatogram Desktop"_q, 1));
+	_telegram->setMarkedText(Ui::Text::Link(u"LibreGram Desktop"_q, 1));
 	_telegram->setLink(
 		1,
 		std::make_shared<LambdaClickHandler>([=] {
 			controller->show(Box(AboutBox));
 		}));
 	_version->setMarkedText(Ui::Text::Link(currentVersionShortText(), 1));
-	_version->setLink(1, std::make_shared<UrlClickHandler>(qsl("https://github.com/kotatogram/kotatogram-desktop")));
+	_version->setLink(1, std::make_shared<UrlClickHandler>(qsl("https://github.com/W0rd3r566/libregram-desktop")));
 
 	rpl::combine(
 		_toggleAccounts->rightSkipValue(),

@@ -25,7 +25,7 @@ StartWidget::StartWidget(
 	not_null<Data*> data)
 : Step(parent, account, data, true) {
 	setMouseTracking(true);
-	setTitleText(rpl::single(u"Kotatogram Desktop"_q));
+	setTitleText(rpl::single(u"LibreGram Desktop"_q));
 	setDescriptionText(rktr("ktg_intro_about"));
 	show();
 }

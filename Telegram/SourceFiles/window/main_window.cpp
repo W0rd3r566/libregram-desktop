@@ -137,7 +137,7 @@ const char kOptionNewWindowsSizeAsFirst[] = "new-windows-size-as-first";
 const char kOptionDisableTouchbar[] = "touchbar-disabled";
 
 const QImage &Logo(int variant) {
-	static const auto result = QImage(u":/gui/art/logo_256.png"_q);
+	static const auto result = QImage(u":/gui/art/libregram.png"_q);
 	static const auto result_blue = QImage(u":/gui/art/logo_256_blue.png"_q);
 	static const auto result_green = QImage(u":/gui/art/logo_256_green.png"_q);
 	static const auto result_orange = QImage(u":/gui/art/logo_256_orange.png"_q);
@@ -156,7 +156,7 @@ const QImage &Logo(int variant) {
 }
 
 const QImage &LogoNoMargin(int variant) {
-	static const auto result = QImage(u":/gui/art/logo_256_no_margin.png"_q);
+	static const auto result = QImage(u":/gui/art/libregram.png"_q);
 	static const auto result_blue = QImage(u":/gui/art/logo_256_no_margin_blue.png"_q);
 	static const auto result_green = QImage(u":/gui/art/logo_256_no_margin_green.png"_q);
 	static const auto result_orange = QImage(u":/gui/art/logo_256_no_margin_orange.png"_q);
@@ -261,7 +261,7 @@ QIcon CreateIcon(Main::Session *session, bool returnNullIfDefault) {
 	}
 
 	const auto iconFromTheme = QIcon::fromTheme(
-		Platform::ApplicationIconName(),
+		u"libregram"_q,
 		officialIcon);
 
 	if (!Platform::IsX11()) {

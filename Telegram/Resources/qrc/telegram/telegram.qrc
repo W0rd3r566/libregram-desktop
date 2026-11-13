@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="/gui">
+    <file alias="art/libregram.png">../../art/libregram.png</file>
+    <file alias="libregram-graphite.tdesktop-theme">../../libregram-graphite.tdesktop-theme</file>
     <file alias="art/background.tgv">../../art/background.tgv</file>
     <file alias="art/bg_thumbnail.png">../../art/bg_thumbnail.png</file>
     <file alias="art/bg_initial.jpg">../../art/bg_initial.jpg</file>

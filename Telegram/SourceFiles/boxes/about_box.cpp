@@ -39,10 +39,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 namespace {
 
 rpl::producer<TextWithEntities> Text1() {
-	return rktre("ktg_about_text1", {
-		"tdesktop_link",
-		Ui::Text::Link(ktr("ktg_about_text1_tdesktop"), "https://desktop.telegram.org/")
-	});
+	return tr::lng_libregram_about(tr::marked);
 }
 
 rpl::producer<TextWithEntities> Text2() {
@@ -50,11 +47,11 @@ rpl::producer<TextWithEntities> Text2() {
 		lt_gpl_link,
 		rpl::single(tr::link(
 			"GNU GPL",
-			"https://github.com/kotatogram/kotatogram-desktop/blob/master/LICENSE")),
+			"https://github.com/W0rd3r566/libregram-desktop/blob/dev/LICENSE")),
 		lt_github_link,
 		rpl::single(tr::link(
 			"GitHub",
-			"https://github.com/kotatogram/kotatogram-desktop")),
+			"https://github.com/W0rd3r566/libregram-desktop")),
 		tr::marked);
 }
 
@@ -86,7 +83,7 @@ rpl::producer<TextWithEntities> Text3() {
 } // namespace
 
 void AboutBox(not_null<Ui::GenericBox*> box) {
-	box->setTitle(u"Kotatogram Desktop"_q);
+	box->setTitle(u"LibreGram Desktop"_q);
 
 	auto layout = box->verticalLayout();
 
