@@ -10,13 +10,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - "packaging/arch/PKGBUILD"
-      - ".github/workflows/arch-package-build.yml"
-      - "packaging/linux/publish-beta.sh"
-      - "packaging/linux/package.sh"
-      - "packaging/nix/package.nix"
-      - "Telegram/build/ws-proxy/**"
 
 concurrency:
   group: libregram-arch-${{ github.ref }}

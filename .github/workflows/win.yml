@@ -264,6 +264,32 @@ jobs:
           cd artifact
           7z a ../LibreGram-Windows-x86_64.zip LibreGram.exe libregram-ws-proxy.exe LICENSE LEGAL tg-ws-proxy-rs.LICENSE
 
+      - name: Start and exit the Windows client
+        if: matrix.arch == 'x64' && matrix.qt == 'qt6'
+        shell: pwsh
+        run: |
+          $binary = (Resolve-Path artifact/LibreGram.exe).Path
+          $profile = Join-Path $env:RUNNER_TEMP "LibreGram-smoke-$PID"
+          New-Item -ItemType Directory -Path $profile | Out-Null
+          $argsList = "-workdir `"$profile`" -noupdate"
+          $app = Start-Process -FilePath $binary -ArgumentList $argsList -PassThru
+          try {
+            $window = $false
+            for ($i = 0; $i -lt 60; $i++) {
+              $app.Refresh()
+              if ($app.HasExited) { throw "LibreGram exited before opening a window" }
+              if ($app.MainWindowHandle -ne 0) { $window = $true; break }
+              Start-Sleep -Milliseconds 500
+            }
+            if (!$window) { throw "LibreGram did not open a window" }
+            $quit = Start-Process -FilePath $binary -ArgumentList "$argsList -quit" -PassThru
+            if (!$quit.WaitForExit(10000) -or !$app.WaitForExit(10000) -or $app.ExitCode -ne 0) {
+              throw "LibreGram did not exit cleanly"
+            }
+          } finally {
+            if (!$app.HasExited) { $app.Kill() }
+          }
+
       - uses: actions/upload-artifact@v7
         if: matrix.arch == 'x64' && matrix.qt == 'qt6'
         with:
