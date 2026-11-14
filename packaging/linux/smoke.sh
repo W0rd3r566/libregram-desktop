@@ -9,6 +9,7 @@ export XDG_RUNTIME_DIR="$profile/runtime"
 install -d -m700 "$XDG_RUNTIME_DIR"
 export QT_QPA_PLATFORM=xcb LIBGL_ALWAYS_SOFTWARE=1
 export HOME="$profile"
+unset DISPLAY XAUTHORITY WAYLAND_DISPLAY
 xvfb-run -a bash -euc '
   app=$1
   profile=$2
@@ -20,7 +21,7 @@ xvfb-run -a bash -euc '
       cat "$profile/stdout.log" >&2
       exit 1
     fi
-    if grep -Fq "QRhi: SurfaceRhi created" "$profile/log.txt" 2>/dev/null; then
+    if xwininfo -root -tree | grep -E "LibreGram.*[1-9][0-9]{2,}x[1-9][0-9]{2,}[+]" >/dev/null; then
       "$app" -workdir "$profile" -noupdate -quit
       wait "$pid"
       trap - EXIT
