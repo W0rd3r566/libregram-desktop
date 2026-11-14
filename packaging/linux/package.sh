@@ -38,7 +38,7 @@ Section: net
 Priority: optional
 Architecture: amd64
 Maintainer: LibreGram contributors <LibreGram@users.noreply.github.com>
-Depends: libc6 (>= 2.34), libgcc-s1, libcairo2, libfontconfig1, libfreetype6, libglib2.0-0t64 | libglib2.0-0, libpango-1.0-0, libpangocairo-1.0-0, libpangoft2-1.0-0, libgl1, libegl1, libpipewire-0.3-0t64 | libpipewire-0.3-0, libpulse0, libasound2t64 | libasound2, libdbus-1-3, libxcb1, libxcb-keysyms1, libxcb-record0, libx11-6, libx11-xcb1, libdrm2, libgbm1, libudev1, libwayland-client0, libwayland-cursor0, libwayland-egl1
+Depends: libc6 (>= 2.34), libgcc-s1, libcairo2, libfontconfig1, libfreetype6, libgtk-3-0t64 | libgtk-3-0, libglib2.0-0t64 | libglib2.0-0, libpango-1.0-0, libpangocairo-1.0-0, libpangoft2-1.0-0, libgl1, libegl1, libpipewire-0.3-0t64 | libpipewire-0.3-0, libpulse0, libasound2t64 | libasound2, libdbus-1-3, libxcb1, libxcb-keysyms1, libxcb-record0, libx11-6, libx11-xcb1, libdrm2, libgbm1, libudev1, libwayland-client0, libwayland-cursor0, libwayland-egl1
 Recommends: fonts-dejavu-core
 Homepage: https://github.com/W0rd3r566/libregram-desktop
 Description: LibreGram Desktop messenger
