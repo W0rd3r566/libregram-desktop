@@ -7,7 +7,7 @@ Download assets from [GitHub Releases](https://github.com/W0rd3r566/libregram-de
 | Arch Linux, CachyOS | `.pkg.tar.zst` for x86-64 |
 | Ubuntu 24.04 and 26.04, Debian 12 and 13 | `.deb` for amd64 |
 | Other glibc Linux distributions | Portable `.tar.xz` for x86-64. The host provides graphics, GLib, Cairo, Pango, font and audio libraries. |
-| Windows | x86-64 installer (.exe), pending a successful build |
+| Windows ARM64, x64 and x86 | Portable ZIP and installer EXE, uploaded after the architecture passes its checks |
 | NixOS | Nix derivation wrapping the Linux archive |
 
 ## NixOS с flakes

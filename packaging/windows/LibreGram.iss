@@ -3,6 +3,15 @@
 #ifndef LibreGramPayload
   #error LibreGramPayload must point to the Windows build artifacts
 #endif
+#if LibreGramArch == "x86"
+  #define AllowedArch "x86compatible"
+#elif LibreGramArch == "x86_64"
+  #define AllowedArch "x64compatible"
+#elif LibreGramArch == "arm64"
+  #define AllowedArch "arm64"
+#else
+  #error Unsupported LibreGramArch
+#endif
 
 [Setup]
 AppId=io.github.w0rd3r566.libregram
@@ -13,9 +22,11 @@ AppPublisherURL=https://github.com/W0rd3r566/libregram-desktop
 DefaultDirName={localappdata}\Programs\LibreGram
 DefaultGroupName={#AppName}
 PrivilegesRequired=lowest
-ArchitecturesAllowed=x64compatible
-ArchitecturesInstallIn64BitMode=x64compatible
-OutputBaseFilename=LibreGram-Windows-x86_64
+ArchitecturesAllowed={#AllowedArch}
+#if LibreGramArch != "x86"
+ArchitecturesInstallIn64BitMode={#AllowedArch}
+#endif
+OutputBaseFilename=LibreGram-Windows-{#LibreGramArch}
 Compression=lzma2
 SolidCompression=yes
 UninstallDisplayIcon={app}\LibreGram.exe

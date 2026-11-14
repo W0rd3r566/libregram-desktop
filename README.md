@@ -56,8 +56,9 @@ You need your own Telegram API credentials (**api_id** and **api_hash**) to buil
 | NixOS с flakes | [Архив .tar.gz](https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.1/LibreGram-NixOS-x86_64-flakes.tar.gz) · [Установка](docs/libregram/install.md#nixos-с-flakes) |
 | NixOS без flakes | [Архив .tar.gz](https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.1/LibreGram-NixOS-x86_64-no-flakes.tar.gz) · [Установка](docs/libregram/install.md#nixos-без-flakes) |
 | Другие Linux с glibc | [Переносной архив .tar.xz](https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.1/LibreGram-0.1.0-beta.1-linux-x86_64.tar.xz) |
-| Windows x64 | Установщик `.exe` будет в [Releases](https://github.com/W0rd3r566/libregram-desktop/releases/tag/v0.1.0-beta.1) после успешной сборки. |
-| macOS | Пакета этой беты пока нет. |
+| Windows ARM64 | Portable `.zip` и установщик `.exe` после проверки сборки |
+| Windows x64 | Portable `.zip` и установщик `.exe` после проверки сборки |
+| Windows x86 (32 бит) | Portable `.zip` и установщик `.exe` после проверки сборки |
 
 ### Команды скачивания
 

@@ -1,37 +1,73 @@
-name: Release Tarball
+name: Release source and download labels
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/tarball-release.yml'
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Published LibreGram release tag
+        type: string
+        default: v0.1.0-beta.1
+
+permissions:
+  contents: write
 
 jobs:
-
-  linux:
-    name: Ubuntu
+  source:
     runs-on: ubuntu-latest
-
+    env:
+      RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag || 'v0.1.0-beta.1' }}
     steps:
-      - name: Get repository name
-        run: |
-          tag_name=${GITHUB_REF##*/}
-          version=${tag_name#k}
-          echo "REPO_NAME=${GITHUB_REPOSITORY##*/}-$version-full" >> $GITHUB_ENV
-
-      - name: Checkout
-        uses: actions/checkout@v7
+      - uses: actions/checkout@v7
         with:
+          ref: refs/tags/${{ env.RELEASE_TAG }}
           submodules: recursive
-          path: ${{ env.REPO_NAME }}
+          persist-credentials: false
 
-      - name: Create tarball
-        run: |
-          artifact_name="$REPO_NAME.tar.gz"
-          echo "ARTIFACT_NAME=$artifact_name" >> $GITHUB_ENV
-
-          rm -rf $REPO_NAME/.git
-          tar -caf $artifact_name $REPO_NAME
-
-      - name: Upload Release Asset
+      - name: Publish the full source archive
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload "${{ github.event.release.tag_name }}" "$ARTIFACT_NAME" --repo "$GITHUB_REPOSITORY"
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git submodule status --recursive | awk '
+            substr($0, 1, 1) != " " { print > "/dev/stderr"; missing = 1 }
+            END { exit missing }
+          '
+          name="libregram-desktop-$RELEASE_TAG-full"
+          archive="$RUNNER_TEMP/$name.tar.gz"
+          tar --exclude=.git --transform="flags=rh;s,^\.,$name," -czf "$archive" .
+          tar -tzf "$archive" > "$RUNNER_TEMP/source-files.txt"
+          grep -Fqx "$name/Telegram/SourceFiles/core/launcher.cpp" "$RUNNER_TEMP/source-files.txt"
+          grep -Fqx "$name/Telegram/lib_base/base/invoke_queued.h" "$RUNNER_TEMP/source-files.txt"
+          gh release upload "$RELEASE_TAG" "$archive#Source code (tar.gz, full)" \
+            --repo "$GITHUB_REPOSITORY" --clobber
+
+  labels:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag || 'v0.1.0-beta.1' }}
+    steps:
+      - name: Label published Linux assets
+        run: |
+          set -euo pipefail
+          release_id=$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" --jq .id)
+          gh api --paginate "repos/$GITHUB_REPOSITORY/releases/$release_id/assets?per_page=100" \
+            --jq '.[] | [.id, .name] | @tsv' > "$RUNNER_TEMP/release-assets.tsv"
+          while IFS=$'\t' read -r id name; do
+            case "$name" in
+              LibreGram-*-linux-x86_64.tar.xz) label='Linux 64 bit: Binary' ;;
+              libregram-*-x86_64.pkg.tar.zst) label='Arch Linux / CachyOS 64 bit: pacman package' ;;
+              libregram-desktop_*_amd64.deb) label='Ubuntu / Debian 64 bit: DEB package' ;;
+              LibreGram-NixOS-x86_64-flakes.tar.gz) label='NixOS 64 bit: With flakes' ;;
+              LibreGram-NixOS-x86_64-no-flakes.tar.gz) label='NixOS 64 bit: Without flakes' ;;
+              *) continue ;;
+            esac
+            gh api --method PATCH "repos/$GITHUB_REPOSITORY/releases/assets/$id" \
+              -f "label=$label" --silent
+          done < "$RUNNER_TEMP/release-assets.tsv"
