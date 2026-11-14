@@ -305,7 +305,7 @@ jobs:
           $iscc = Join-Path ${env:ProgramFiles(x86)} "Inno Setup 6/ISCC.exe"
           $project = Join-Path $env:TBUILD "$env:REPO_NAME/packaging/windows/LibreGram.iss"
           $source = (Resolve-Path artifact).Path
-          & $iscc "/DSourcePath=$source" "/O$PWD" $project
+          & $iscc "/DLibreGramPayload=$source" "/O$PWD" $project
           if ($LASTEXITCODE -ne 0) { throw "LibreGram installer build failed" }
           $target = Join-Path $env:RUNNER_TEMP "LibreGram-install-$PID"
           $installer = Start-Process -FilePath ./LibreGram-Windows-x86_64.exe -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /DIR=`"$target`"" -Wait -PassThru

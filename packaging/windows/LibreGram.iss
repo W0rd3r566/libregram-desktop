@@ -1,7 +1,7 @@
 #define AppName "LibreGram Desktop"
 #define AppVersion "0.1.0-beta.1"
-#ifndef SourcePath
-  #error SourcePath must point to the Windows build artifacts
+#ifndef LibreGramPayload
+  #error LibreGramPayload must point to the Windows build artifacts
 #endif
 
 [Setup]
@@ -21,11 +21,11 @@ SolidCompression=yes
 UninstallDisplayIcon={app}\LibreGram.exe
 
 [Files]
-Source: "{#SourcePath}\LibreGram.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#SourcePath}\libregram-ws-proxy.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#SourcePath}\LICENSE"; DestDir: "{app}"
-Source: "{#SourcePath}\LEGAL"; DestDir: "{app}"
-Source: "{#SourcePath}\tg-ws-proxy-rs.LICENSE"; DestDir: "{app}"
+Source: "{#LibreGramPayload}\LibreGram.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#LibreGramPayload}\libregram-ws-proxy.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#LibreGramPayload}\LICENSE"; DestDir: "{app}"
+Source: "{#LibreGramPayload}\LEGAL"; DestDir: "{app}"
+Source: "{#LibreGramPayload}\tg-ws-proxy-rs.LICENSE"; DestDir: "{app}"
 
 [Icons]
 Name: "{group}\{#AppName}"; Filename: "{app}\LibreGram.exe"
