@@ -1,4 +1,8 @@
 {
+	"ktg_libregram_seasonal_icon": "Сезонная иконка приложения",
+	"ktg_libregram_seasonal_icon_about": "Цвет акцента зависит от времени года. Если вы выбрали свою иконку, клиент покажет её.",
+	"ktg_libregram_local_premium_badge": "Локальный значок Premium",
+	"ktg_libregram_local_premium_badge_about": "Звезда рядом с вашим именем видна в настройках и главном меню на этом устройстве. Для функций Telegram Premium нужна подписка.",
 	"ktg_intro_about": "Добро пожаловать в неофициальный мессенджер\nна основе Telegram Desktop.",
 	"ktg_about_text1": "Экспериментальный неофициальный форк {tdesktop_link}.",
 	"ktg_about_text1_tdesktop": "Telegram Desktop",

@@ -928,11 +928,6 @@ void SetupKotatoSystem(
 			TrayIconLabel,
 			[=] (int value) {
 				::Kotato::JsonSettings::Set("custom_app_icon", value);
-				controller->session().data().notifyUnreadBadgeChanged();
-				Core::App().enumerateWindows([](
-						not_null<Window::Controller*> window) {
-					window->widget()->updateWindowIcon();
-				});
 				::Kotato::JsonSettings::Write();
 			}, false));
 	});

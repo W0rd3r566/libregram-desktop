@@ -151,14 +151,15 @@ Cover::Cover(
 	this,
 	st::settingsCoverBadge,
 	&user->session(),
-	Info::Profile::BadgeContentForPeer(user),
+	Info::Profile::BadgeContentForOwnProfile(&user->session()),
 	&_emojiStatusPanel,
 	[=] {
 		return controller->isGifPausedAtLeastFor(
 			Window::GifPauseReason::Layer);
 	},
 	0, // customStatusLoopsLimit
-	Info::Profile::BadgeType::Premium)
+	Info::Profile::BadgeType::Premium
+		| Info::Profile::BadgeType::LocalPremium)
 , _userpic(
 	this,
 	controller,

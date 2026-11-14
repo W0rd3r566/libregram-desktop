@@ -17,6 +17,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "platform/platform_specific.h"
 #include "ui/ui_utility.h"
 #include "ui/widgets/popup_menu.h"
+#include "window/main_window.h"
+#include "window/window_app_icon.h"
 #include "window/window_controller.h"
 
 #include <QtCore/QCoreApplication>
@@ -92,6 +94,7 @@ IconGraphic::~IconGraphic() = default;
 QIcon IconGraphic::systemIcon() const {
 	if (_new.iconThemeName == _current.iconThemeName
 		&& _new.monochrome == _current.monochrome
+		&& _new.customId == _current.customId
 		&& (_new.counter > 0) == (_current.counter > 0)
 		&& _new.muted == _current.muted
 		&& _new.telegramPanelIcon == _current.telegramPanelIcon) {
@@ -100,7 +103,7 @@ QIcon IconGraphic::systemIcon() const {
 
 	const auto candidates = {
 		_new.monochrome ? PanelIconName(_new.counter, _new.muted) : QString(),
-		ApplicationIconName(),
+		_new.customId ? QString() : ApplicationIconName(),
 	};
 
 	for (const auto &candidate : candidates) {
@@ -137,7 +140,7 @@ void IconGraphic::updateState() {
 	_new.monochrome = Core::App().settings().trayIconMonochrome();
 	_new.counter = Core::App().unreadBadge();
 	_new.muted = Core::App().unreadBadgeMuted();
-	_new.customId = ::Kotato::JsonSettings::GetInt("custom_app_icon");
+	_new.customId = Window::AppIconVariant();
 	_new.counterDisabled = ::Kotato::JsonSettings::GetBool("disable_tray_counter");
 	_new.telegramPanelIcon = ::Kotato::JsonSettings::GetBool("use_telegram_panel_icon");
 	_new.systemIcon = systemIcon();
@@ -147,6 +150,7 @@ bool IconGraphic::isRefreshNeeded() const {
 	return _trayIcon.isNull()
 		|| _new.iconThemeName != _current.iconThemeName
 		|| _new.systemIcon.name() != _current.systemIcon.name()
+		|| _new.monochrome != _current.monochrome
 		|| (isCounterNeeded(_new)
 			? _new.muted != _current.muted
 				|| counterSlice(_new.counter) != counterSlice(

@@ -93,6 +93,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "payments/payments_checkout_process.h"
 #include "export/export_manager.h"
 #include "webrtc/webrtc_environment.h"
+#include "window/main_window.h"
+#include "window/window_app_icon.h"
 #include "window/window_saved_windows.h"
 #include "window/window_separate_id.h"
 #include "window/window_session_controller.h"
@@ -451,6 +453,37 @@ void Application::run() {
 
 	startDomain();
 	startTray();
+	const auto previousIconVariant = _lifetime.make_state<int>(
+		Window::AppIconVariant());
+	const auto refreshIcon = [=] {
+		const auto variant = Window::AppIconVariant();
+		if (*previousIconVariant == variant) {
+			return;
+		}
+		*previousIconVariant = variant;
+		refreshApplicationIcon();
+		enumerateWindows([](not_null<Window::Controller*> window) {
+			window->widget()->updateWindowIcon();
+		});
+		tray().updateIconCounters();
+	};
+	const auto seasonalTimer = _lifetime.make_state<base::Timer>(refreshIcon);
+	const auto trackSeason = [=] {
+		constexpr auto kSeasonCheckInterval = crl::time(60'000);
+		if (::Kotato::JsonSettings::GetBool("libregram/seasonal_icon")) {
+			seasonalTimer->callEach(kSeasonCheckInterval);
+		} else {
+			seasonalTimer->cancel();
+		}
+		refreshIcon();
+	};
+	::Kotato::JsonSettings::Events(
+		u"libregram/seasonal_icon"_q
+	) | rpl::on_next(trackSeason, _lifetime);
+	::Kotato::JsonSettings::Events(
+		u"custom_app_icon"_q
+	) | rpl::on_next(refreshIcon, _lifetime);
+	trackSeason();
 
 	_lastActivePrimaryWindow->firstShow();
 

@@ -19,6 +19,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/painter.h"
 #include "ui/ui_utility.h"
 #include "ui/widgets/popup_menu.h"
+#include "window/main_window.h"
+#include "window/window_app_icon.h"
 #include "window/window_controller.h"
 #include "window/window_session_controller.h"
 #include "styles/style_window.h"
@@ -108,7 +110,7 @@ bool DarkTasbarValueValid/* = false*/;
 		bool supportMode,
 		bool smallIcon,
 		bool monochrome) {
-	using Key = std::pair<int, int>; // size, custom_app_icon
+	using Key = std::pair<int, int>; // size, icon variant
 	static auto ScaledLogo = base::flat_map<Key, QImage>();
 	static auto ScaledLogoNoMargin = base::flat_map<Key, QImage>();
 	static auto ScaledLogoDark = base::flat_map<Key, QImage>();
@@ -126,7 +128,7 @@ bool DarkTasbarValueValid/* = false*/;
 
 	auto result = [&] {
 		const auto idx = CustomIcon.isNull()
-			? ::Kotato::JsonSettings::GetInt("custom_app_icon")
+			? Window::AppIconVariant()
 			: 0;
 		const auto key = Key(args.size, idx);
 		if (const auto it = scaled.find(key); it != scaled.end()) {

@@ -6,6 +6,7 @@ For license and copyright information please follow this link:
 https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "window/main_window.h"
+#include "window/window_app_icon.h"
 
 #include "kotato/kotato_settings.h"
 #include "api/api_updates.h"
@@ -55,6 +56,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "platform/mac/global_menu_mac.h"
 #endif // Q_OS_MAC
 
+#include <QtCore/QDate>
 #include <QtCore/QMimeData>
 #include <QtGui/QWindow>
 #include <QtGui/QScreen>
@@ -80,6 +82,24 @@ using Core::WindowPosition;
 	const auto skipx = Dialogs::Ui::ChatListNarrowWidth();
 	const auto skipy = st::windowTitleHeight;
 	return { skipx, skipy };
+}
+
+enum class SeasonalIcon {
+	Winter = 6,
+	Spring,
+	Summer,
+	Autumn,
+};
+
+[[nodiscard]] QImage WithSeasonalAccent(const QImage &logo, QColor color) {
+	auto image = logo.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+	auto painter = QPainter(&image);
+	painter.setRenderHint(QPainter::Antialiasing);
+	painter.scale(image.width() / 512., image.height() / 512.);
+	painter.setPen(QPen(color, 28));
+	painter.setBrush(Qt::NoBrush);
+	painter.drawRoundedRect(QRectF(14, 14, 484, 484), 101, 101);
+	return image;
 }
 
 [[nodiscard]] QImage &OverridenIcon() {
@@ -136,6 +156,15 @@ base::options::toggle OptionDisableTouchbar({
 const char kOptionNewWindowsSizeAsFirst[] = "new-windows-size-as-first";
 const char kOptionDisableTouchbar[] = "touchbar-disabled";
 
+int AppIconVariant() {
+	const auto custom = ::Kotato::JsonSettings::GetInt("custom_app_icon");
+	if (custom || !::Kotato::JsonSettings::GetBool("libregram/seasonal_icon")) {
+		return custom;
+	}
+	const auto month = QDate::currentDate().month();
+	return static_cast<int>(SeasonalIcon::Winter) + ((month % 12) / 3);
+}
+
 const QImage &Logo(int variant) {
 	static const auto result = QImage(u":/gui/art/libregram.png"_q);
 	static const auto result_blue = QImage(u":/gui/art/logo_256_blue.png"_q);
@@ -150,6 +179,24 @@ const QImage &Logo(int variant) {
 		case 3: return result_orange;
 		case 4: return result_red;
 		case 5: return result_old;
+	}
+	switch (static_cast<SeasonalIcon>(variant)) {
+	case SeasonalIcon::Winter: {
+		static const auto icon = WithSeasonalAccent(result, QColor(133, 206, 250));
+		return icon;
+	}
+	case SeasonalIcon::Spring: {
+		static const auto icon = WithSeasonalAccent(result, QColor(124, 218, 156));
+		return icon;
+	}
+	case SeasonalIcon::Summer: {
+		static const auto icon = WithSeasonalAccent(result, QColor(255, 214, 108));
+		return icon;
+	}
+	case SeasonalIcon::Autumn: {
+		static const auto icon = WithSeasonalAccent(result, QColor(238, 134, 99));
+		return icon;
+	}
 	}
 
 	return result;
@@ -171,7 +218,7 @@ const QImage &LogoNoMargin(int variant) {
 		case 5: return result_old;
 	}
 
-	return result;
+	return Logo(variant);
 }
 
 void ConvertIconToBlack(QImage &image) {
@@ -235,7 +282,7 @@ QIcon CreateSupportIcon(Main::Session *session) {
 
 	auto image = customIcon.isNull()
 		? overriden.isNull()
-			? Logo(::Kotato::JsonSettings::GetInt("custom_app_icon"))
+			? Logo(AppIconVariant())
 			: overriden
 		: customIcon;
 
@@ -245,13 +292,15 @@ QIcon CreateSupportIcon(Main::Session *session) {
 
 QIcon CreateIcon(Main::Session *session, bool returnNullIfDefault) {
 	const auto supportIcon = CreateSupportIcon(session);
-	if (!supportIcon.isNull() || returnNullIfDefault) {
+	if (!supportIcon.isNull()) {
 		return supportIcon;
 	}
 
 	const auto customIcon = QImage(cWorkingDir() + "tdata/icon.png");
-	const auto customIconId = ::Kotato::JsonSettings::GetInt(
-		"custom_app_icon");
+	const auto customIconId = AppIconVariant();
+	if (returnNullIfDefault && !customIconId && customIcon.isNull()) {
+		return QIcon();
+	}
 	const auto officialIcon = QIcon(Ui::PixmapFromImage(customIcon.isNull()
 		? base::duplicate(Logo(customIconId))
 		: base::duplicate(customIcon)));
