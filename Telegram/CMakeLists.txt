@@ -542,6 +542,8 @@ PRIVATE
     chat_helpers/tabbed_selector.h
     chat_helpers/ttl_media_layer_widget.cpp
     chat_helpers/ttl_media_layer_widget.h
+    core/libregram_ws_proxy.cpp
+    core/libregram_ws_proxy.h
     core/application.cpp
     core/application.h
     core/proxy_rotation_manager.cpp

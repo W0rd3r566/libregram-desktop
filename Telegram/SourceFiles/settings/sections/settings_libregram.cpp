@@ -5,6 +5,7 @@ For license and upstream attribution, see LICENSE and LEGAL.
 #include "settings/sections/settings_libregram.h"
 
 #include "core/application.h"
+#include "core/libregram_ws_proxy.h"
 #include "kotato/kotato_settings.h"
 #include "kotato/kotato_settings_menu.h"
 #include "lang/lang_keys.h"
@@ -18,11 +19,14 @@ For license and upstream attribution, see LICENSE and LEGAL.
 #include "settings/settings_power_saving.h"
 #include "ui/layers/generic_box.h"
 #include "ui/power_saving.h"
+#include "ui/vertical_list.h"
 #include "ui/widgets/buttons.h"
+#include "ui/widgets/labels.h"
 #include "ui/wrap/vertical_layout.h"
 #include "window/themes/window_theme.h"
 #include "window/window_session_controller.h"
 
+#include "styles/style_layers.h"
 #include "styles/style_menu_icons.h"
 #include "styles/style_settings.h"
 
@@ -133,6 +137,15 @@ const auto kMeta = BuildHelper({
 	builder.addDivider();
 	builder.addSkip();
 	builder.addSubsectionTitle(tr::lng_libregram_client());
+	builder.addButton({
+		.id = u"libregram/ws-proxy"_q,
+		.title = tr::lng_libregram_ws_proxy(),
+		.icon = { &st::menuIconManage },
+		.onClick = [controller = builder.controller()] {
+			controller->show(Box(WsProxyBox));
+		},
+		.keywords = { u"websocket"_q, u"proxy"_q },
+	});
 	const auto session = builder.session();
 	AddToggle(builder, {
 		.id = u"libregram/hide-phone"_q,
@@ -176,6 +189,48 @@ rpl::producer<QString> LibreGram::title() {
 }
 
 } // namespace
+
+void WsProxyBox(not_null<Ui::GenericBox*> box) {
+	using State = Core::LibreGramWsProxy::State;
+	box->setTitle(tr::lng_libregram_ws_proxy());
+	box->setWidth(st::boxWideWidth);
+	const auto content = box->verticalLayout();
+	Ui::AddDividerText(content, tr::lng_libregram_ws_about());
+	const auto fallback = AddButtonWithIcon(
+		content,
+		tr::lng_libregram_ws_tcp_fallback(),
+		st::settingsButtonNoIcon)->toggleOn(rpl::single(false));
+	const auto status = Ui::AddDividerText(
+		content,
+		rpl::single(QString()));
+	const auto proxy = &Core::App().libreGramWsProxy();
+	const auto start = box->addButton(tr::lng_libregram_ws_start(), [=] {
+		proxy->start(fallback->toggled());
+	});
+	const auto stop = box->addButton(tr::lng_libregram_ws_stop(), [=] {
+		proxy->stop();
+	});
+	box->addButton(tr::lng_close(), [=] { box->closeBox(); });
+	proxy->state() | rpl::on_next([=](State state) {
+		const auto message = [&] {
+			switch (state) {
+			case State::Off: return tr::lng_libregram_ws_off(tr::now);
+			case State::Starting: return tr::lng_libregram_ws_starting(tr::now);
+			case State::Listening: return tr::lng_libregram_ws_listening(tr::now);
+			case State::Stopping: return tr::lng_libregram_ws_stopping(tr::now);
+			case State::Unavailable: return tr::lng_libregram_ws_unavailable(tr::now);
+			case State::Failed: return tr::lng_libregram_ws_failed(tr::now);
+			}
+			Unexpected("WS Proxy state");
+		}();
+		status->setText(message);
+		const auto active = (state == State::Starting || state == State::Listening);
+		const auto canStart = !active && (state != State::Stopping);
+		start->setDisabled(!canStart);
+		fallback->setDisabled(!canStart);
+		stop->setDisabled(!active);
+	}, box->lifetime());
+}
 
 Type LibreGramId() {
 	return LibreGram::Id();

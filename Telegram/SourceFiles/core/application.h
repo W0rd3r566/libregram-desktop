@@ -130,6 +130,8 @@ enum class QuitReason {
 
 extern const char kOptionSkipUrlSchemeRegister[];
 
+class LibreGramWsProxy;
+
 class Application final : public QObject {
 public:
 	struct ProxyChange {
@@ -235,6 +237,10 @@ public:
 	void setCurrentProxy(
 		const MTP::ProxyData &proxy,
 		MTP::ProxyData::Settings settings);
+	[[nodiscard]] MTP::ProxyData effectiveProxy() const;
+	void setTemporaryWsProxy(MTP::ProxyData proxy);
+	[[nodiscard]] bool hasTemporaryWsProxy() const;
+	[[nodiscard]] LibreGramWsProxy &libreGramWsProxy();
 	void proxyRotationSettingsChanged();
 	void checkProxyRotation(not_null<Main::Account*> account, int32 state);
 	[[nodiscard]] rpl::producer<ProxyChange> proxyChanges() const;

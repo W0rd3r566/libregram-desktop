@@ -7,6 +7,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "core/application.h"
 
+#include "core/libregram_ws_proxy.h"
+
 #include "kotato/kotato_lang.h"
 #include "kotato/kotato_settings.h"
 #include "data/data_abstract_structure.h"
@@ -157,6 +159,8 @@ struct Application::Private {
 	base::Timer quitTimer;
 	UiIntegration uiIntegration;
 	Settings settings;
+	MTP::ProxyData temporaryWsProxy;
+	std::unique_ptr<LibreGramWsProxy> libreGramWsProxy;
 	std::unique_ptr<ProxyRotationManager> proxyRotation;
 };
 
@@ -259,6 +263,7 @@ void Application::closeAdditionalWindows() {
 }
 
 Application::~Application() {
+	_private->libreGramWsProxy.reset();
 	if (_savedWindows) {
 		_savedWindows->writeNow();
 	}
@@ -906,17 +911,50 @@ void Application::setCurrentProxy(
 		const MTP::ProxyData &proxy,
 		MTP::ProxyData::Settings settings) {
 	auto &my = _private->settings.proxy();
-	const auto current = [&] {
-		return my.isEnabled() ? my.selected() : MTP::ProxyData();
-	};
-	const auto was = current();
+	const auto was = effectiveProxy();
 	my.setSelected(proxy);
 	my.setSettings(settings);
-	const auto now = current();
+	if (_private->libreGramWsProxy) {
+		_private->temporaryWsProxy = {};
+		_private->libreGramWsProxy->stop();
+	}
+	const auto now = effectiveProxy();
 	refreshGlobalProxy();
 	_proxyChanges.fire({ was, now });
 	my.connectionTypeChangesNotify();
 	proxyRotationSettingsChanged();
+}
+
+MTP::ProxyData Application::effectiveProxy() const {
+	const auto &saved = _private->settings.proxy();
+	return hasTemporaryWsProxy()
+		? _private->temporaryWsProxy
+		: saved.isEnabled()
+		? saved.selected()
+		: MTP::ProxyData();
+}
+
+void Application::setTemporaryWsProxy(MTP::ProxyData proxy) {
+	if (_private->temporaryWsProxy == proxy) {
+		return;
+	}
+	const auto was = effectiveProxy();
+	_private->temporaryWsProxy = std::move(proxy);
+	refreshGlobalProxy();
+	_proxyChanges.fire({ was, effectiveProxy() });
+	settings().proxy().connectionTypeChangesNotify();
+	proxyRotationSettingsChanged();
+}
+
+bool Application::hasTemporaryWsProxy() const {
+	return _private->temporaryWsProxy.type != MTP::ProxyData::Type::None;
+}
+
+LibreGramWsProxy &Application::libreGramWsProxy() {
+	if (!_private->libreGramWsProxy) {
+		_private->libreGramWsProxy = std::make_unique<LibreGramWsProxy>(*this);
+	}
+	return *_private->libreGramWsProxy;
 }
 
 void Application::proxyRotationSettingsChanged() {
@@ -1925,10 +1963,7 @@ void Application::postponeCall(FnMut<void()> &&callable) {
 }
 
 void Application::refreshGlobalProxy() {
-	const auto &proxySettings = settings().proxy();
-	const auto proxy = proxySettings.isEnabled()
-		? proxySettings.selected()
-		: MTP::ProxyData();
+	const auto proxy = effectiveProxy();
 	if (proxy.type == MTP::ProxyData::Type::Web && proxy.valid()) {
 		MTP::WebProxy::Transport::Activate(proxy);
 	} else {

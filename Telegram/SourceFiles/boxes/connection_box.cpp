@@ -24,6 +24,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "mtproto/proxy_check.h"
 #include "mtproto/web_proxy/web_proxy_transport.h"
 #include "qr/qr_generate.h"
+#include "settings/sections/settings_libregram.h"
 #include "settings/settings_common.h"
 #include "storage/localstorage.h"
 #include "ui/basic_click_handlers.h"
@@ -1109,6 +1110,9 @@ void ProxiesBox::prepare() {
 	setTitle(tr::lng_proxy_settings());
 
 	_addProxyButton = addButton(tr::lng_proxy_add(), [=] { addNewProxy(); });
+	addLeftButton(tr::lng_libregram_ws_proxy(), [] {
+		Ui::show(Box(Settings::WsProxyBox));
+	});
 	addButton(tr::lng_close(), [=] { closeBox(); });
 
 	setupTopButton();

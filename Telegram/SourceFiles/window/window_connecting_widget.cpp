@@ -313,7 +313,7 @@ void ConnectionState::refreshState() {
 		const auto ready = !Core::UpdaterDisabled()
 			&& (Checker().state() == Checker::State::Ready);
 		const auto state = _account->mtp().dcstate();
-		const auto proxy = Core::App().settings().proxy().isEnabled();
+		const auto proxy = bool(Core::App().effectiveProxy());
 		if (state == MTP::ConnectingState
 			|| state == MTP::DisconnectedState
 			|| (state < 0 && state > -600)) {

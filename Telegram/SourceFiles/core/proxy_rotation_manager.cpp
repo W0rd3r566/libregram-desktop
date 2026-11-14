@@ -48,7 +48,8 @@ void ProxyRotationManager::handleConnectionStateChanged(
 
 bool ProxyRotationManager::shouldObserve() const {
 	const auto &settings = App().settings().proxy();
-	return settings.isEnabled()
+	return !App().hasTemporaryWsProxy()
+		&& settings.isEnabled()
 		&& settings.selected()
 		&& settings.proxyRotationEnabled()
 		&& (settings.list().size() > 1);

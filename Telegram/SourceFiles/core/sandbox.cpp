@@ -672,15 +672,14 @@ void Sandbox::checkForQuit() {
 void Sandbox::refreshGlobalProxy() {
 	const auto proxy = !Core::IsAppLaunched()
 		? _sandboxProxy
-		: Core::App().settings().proxy().isEnabled()
-		? Core::App().settings().proxy().selected()
-		: MTP::ProxyData();
+		: Core::App().effectiveProxy();
 	if (proxy.type == MTP::ProxyData::Type::Socks5
 		|| proxy.type == MTP::ProxyData::Type::Http) {
 		QNetworkProxy::setApplicationProxy(
 			MTP::ToNetworkProxy(MTP::ToDirectIpProxy(proxy)));
 	} else if (!Core::IsAppLaunched()
-		|| Core::App().settings().proxy().isSystem()) {
+		|| (!Core::App().hasTemporaryWsProxy()
+			&& Core::App().settings().proxy().isSystem())) {
 		QNetworkProxyFactory::setUseSystemConfiguration(true);
 	} else {
 		QNetworkProxy::setApplicationProxy(QNetworkProxy::NoProxy);

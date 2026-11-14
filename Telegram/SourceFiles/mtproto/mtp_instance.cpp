@@ -368,7 +368,8 @@ Instance::Private::Private(
 	_proxySettings.connectionTypeChanges(
 	) | rpl::on_next([=] {
 		if (_configLoader) {
-			_configLoader->setProxyEnabled(_proxySettings.isEnabled());
+			_configLoader->setProxyEnabled(
+				bool(Core::App().effectiveProxy()));
 		}
 	}, _lifetime);
 }
@@ -522,7 +523,7 @@ void Instance::Private::requestConfig() {
 		[=](const Error &error, const Response &) {
 			return configLoadFail(error);
 		},
-		_proxySettings.isEnabled());
+		bool(Core::App().effectiveProxy()));
 	_configLoader->load();
 }
 

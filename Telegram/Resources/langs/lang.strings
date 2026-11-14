@@ -8791,4 +8791,16 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 "lng_libregram_reduced_motion_about" = "Applies to interface transitions. Stickers and other effects can be configured below. System battery saving may also reduce animations.";
 "lng_libregram_hide_phone" = "Hide phone number in settings";
 
+"lng_libregram_ws_proxy" = "WS Proxy";
+"lng_libregram_ws_about" = "Route Telegram connections through a local proxy using secure WebSockets. Stopping it restores the connection from your saved proxy settings.";
+"lng_libregram_ws_tcp_fallback" = "Allow TCP fallback";
+"lng_libregram_ws_start" = "Start";
+"lng_libregram_ws_stop" = "Stop";
+"lng_libregram_ws_off" = "WS Proxy is off.";
+"lng_libregram_ws_starting" = "Starting the local WS Proxy…";
+"lng_libregram_ws_listening" = "Local WS Proxy is running. Telegram connection status is shown in the main window.";
+"lng_libregram_ws_stopping" = "Stopping WS Proxy…";
+"lng_libregram_ws_unavailable" = "The WS Proxy helper is missing. Install it next to LibreGram.";
+"lng_libregram_ws_failed" = "The local WS Proxy could not start or stopped unexpectedly.";
+
 // Keys finished
