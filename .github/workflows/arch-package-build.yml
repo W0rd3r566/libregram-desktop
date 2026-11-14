@@ -13,10 +13,11 @@ on:
     paths:
       - "packaging/arch/PKGBUILD"
       - ".github/workflows/arch-package-build.yml"
+      - "Telegram/SourceFiles/core/sandbox.cpp"
 
 concurrency:
   group: libregram-arch-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -108,6 +109,11 @@ jobs:
           package=libregram-0.1.0beta1-1-x86_64.pkg.tar.zst
           test -f "$package"
           sha256sum "$package" > "$package.sha256"
+          current_head=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')
+          if [[ "$current_head" != "$GITHUB_SHA" ]]; then
+            echo "A newer main commit supersedes this package."
+            exit 0
+          fi
           if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "This beta has already been published."
             exit 0

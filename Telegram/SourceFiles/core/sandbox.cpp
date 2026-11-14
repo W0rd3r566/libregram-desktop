@@ -845,7 +845,7 @@ uint64 Sandbox::execExternal(const QString &cmd) {
 			return Platform::ActivationWindowId(window);
 		}
 	} else if (cmd == "quit") {
-		Quit();
+		InvokeQueued(this, [] { Quit(); });
 	}
 	return 0;
 }
