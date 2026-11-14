@@ -20,13 +20,12 @@ on:
       - 'LICENSE'
       - '.github/**'
       - '!.github/workflows/win.yml'
-      - '!.github/workflows/linux.yml'
-      - '!.github/workflows/arch-package-build.yml'
       - 'lib/xdg/**'
       - 'snap/**'
       - 'packaging/**'
       - '!packaging/linux/publish-beta.sh'
       - '!packaging/linux/beta-notes.md'
+      - '!packaging/windows/**'
       - 'Telegram/build/docker/**'
       - 'Telegram/Resources/uwp/**'
       - 'Telegram/SourceFiles/platform/linux/**'
@@ -46,13 +45,12 @@ on:
       - 'LICENSE'
       - '.github/**'
       - '!.github/workflows/win.yml'
-      - '!.github/workflows/linux.yml'
-      - '!.github/workflows/arch-package-build.yml'
       - 'lib/xdg/**'
       - 'snap/**'
       - 'packaging/**'
       - '!packaging/linux/publish-beta.sh'
       - '!packaging/linux/beta-notes.md'
+      - '!packaging/windows/**'
       - 'Telegram/build/docker/**'
       - 'Telegram/Resources/uwp/**'
       - 'Telegram/SourceFiles/platform/linux/**'
@@ -271,8 +269,6 @@ jobs:
             bash "$repo/Telegram/build/ws-proxy/build.sh" artifact
           ./artifact/libregram-ws-proxy.exe --help >/dev/null
           cp "$repo/LICENSE" "$repo/LEGAL" artifact/
-          cd artifact
-          7z a ../LibreGram-Windows-x86_64.zip LibreGram.exe libregram-ws-proxy.exe LICENSE LEGAL tg-ws-proxy-rs.LICENSE
 
       - name: Start and exit the Windows client
         if: matrix.arch == 'x64' && matrix.qt == 'qt6'
@@ -300,11 +296,31 @@ jobs:
             if (!$app.HasExited) { $app.Kill() }
           }
 
+      - name: Build and verify the Windows installer
+        if: matrix.arch == 'x64' && matrix.qt == 'qt6'
+        shell: pwsh
+        run: |
+          choco install innosetup --yes --no-progress
+          if ($LASTEXITCODE -ne 0) { throw "Inno Setup installation failed" }
+          $iscc = Join-Path ${env:ProgramFiles(x86)} "Inno Setup 6/ISCC.exe"
+          $project = Join-Path $env:TBUILD "$env:REPO_NAME/packaging/windows/LibreGram.iss"
+          $source = (Resolve-Path artifact).Path
+          & $iscc "/DSourcePath=$source" "/O$PWD" $project
+          if ($LASTEXITCODE -ne 0) { throw "LibreGram installer build failed" }
+          $target = Join-Path $env:RUNNER_TEMP "LibreGram-install-$PID"
+          $installer = Start-Process -FilePath ./LibreGram-Windows-x86_64.exe -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /DIR=`"$target`"" -Wait -PassThru
+          if ($installer.ExitCode -ne 0) { throw "Silent installation failed" }
+          foreach ($name in @("LibreGram.exe", "libregram-ws-proxy.exe")) {
+            $expected = (Get-FileHash (Join-Path $source $name)).Hash
+            $installed = (Get-FileHash (Join-Path $target $name)).Hash
+            if ($installed -ne $expected) { throw "Installed $name failed its hash check" }
+          }
+
       - uses: actions/upload-artifact@v7
         if: matrix.arch == 'x64' && matrix.qt == 'qt6'
         with:
           name: LibreGram Windows x86_64 (${{ matrix.generator || 'Visual Studio' }})
-          path: LibreGram-Windows-x86_64.zip
+          path: LibreGram-Windows-x86_64.exe
           if-no-files-found: error
 
       - uses: actions/upload-artifact@v7
@@ -316,9 +332,9 @@ jobs:
           retention-days: 1
 
   publish-beta:
-    name: Publish the Windows x64 ZIP
+    name: Publish the Windows x64 installer
     needs: windows
-    if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && !cancelled()
+    if: ${{ !cancelled() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -328,12 +344,17 @@ jobs:
         with:
           name: LibreGram Windows x86_64 (Visual Studio)
           path: dist
-      - name: Publish the checked ZIP
+      - name: Publish the checked installer
         env:
           GH_TOKEN: ${{ github.token }}
           LIBREGRAM_API_ID: ${{ secrets.LIBREGRAM_API_ID }}
           LIBREGRAM_API_HASH: ${{ secrets.LIBREGRAM_API_HASH }}
         run: |
-          test -n "$LIBREGRAM_API_ID" && test -n "$LIBREGRAM_API_HASH"
-          (cd dist && sha256sum LibreGram-Windows-x86_64.zip > SHA256SUMS-windows)
-          bash packaging/linux/publish-beta.sh dist/LibreGram-Windows-x86_64.zip dist/SHA256SUMS-windows
+          test -n "$LIBREGRAM_API_ID"
+          test -n "$LIBREGRAM_API_HASH"
+          (cd dist && sha256sum LibreGram-Windows-x86_64.exe > SHA256SUMS-windows)
+          base=$(gh api "repos/$GITHUB_REPOSITORY/commits/v0.1.0-beta.1" --jq .sha)
+          git fetch --no-tags origin "$base"
+          git diff --exit-code "$base" HEAD -- CMakeLists.txt Telegram/CMakeLists.txt Telegram/SourceFiles Telegram/Resources Telegram/build/ws-proxy/libregram-ws-proxy.rs
+          gh release upload v0.1.0-beta.1 dist/LibreGram-Windows-x86_64.exe dist/SHA256SUMS-windows \
+            --repo "$GITHUB_REPOSITORY" --clobber

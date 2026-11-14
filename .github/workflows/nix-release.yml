@@ -1,0 +1,43 @@
+name: LibreGram Nix packages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'flake.nix'
+      - 'flake.lock'
+      - 'default.nix'
+      - 'packaging/nix/**'
+      - '.github/workflows/nix-release.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  nix:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: cachix/install-nix-action@v31
+      - name: Build both Nix entry points
+        run: |
+          nix build .#libregram-desktop --out-link result-flake
+          nixpkgs=$(nix flake archive --json | jq -er .inputs.nixpkgs.path)
+          nix-build default.nix -I "nixpkgs=$nixpkgs" --out-link result-classic
+          test "$(readlink result-flake)" = "$(readlink result-classic)"
+          result-flake/libexec/libregram/libregram-ws-proxy --help >/dev/null
+      - name: Publish the two Nix recipes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=v0.1.0-beta.1
+          mkdir -p dist
+          tar -czf dist/LibreGram-NixOS-x86_64-flakes.tar.gz \
+            default.nix flake.nix flake.lock packaging/nix docs/libregram/install.md
+          tar -czf dist/LibreGram-NixOS-x86_64-no-flakes.tar.gz \
+            default.nix packaging/nix docs/libregram/install.md
+          (cd dist && sha256sum -- *.tar.gz > SHA256SUMS-nix)
+          gh release upload "$version" dist/*.tar.gz dist/SHA256SUMS-nix --repo "$GITHUB_REPOSITORY" --clobber

@@ -7,17 +7,27 @@ Download assets from [GitHub Releases](https://github.com/W0rd3r566/libregram-de
 | Arch Linux, CachyOS | `.pkg.tar.zst` for x86-64 |
 | Ubuntu 24.04 and 26.04, Debian 12 and 13 | `.deb` for amd64 |
 | Other glibc Linux distributions | Portable `.tar.xz` for x86-64. The host provides graphics, GLib, Cairo, Pango, font and audio libraries. |
-| Windows | Portable ZIP for x86-64 |
+| Windows | x86-64 installer (.exe), pending a successful build |
 | NixOS | Nix derivation wrapping the Linux archive |
 
-## NixOS
+## NixOS с flakes
 
-Download the portable Linux archive, then clone and check out the source tag from the same release. From the source directory, run:
+Установите пакет из ветки `main`. Flake использует версию nixpkgs из `flake.lock`.
 
 ```sh
-archive=$(realpath /path/to/LibreGram-0.1.0-beta.1-linux-x86_64.tar.xz)
-nix profile install --impure --expr \
-  "(builtins.getFlake (toString ./.)).lib.mkLibreGram { archive = $archive; version = \"0.1.0-beta.1\"; }"
+nix profile install github:W0rd3r566/libregram-desktop/main#libregram-desktop
 ```
 
-This requires Nix with the `nix-command` and `flakes` features enabled. The derivation uses the pinned nixpkgs revision in `flake.lock`.
+## NixOS без flakes
+
+Если у вас настроен канал `nixpkgs`, выполните:
+
+```sh
+git clone --depth 1 --branch main https://github.com/W0rd3r566/libregram-desktop.git
+cd libregram-desktop
+nix-env -if ./default.nix
+```
+
+Можно также скачать архив рецепта NixOS из Releases. Распакуйте его и из этой папки выполните `nix profile install .#libregram-desktop` для варианта с flakes или `nix-env -if ./default.nix` для варианта без flakes.
+
+Оба варианта скачивают один и тот же архив из Releases и проверяют его SHA-256. Версия без flakes использует ваш `<nixpkgs>`.
