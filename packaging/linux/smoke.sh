@@ -20,7 +20,7 @@ xvfb-run -a bash -euc '
       cat "$profile/stdout.log" >&2
       exit 1
     fi
-    if xwininfo -root -tree | grep -i LibreGram >/dev/null; then
+    if grep -Fq "QRhi: SurfaceRhi created" "$profile/log.txt" 2>/dev/null; then
       "$app" -workdir "$profile" -noupdate -quit
       wait "$pid"
       trap - EXIT

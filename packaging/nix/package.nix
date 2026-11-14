@@ -1,5 +1,5 @@
 { lib, stdenv, stdenvNoCC, autoPatchelfHook, makeWrapper, glib, cairo, pango
-, fontconfig, freetype, libglvnd, libpulseaudio, alsa-lib, dbus
+, fontconfig, freetype, libglvnd, libpulseaudio, alsa-lib, pipewire, dbus
 , libx11, libxcb, libxext, libxrender, libxfixes, libxrandr, libxi
 , libxcomposite, libxdamage, libxtst, vulkan-loader, wayland
 , archive, version
@@ -12,7 +12,7 @@ stdenvNoCC.mkDerivation {
   nativeBuildInputs = [ autoPatchelfHook makeWrapper ];
   buildInputs = [
     stdenv.cc.cc.lib glib cairo pango fontconfig freetype libglvnd
-    libpulseaudio alsa-lib dbus libx11 libxcb libxext libxrender libxfixes
+    libpulseaudio alsa-lib pipewire dbus libx11 libxcb libxext libxrender libxfixes
     libxrandr libxi libxcomposite libxdamage libxtst vulkan-loader wayland
   ];
   dontBuild = true;
@@ -29,7 +29,7 @@ stdenvNoCC.mkDerivation {
     install -Dm644 LICENSE "$out/share/licenses/libregram-desktop/LICENSE"
     install -m644 LEGAL tg-ws-proxy-rs.LICENSE "$out/share/licenses/libregram-desktop/"
     makeWrapper "$out/libexec/libregram/LibreGram" "$out/bin/LibreGram" \
-      --prefix LD_LIBRARY_PATH : "/run/opengl-driver/lib:${lib.makeLibraryPath [ libglvnd libpulseaudio alsa-lib dbus vulkan-loader wayland ]}"
+      --prefix LD_LIBRARY_PATH : "/run/opengl-driver/lib:${lib.makeLibraryPath [ libglvnd libpulseaudio alsa-lib pipewire dbus vulkan-loader wayland ]}"
     runHook postInstall
   '';
   meta = {

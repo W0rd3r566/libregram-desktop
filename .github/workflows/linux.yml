@@ -248,7 +248,7 @@ jobs:
 
       - name: Create Debian and portable Linux packages
         run: |
-          strip --strip-debug out/Debug/artifact/LibreGram
+          strip --strip-debug --strip-unneeded out/Debug/artifact/LibreGram
           packaging/linux/package.sh out/Debug/artifact/LibreGram \
             out/Debug/artifact/libregram-ws-proxy dist '0.1.0~beta.1'
 
@@ -278,7 +278,7 @@ jobs:
             -v "$PWD/packaging/linux/smoke.sh:/smoke.sh:ro" \
             "${{ matrix.image }}" bash -ec '
               apt-get update
-              apt-get install -y --no-install-recommends xvfb xauth x11-utils ca-certificates /packages/*.deb
+              apt-get install -y --no-install-recommends xvfb xauth ca-certificates /packages/*.deb
               bash /smoke.sh /usr/bin/LibreGram /usr/lib/libregram/libregram-ws-proxy
             '
 
@@ -298,7 +298,7 @@ jobs:
           archive=$(realpath dist/*.tar.xz)
           nix build --expr "(builtins.getFlake (toString ./.)).lib.mkLibreGram { archive = $archive; version = \"0.1.0-beta.1\"; }" --impure
           sudo apt-get update
-          sudo apt-get install -y xvfb xauth x11-utils
+          sudo apt-get install -y xvfb xauth
           bash packaging/linux/smoke.sh result/bin/LibreGram result/libexec/libregram/libregram-ws-proxy
 
   publish-beta:
