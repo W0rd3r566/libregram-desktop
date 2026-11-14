@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="Telegram/Resources/art/libregram.png" alt="Логотип LibreGram" width="128">
+
 # LibreGram Desktop
 
 **An experimental Telegram Desktop fork with a familiar Kotatogram-inspired experience.**
@@ -18,32 +20,6 @@ LibreGram Desktop is an independent project based on the Telegram Desktop codeba
 LibreGram is **not affiliated with Telegram** or Telegram FZ-LLC.
 
 LibreGram adds native settings, the Graphite theme, and a [WS Proxy](docs/libregram/ws-proxy.md) switch with optional auto-start. The [profile manager](docs/MULTI_ACCOUNT.md) opens independent workspaces with their own data.
-
-## What the current codebase brings
-
-The inherited Kotatogram feature set includes:
-
-- Local chat folders
-- Forwarding to multiple chats
-- Compact chat list
-- Custom fonts and text replacements
-- Adjustable sticker size
-- Adaptive chat bubbles
-
-These describe capabilities from the upstream base. They are not a promise that every feature has been redesigned or independently maintained by LibreGram.
-
-## Build from source
-
-Build instructions currently focus on Linux and Windows:
-
-| Platform | Guide |
-|:--|:--|
-| Linux | [Build with Docker](docs/building-linux.md) |
-| Windows | [Build with Visual Studio](docs/building-win.md) |
-
-You need your own Telegram API credentials (**api_id** and **api_hash**) to build the application. See [how to obtain them](docs/api_credentials.md).
-
-**Keep credentials private.** Do not commit API values, local secrets, or credential-filled configuration files.
 
 ## Скачать
 
@@ -93,6 +69,70 @@ curl -fLO 'https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1
 ```bash
 curl -fLO 'https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.1/LibreGram-0.1.0-beta.1-linux-x86_64.tar.xz'
 ```
+
+## Быстрый старт
+
+Выполняйте команды установки из папки, куда скачали пакет.
+
+**Arch Linux и CachyOS**
+
+```bash
+sudo pacman -U ./libregram-0.1.0beta1-1-x86_64.pkg.tar.zst
+```
+
+**Ubuntu и Debian**
+
+```bash
+sudo apt install ./libregram-desktop_0.1.0.beta.1_amd64.deb
+```
+
+После установки откройте LibreGram из меню приложений.
+
+**NixOS**
+
+Выберите инструкцию [с flakes](docs/libregram/install.md#nixos-с-flakes) или [без flakes](docs/libregram/install.md#nixos-без-flakes). После установки запустите `LibreGram`.
+
+**Переносной архив Linux**
+
+Распакуйте архив и запустите `./LibreGram` из распакованной папки. Оставьте `libregram-ws-proxy` рядом с клиентом.
+
+### Как включить WS Proxy
+
+1. Откройте главное меню и включите **WS Proxy**. До входа в аккаунт его можно включить из списка прокси на экране входа.
+2. Для автозапуска откройте **Настройки → LibreGram Settings → WS Proxy** и включите **Start WS Proxy when LibreGram opens**. [Подробнее о WS Proxy](docs/libregram/ws-proxy.md)
+
+![Настройки WS Proxy в реальном окне LibreGram Desktop](docs/libregram/screenshots/ws-proxy.png)
+
+## Обратная связь
+
+Сообщайте об ошибках в [GitHub Issues](https://github.com/W0rd3r566/libregram-desktop/issues). Укажите версию LibreGram, ОС и архитектуру, а также шаги, после которых возникает ошибка.
+
+Новости проекта и релизов публикуются в [Telegram-канале LibreGram](https://t.me/libregramm).
+
+## What the current codebase brings
+
+The inherited Kotatogram feature set includes:
+
+- Local chat folders
+- Forwarding to multiple chats
+- Compact chat list
+- Custom fonts and text replacements
+- Adjustable chat bubbles
+
+These describe capabilities from the upstream base. They are not a promise that every feature has been redesigned or independently maintained by LibreGram.
+
+## Build from source
+
+Build instructions currently focus on Linux and Windows:
+
+| Platform | Guide |
+|:--|:--|
+| Linux | [Build with Docker](docs/building-linux.md) |
+| Windows | [Build with Visual Studio](docs/building-win.md) |
+
+You need your own Telegram API credentials (**api_id** and **api_hash**) to build the application. See [how to obtain them](docs/api_credentials.md).
+
+**Keep credentials private.** Do not commit API values, local secrets, or credential-filled configuration files.
 
 ## Project structure
 
