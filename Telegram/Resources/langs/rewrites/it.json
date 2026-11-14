@@ -3,7 +3,7 @@
 	"ktg_about_text1": "Fork sperimentale non ufficiale di {tdesktop_link}",
 	"ktg_about_text1_tdesktop": "Telegram Desktop",
 	"ktg_about_text3": "Visita {channel_link} o {faq_link} per maggiori informazioni.",
-	"ktg_about_text3_channel": "Canale di Kotatogram",
+	"ktg_about_text3_channel": "Canale di LibreGram",
 	"ktg_new_version": "LibreGram è stato aggiornato alla versione {version} (TD {td_version})\n\nLa cronologia completa delle versioni è disponibile qui:\n{link}",
 	"ktg_open_from_tray": "Apri LibreGram",
 	"ktg_quit_from_tray": "Chiudi LibreGram",

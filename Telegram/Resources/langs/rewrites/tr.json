@@ -3,7 +3,7 @@
 	"ktg_about_text1": "Resmi olmayan ve deneysel {tdesktop_link} alternatifi.",
 	"ktg_about_text1_tdesktop": "Masaüstü Telegram",
 	"ktg_about_text3": "daha fazla bilgi için {channel_link} veya {faq_link} ziyaret ediniz.",
-	"ktg_about_text3_channel": "Kotatogram'ın kanalı",
+	"ktg_about_text3_channel": "LibreGram'ın kanalı",
 	"ktg_new_version": "masa üstü LibreGram {version} sürümüne güncellendi (TD {td_version})\n\nTam sürüm geçmişi burda bulunabilir:\n{link}",
 	"ktg_open_from_tray": "LibreGram'ı aç",
 	"ktg_quit_from_tray": "LibreGram'dan çık",

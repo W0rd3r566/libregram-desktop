@@ -3,7 +3,7 @@
 	"ktg_about_text1": "גרסה לא רשמית ומבוססת על {tdesktop_link}.",
 	"ktg_about_text1_tdesktop": "טלגרם למחשב",
 	"ktg_about_text3": "בקר ב {channel_link} או ב {faq_link} לעוד מידע.",
-	"ktg_about_text3_channel": "ערוץ Kotatogram",
+	"ktg_about_text3_channel": "ערוץ LibreGram",
 	"ktg_new_version": "LibreGram עודכן ל {version} (TD {td_version})\n\nרשימת הגירסאות המלאה זמינה כאן:\n{link}",
 	"ktg_open_from_tray": "פתיחת LibreGram",
 	"ktg_quit_from_tray": "יציאה מ LibreGram",

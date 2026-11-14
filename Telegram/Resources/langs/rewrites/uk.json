@@ -3,7 +3,7 @@
 	"ktg_about_text1": "Експериментальний неофіційний форк {tdesktop_link}.",
 	"ktg_about_text1_tdesktop": "Telegram Desktop",
 	"ktg_about_text3": "Щоб дізнатися більше, відвідайте {channel_link} або {faq_link} (англ.).",
-	"ktg_about_text3_channel": "канал Kotatogram",
+	"ktg_about_text3_channel": "канал LibreGram",
 	"ktg_new_version": "LibreGram оновився до версії {version} (TD {td_version})\n\nПовна історія змін доступна тут:\n{link}",
 	"ktg_open_from_tray": "Відкрити LibreGram",
 	"ktg_quit_from_tray": "Закрити LibreGram",

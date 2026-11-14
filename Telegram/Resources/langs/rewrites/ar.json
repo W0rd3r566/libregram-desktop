@@ -3,7 +3,7 @@
 	"ktg_about_text1": "عميل تجريبي وغير رسمي. {tdesktop_link} ",
 	"ktg_about_text1_tdesktop": "سطح مكتب تيليجرام",
 	"ktg_about_text3": "قم بزيارة {channel_link} أو {faq_link} لمزيد من المعلومات.",
-	"ktg_about_text3_channel": "قناة Kotatogram",
+	"ktg_about_text3_channel": "قناة LibreGram",
 	"ktg_new_version": "تم تحديث سطح المكتب LibreGram لـ {version} (TD {td_version})\n\nتاريخ الإصدار الكامل متاح هنا:\n{link}",
 	"ktg_open_from_tray": "فتح LibreGram",
 	"ktg_quit_from_tray": "اغلاق LibreGram",

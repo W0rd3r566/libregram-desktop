@@ -3,7 +3,7 @@
 	"ktg_about_text1": "فورک غیر رسمی {tdesktop_link}.",
 	"ktg_about_text1_tdesktop": "تلگرام دسکتاپ",
 	"ktg_about_text3": "برای اطلاعات بیشتر به {channel_link} یا {faq_link} مراجعه کنید.",
-	"ktg_about_text3_channel": "کانال Kotatogram",
+	"ktg_about_text3_channel": "کانال LibreGram",
 	"ktg_new_version": "LibreGram به {version} (TD {td_version}) به‌روزرسانی شد\n\nتاریخچه نسخه کامل در اینجا موجود است:\n{link}",
 	"ktg_open_from_tray": "باز کردن LibreGram",
 	"ktg_quit_from_tray": "خارج شدن از LibreGram",

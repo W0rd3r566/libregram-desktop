@@ -7,6 +7,8 @@
 [![Development branch](https://img.shields.io/badge/development-dev-20242B?style=flat-square)](https://github.com/W0rd3r566/libregram-desktop/tree/dev)
 [![License](https://img.shields.io/badge/license-see%20LICENSE-20242B?style=flat-square)](LICENSE)
 
+[LibreGram on Telegram](https://t.me/libregramm)
+
 </div>
 
 > **Project status:** experimental. LibreGram is under active development. Interfaces, build steps, and project structure may change.

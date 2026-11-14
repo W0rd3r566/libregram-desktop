@@ -3,7 +3,7 @@
 	"ktg_about_text1": "实验性的非正式 {tdesktop_link} 分支。",
 	"ktg_about_text1_tdesktop": "Telegram Desktop",
 	"ktg_about_text3": "访问 {channel_link} 或 {faq_link} 了解更多。\n",
-	"ktg_about_text3_channel": "Kotatogram 频道",
+	"ktg_about_text3_channel": "LibreGram 频道",
 	"ktg_new_version": "LibreGram 已更新到 {version} (TD {td_version})\n\n访问此链接查看完整版本更新说明:\n{link}",
 	"ktg_open_from_tray": "打开 LibreGram",
 	"ktg_quit_from_tray": "退出 LibreGram",
