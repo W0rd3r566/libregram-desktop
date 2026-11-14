@@ -24,8 +24,8 @@ jobs:
       - uses: cachix/install-nix-action@v31
       - name: Build both Nix entry points
         run: |
-          nix build .#libregram-desktop --out-link result-flake
-          nixpkgs=$(nix flake archive --json | jq -er .inputs.nixpkgs.path)
+          nix build "path:$PWD#libregram-desktop" --out-link result-flake
+          nixpkgs=$(nix flake archive "path:$PWD" --json | jq -er .inputs.nixpkgs.path)
           nix-build default.nix -I "nixpkgs=$nixpkgs" --out-link result-classic
           test "$(readlink result-flake)" = "$(readlink result-classic)"
           result-flake/libexec/libregram/libregram-ws-proxy --help >/dev/null
