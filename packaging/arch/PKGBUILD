@@ -9,6 +9,7 @@ pkgdesc='Independent desktop Telegram client with local customization'
 arch=('x86_64')
 url='https://github.com/W0rd3r566/libregram-desktop'
 license=('GPL-3.0-or-later')
+options=('!lto')
 depends=(
   'abseil-cpp'
   'ada'

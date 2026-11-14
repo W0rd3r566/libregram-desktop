@@ -47,7 +47,7 @@ You need your own Telegram API credentials (**api_id** and **api_hash**) to buil
 
 ## Downloads
 
-See [GitHub Releases](https://github.com/W0rd3r566/libregram-desktop/releases) for published builds.
+See [GitHub Releases](https://github.com/W0rd3r566/libregram-desktop/releases) for published builds and the [installation guide](docs/libregram/install.md) for supported package formats.
 
 ## Project structure
 

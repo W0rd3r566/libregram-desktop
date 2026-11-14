@@ -29,6 +29,7 @@ on:
       - 'Telegram/Telegram/**'
       - 'Telegram/configure.sh'
       - 'Telegram/Telegram.plist'
+  workflow_dispatch:
   pull_request:
     paths-ignore:
       - 'docs/**'
@@ -62,6 +63,7 @@ jobs:
     runs-on: ${{ matrix.arch == 'arm64' && 'windows-11-arm' || 'windows-latest' }}
 
     strategy:
+      fail-fast: false
       matrix:
         arch: [x64_x86, x64, arm64]
         qt: ["", qt6]
@@ -179,6 +181,9 @@ jobs:
           %TBUILD%\%REPO_NAME%\Telegram\build\prepare\win.bat skip-release silent ${{ matrix.qt }}
 
       - name: Read configuration matrix.
+        env:
+          LIBREGRAM_API_ID: ${{ secrets.LIBREGRAM_API_ID }}
+          LIBREGRAM_API_HASH: ${{ secrets.LIBREGRAM_API_HASH }}
         shell: bash
         run: |
           ARTIFACT_NAME="LibreGram"
@@ -209,20 +214,11 @@ jobs:
           [ -n "$GENERATOR" ] && ARCH=""
           echo "TDESKTOP_BUILD_ARCH=$ARCH" >> $GITHUB_ENV
 
-          DEFINE=""
-          if [ -n "${{ matrix.defines }}" ]; then
-            DEFINE="-D ${{ matrix.defines }}=ON"
-            echo "Define from matrix: $DEFINE"
-            ARTIFACT_NAME="${ARTIFACT_NAME} ${{ matrix.defines }}"
-          fi
-          echo "TDESKTOP_BUILD_DEFINE=$DEFINE" >> $GITHUB_ENV
-
           echo "ARTIFACT_NAME=$ARTIFACT_NAME" >> $GITHUB_ENV
 
           API="-D TDESKTOP_API_TEST=ON"
-          if [ $GITHUB_REF == 'refs/heads/nightly' ]; then
-            echo "Use the open credentials."
-            API="-D TDESKTOP_API_ID=611335 -D TDESKTOP_API_HASH=d524b414d21f4d37f08684c1df41ac9c"
+          if [[ "$GITHUB_EVENT_NAME" != pull_request && -n "$LIBREGRAM_API_ID" && -n "$LIBREGRAM_API_HASH" ]]; then
+            API="-D TDESKTOP_API_ID=$LIBREGRAM_API_ID -D TDESKTOP_API_HASH=$LIBREGRAM_API_HASH"
           fi
           echo "TDESKTOP_BUILD_API=$API" >> $GITHUB_ENV
 
@@ -245,8 +241,7 @@ jobs:
           -D CMAKE_COMPILE_WARNING_AS_ERROR=ON ^
           -D CMAKE_MSVC_DEBUG_INFORMATION_FORMAT= ^
           -D DESKTOP_APP_DISABLE_AUTOUPDATE=OFF ^
-          -D DESKTOP_APP_DISABLE_CRASH_REPORTS=OFF ^
-          %TDESKTOP_BUILD_DEFINE%
+          -D DESKTOP_APP_DISABLE_CRASH_REPORTS=OFF
 
           cmake --build ..\out --config Debug --parallel
 
@@ -256,6 +251,26 @@ jobs:
           set OUT=%TBUILD%\%REPO_NAME%\out\Debug
           mkdir artifact
           move %OUT%\LibreGram.exe artifact/
+      - name: Package Windows x64 with WS Proxy
+        if: matrix.arch == 'x64' && matrix.qt == 'qt6'
+        shell: bash
+        run: |
+          repo="$TBUILD/$REPO_NAME"
+          rustup target add x86_64-pc-windows-msvc
+          LIBREGRAM_WS_TARGET=x86_64-pc-windows-msvc \
+            bash "$repo/Telegram/build/ws-proxy/build.sh" artifact
+          ./artifact/libregram-ws-proxy.exe --help >/dev/null
+          cp "$repo/LICENSE" "$repo/LEGAL" artifact/
+          cd artifact
+          7z a ../LibreGram-Windows-x86_64.zip LibreGram.exe libregram-ws-proxy.exe LICENSE LEGAL tg-ws-proxy-rs.LICENSE
+
+      - uses: actions/upload-artifact@v7
+        if: matrix.arch == 'x64' && matrix.qt == 'qt6'
+        with:
+          name: LibreGram Windows x86_64 (${{ matrix.generator || 'Visual Studio' }})
+          path: LibreGram-Windows-x86_64.zip
+          if-no-files-found: error
+
       - uses: actions/upload-artifact@v7
         name: Upload artifact.
         if: (env.UPLOAD_ARTIFACT == 'true') || (github.ref == 'refs/heads/nightly')
@@ -263,3 +278,26 @@ jobs:
           name: ${{ env.ARTIFACT_NAME }}
           path: artifact\
           retention-days: 1
+
+  publish-beta:
+    name: Publish the Windows x64 ZIP
+    needs: windows
+    if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && !cancelled()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v4
+        with:
+          name: LibreGram Windows x86_64 (Visual Studio)
+          path: dist
+      - name: Publish the checked ZIP
+        env:
+          GH_TOKEN: ${{ github.token }}
+          LIBREGRAM_API_ID: ${{ secrets.LIBREGRAM_API_ID }}
+          LIBREGRAM_API_HASH: ${{ secrets.LIBREGRAM_API_HASH }}
+        run: |
+          test -n "$LIBREGRAM_API_ID" && test -n "$LIBREGRAM_API_HASH"
+          (cd dist && sha256sum LibreGram-Windows-x86_64.zip > SHA256SUMS-windows)
+          bash packaging/linux/publish-beta.sh dist/LibreGram-Windows-x86_64.zip dist/SHA256SUMS-windows

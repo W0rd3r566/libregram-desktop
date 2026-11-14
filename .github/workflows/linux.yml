@@ -17,11 +17,17 @@ on:
       - 'changelog.txt'
       - 'LEGAL'
       - 'LICENSE'
+      - 'packaging/**'
+      - '!packaging/linux/**'
+      - '!packaging/nix/**'
+      - '!flake.nix'
+      - '!flake.lock'
       - '.github/**'
       - '!.github/workflows/linux.yml'
       - 'snap/**'
       - 'Telegram/build/**'
       - '!Telegram/build/docker/centos_env/**'
+      - '!Telegram/build/ws-proxy/**'
       - 'Telegram/Resources/uwp/**'
       - 'Telegram/Resources/winrc/**'
       - 'Telegram/SourceFiles/platform/win/**'
@@ -29,6 +35,7 @@ on:
       - 'Telegram/Telegram/**'
       - 'Telegram/configure.bat'
       - 'Telegram/Telegram.plist'
+  workflow_dispatch:
   pull_request:
     paths-ignore:
       - 'docs/**'
@@ -37,11 +44,17 @@ on:
       - 'changelog.txt'
       - 'LEGAL'
       - 'LICENSE'
+      - 'packaging/**'
+      - '!packaging/linux/**'
+      - '!packaging/nix/**'
+      - '!flake.nix'
+      - '!flake.lock'
       - '.github/**'
       - '!.github/workflows/linux.yml'
       - 'snap/**'
       - 'Telegram/build/**'
       - '!Telegram/build/docker/centos_env/**'
+      - '!Telegram/build/ws-proxy/**'
       - 'Telegram/Resources/uwp/**'
       - 'Telegram/Resources/winrc/**'
       - 'Telegram/SourceFiles/platform/win/**'
@@ -142,7 +155,14 @@ jobs:
 
       - name: LibreGram Desktop build.
         if: env.ONLY_CACHE == 'false'
+        env:
+          LIBREGRAM_API_ID: ${{ secrets.LIBREGRAM_API_ID }}
+          LIBREGRAM_API_HASH: ${{ secrets.LIBREGRAM_API_HASH }}
         run: |
+          api=(-D TDESKTOP_API_TEST=ON)
+          if [[ "$GITHUB_EVENT_NAME" != pull_request && -n "$LIBREGRAM_API_ID" && -n "$LIBREGRAM_API_HASH" ]]; then
+            api=(-D "TDESKTOP_API_ID=$LIBREGRAM_API_ID" -D "TDESKTOP_API_HASH=$LIBREGRAM_API_HASH")
+          fi
           DEFINE=""
           if [ -n "${{ matrix.defines }}" ]; then
             DEFINE="-D ${{ matrix.defines }}=ON"
@@ -166,7 +186,7 @@ jobs:
           -D CMAKE_C_FLAGS_DEBUG="-O0 -fpch-preprocess" \
           -D CMAKE_CXX_FLAGS_DEBUG="-O0 -fpch-preprocess" \
           -D CMAKE_COMPILE_WARNING_AS_ERROR=ON \
-          -D TDESKTOP_API_TEST=ON \
+          "${api[@]}" \
           -D DESKTOP_APP_DISABLE_AUTOUPDATE=OFF \
           -D DESKTOP_APP_DISABLE_CRASH_REPORTS=OFF \
           $DEFINE
@@ -217,10 +237,89 @@ jobs:
           cd out/Debug
           mkdir artifact
           mv LibreGram artifact/
+      - name: Build the portable WS Proxy helper
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y musl-tools
+          rustup target add x86_64-unknown-linux-musl
+          LIBREGRAM_WS_TARGET=x86_64-unknown-linux-musl \
+            bash Telegram/build/ws-proxy/build.sh out/Debug/artifact
+          out/Debug/artifact/libregram-ws-proxy --help >/dev/null
+
+      - name: Create Debian and portable Linux packages
+        run: |
+          strip --strip-debug out/Debug/artifact/LibreGram
+          packaging/linux/package.sh out/Debug/artifact/LibreGram \
+            out/Debug/artifact/libregram-ws-proxy dist '0.1.0~beta.1'
+
       - uses: actions/upload-artifact@v7
-        if: env.UPLOAD_ARTIFACT == 'true'
-        name: Upload artifact.
         with:
-          name: ${{ env.ARTIFACT_NAME }}
-          path: out/Debug/artifact/
-          retention-days: 1
+          name: LibreGram Linux x86_64 packages
+          path: dist/
+          if-no-files-found: error
+
+  distro-smoke:
+    name: Install and launch on ${{ matrix.image }}
+    needs: linux
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image: ['ubuntu:24.04', 'ubuntu:26.04', 'debian:12', 'debian:13']
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v4
+        with:
+          name: LibreGram Linux x86_64 packages
+          path: dist
+      - name: Check the installed package in a clean container
+        run: |
+          docker run --rm -v "$PWD/dist:/packages:ro" \
+            -v "$PWD/packaging/linux/smoke.sh:/smoke.sh:ro" \
+            "${{ matrix.image }}" bash -ec '
+              apt-get update
+              apt-get install -y --no-install-recommends xvfb xauth x11-utils ca-certificates /packages/*.deb
+              bash /smoke.sh /usr/bin/LibreGram /usr/lib/libregram/libregram-ws-proxy
+            '
+
+  nix-smoke:
+    name: Build and launch the Nix package
+    needs: linux
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v4
+        with:
+          name: LibreGram Linux x86_64 packages
+          path: dist
+      - uses: cachix/install-nix-action@v31
+      - name: Build against pinned nixpkgs
+        run: |
+          archive=$(realpath dist/*.tar.xz)
+          nix build --expr "(builtins.getFlake (toString ./.)).lib.mkLibreGram { archive = $archive; version = \"0.1.0-beta.1\"; }" --impure
+          sudo apt-get update
+          sudo apt-get install -y xvfb xauth x11-utils
+          bash packaging/linux/smoke.sh result/bin/LibreGram result/libexec/libregram/libregram-ws-proxy
+
+  publish-beta:
+    name: Publish Debian and portable Linux packages
+    needs: [distro-smoke, nix-smoke]
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v4
+        with:
+          name: LibreGram Linux x86_64 packages
+          path: dist
+      - name: Publish packages after checking project API configuration
+        env:
+          GH_TOKEN: ${{ github.token }}
+          LIBREGRAM_API_ID: ${{ secrets.LIBREGRAM_API_ID }}
+          LIBREGRAM_API_HASH: ${{ secrets.LIBREGRAM_API_HASH }}
+        run: |
+          test -n "$LIBREGRAM_API_ID" && test -n "$LIBREGRAM_API_HASH"
+          (cd dist && sha256sum -- *.deb *.tar.xz > SHA256SUMS-linux)
+          bash packaging/linux/publish-beta.sh dist/*.deb dist/*.tar.xz dist/SHA256SUMS-linux

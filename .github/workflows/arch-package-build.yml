@@ -13,7 +13,8 @@ on:
     paths:
       - "packaging/arch/PKGBUILD"
       - ".github/workflows/arch-package-build.yml"
-      - "Telegram/SourceFiles/core/sandbox.cpp"
+      - "packaging/linux/publish-beta.sh"
+      - "Telegram/build/ws-proxy/**"
 
 concurrency:
   group: libregram-arch-${{ github.ref }}
@@ -95,6 +96,7 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v7
       - uses: actions/download-artifact@v4
         with:
           name: libregram-arch-x86_64
@@ -102,30 +104,7 @@ jobs:
       - name: Publish the checked Arch package
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: v0.1.0-beta.1
         run: |
-          set -euo pipefail
-          cd dist
           package=libregram-0.1.0beta1-1-x86_64.pkg.tar.zst
-          test -f "$package"
-          sha256sum "$package" > "$package.sha256"
-          current_head=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')
-          if [[ "$current_head" != "$GITHUB_SHA" ]]; then
-            echo "A newer main commit supersedes this package."
-            exit 0
-          fi
-          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo "This beta has already been published."
-            exit 0
-          fi
-          gh release create "$RELEASE_TAG" "$package" "$package.sha256" \
-            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
-            --title "LibreGram Desktop 0.1.0 beta 1" --notes-file - <<'EOF'
-          First Linux beta for Arch Linux and CachyOS (x86-64).
-
-          - Toggle WS Proxy from the main menu. Its settings include optional startup, restart and TCP fallback.
-          - Manage separate local profiles with their own account data.
-          - Use the Graphite theme and native LibreGram settings.
-
-          Download the package below and install it with `sudo pacman -U libregram-0.1.0beta1-1-x86_64.pkg.tar.zst`.
-          EOF
+          (cd dist && sha256sum "$package" > "$package.sha256")
+          bash packaging/linux/publish-beta.sh "dist/$package" "dist/$package.sha256"
