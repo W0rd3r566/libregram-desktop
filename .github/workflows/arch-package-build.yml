@@ -2,9 +2,21 @@ name: Build LibreGram Arch package
 
 on:
   workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish the tested beta to GitHub Releases
+        type: boolean
+        default: false
   push:
-    tags:
-      - "v*"
+    branches:
+      - main
+    paths:
+      - "packaging/arch/PKGBUILD"
+      - ".github/workflows/arch-package-build.yml"
+
+concurrency:
+  group: libregram-arch-${{ github.ref }}
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -35,6 +47,7 @@ jobs:
           docker run --rm \
             -e LIBREGRAM_API_ID \
             -e LIBREGRAM_API_HASH \
+            -e LIBREGRAM_SOURCE_REF="$GITHUB_SHA" \
             -v "$GITHUB_WORKSPACE:/workspace" \
             -w /workspace/packaging/arch \
             archlinux:base-devel \
@@ -48,14 +61,65 @@ jobs:
                 HOME=/home/builder USER=builder LOGNAME=builder \
                 LIBREGRAM_API_ID="$LIBREGRAM_API_ID" \
                 LIBREGRAM_API_HASH="$LIBREGRAM_API_HASH" \
+                LIBREGRAM_SOURCE_REF="$LIBREGRAM_SOURCE_REF" \
                 CMAKE_BUILD_PARALLEL_LEVEL=2 \
                 makepkg --noconfirm --syncdeps --clean --cleanbuild
+              package=libregram-0.1.0beta1-1-x86_64.pkg.tar.zst
+              test -f "$package"
+              pacman -U --noconfirm "$package"
+              test -x /usr/bin/LibreGram
+              /usr/bin/libregram-ws-proxy --help >/dev/null
+              for executable in /usr/bin/LibreGram /usr/bin/libregram-ws-proxy; do
+                dependencies=$(ldd "$executable")
+                if [[ "$dependencies" == *"not found"* ]]; then
+                  printf "%s\n" "$dependencies" >&2
+                  exit 1
+                fi
+              done
             '
 
       - name: Upload package artifact
         uses: actions/upload-artifact@v4
         with:
           name: libregram-arch-x86_64
-          path: packaging/arch/*.pkg.tar.zst
+          path: packaging/arch/libregram-0.1.0beta1-1-x86_64.pkg.tar.zst
           if-no-files-found: error
           retention-days: 14
+
+  publish-beta:
+    name: Publish LibreGram Desktop 0.1.0 beta 1
+    needs: build
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || inputs.publish)
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: libregram-arch-x86_64
+          path: dist
+      - name: Publish the checked Arch package
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: v0.1.0-beta.1
+        run: |
+          set -euo pipefail
+          cd dist
+          package=libregram-0.1.0beta1-1-x86_64.pkg.tar.zst
+          test -f "$package"
+          sha256sum "$package" > "$package.sha256"
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "This beta has already been published."
+            exit 0
+          fi
+          gh release create "$RELEASE_TAG" "$package" "$package.sha256" \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
+            --title "LibreGram Desktop 0.1.0 beta 1" --notes-file - <<'EOF'
+          First Linux beta for Arch Linux and CachyOS (x86-64).
+
+          - Toggle WS Proxy from the main menu. Its settings include optional startup, restart and TCP fallback.
+          - Manage separate local profiles with their own account data.
+          - Use the Graphite theme and native LibreGram settings.
+
+          Download the package below and install it with `sudo pacman -U libregram-0.1.0beta1-1-x86_64.pkg.tar.zst`.
+          EOF

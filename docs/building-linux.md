@@ -1,74 +1,101 @@
-# Build LibreGram Desktop on Linux
+# Сборка LibreGram Desktop в Linux
 
-This guide builds the **development branch** of this repository inside the included Docker build environment.
+Эта инструкция относится к ветке `main`. Проект использует C++/Qt и собирается штатной системой CMake. Внешний вид приложения не требует отдельного фронтенда или веб-сборки.
 
-## Requirements
+> Для первой нативной сборки на CachyOS / Arch Linux используйте [план релиза 0.1.0](CACHYOS_RELEASE.md) и [инструкцию PKGBUILD](../packaging/arch/README.md). Оставшаяся часть этого документа описывает унаследованный контейнерный способ сборки.
 
-- Git
-- Docker
-- [Poetry](https://python-poetry.org/)
-- Your own Telegram API credentials: `api_id` and `api_hash`
+## 1. Требования
 
-See [API credentials](api_credentials.md) for the official instructions. Keep these values private and never commit them.
+Для рекомендуемого контейнерного способа нужны:
 
-## 1. Clone LibreGram
+- Git с поддержкой submodules;
+- Docker Engine и запущенный Docker daemon;
+- Python 3 и Poetry;
+- собственные Telegram API credentials: `api_id` и `api_hash`.
 
-From the directory where you keep your projects, run:
+Получение credentials описано в [api_credentials.md](api_credentials.md). Не добавляйте реальные значения в Git, исходники или публичные логи.
+
+## 2. Получение исходников
+
+Клонируйте именно репозиторий LibreGram с подмодулями:
 
 ```bash
 git clone --recursive https://github.com/W0rd3r566/libregram-desktop.git
 cd libregram-desktop
 ```
 
-The repository's default branch is `dev`.
+Проверьте, что подмодули загружены:
 
-## 2. Prepare the Docker build environment
+```bash
+git submodule status --recursive
+```
 
-From the repository root:
+Если репозиторий был клонирован без `--recursive`, выполните:
+
+```bash
+git submodule update --init --recursive
+```
+
+## 3. Подготовка контейнера сборки
+
+Из корня репозитория запустите:
 
 ```bash
 ./Telegram/build/prepare/linux.sh
 ```
 
-The script installs the Python build dependencies with Poetry and builds the Docker image named `tdesktop:centos_env`.
+Скрипт устанавливает Python-зависимости окружения через Poetry и собирает Docker-образ `tdesktop:centos_env`. Это унаследованное техническое имя образа сборочной среды, а не название приложения.
 
-## 3. Build a release version
+## 4. Сборка Release
 
-Run this from the **LibreGram repository root**. Replace the placeholders with your own API credentials:
+Передайте свои credentials в CMake во время сборки:
 
 ```bash
 docker run --rm -it \
   -u "$(id -u)" \
   -v "$PWD:/usr/src/tdesktop" \
+  -e CONFIG=Release \
   tdesktop:centos_env \
   /usr/src/tdesktop/Telegram/build/docker/centos_env/build.sh \
   -D TDESKTOP_API_ID=YOUR_API_ID \
   -D TDESKTOP_API_HASH=YOUR_API_HASH
 ```
 
-## 4. Build a debug version
+Замените оба заполнителя собственными значениями. Не публикуйте команду с настоящим `api_hash` в логах, скриншотах или публичных issue.
 
-Use the same command with `CONFIG=Debug` added to the container environment:
+Для Debug-сборки замените `CONFIG=Release` на `CONFIG=Debug`.
+
+## 5. Где находится результат
+
+CMake generator и конфигурация определяют точный каталог результата. Найти исполняемый файл можно командой:
 
 ```bash
-docker run --rm -it \
-  -u "$(id -u)" \
-  -e CONFIG=Debug \
-  -v "$PWD:/usr/src/tdesktop" \
-  tdesktop:centos_env \
-  /usr/src/tdesktop/Telegram/build/docker/centos_env/build.sh \
-  -D TDESKTOP_API_ID=YOUR_API_ID \
-  -D TDESKTOP_API_HASH=YOUR_API_HASH
+find out -type f -name LibreGram -executable -print
 ```
 
-Build output is written to the repository's `out` directory.
+Запускайте найденный бинарный файл из терминала, чтобы видеть диагностические сообщения.
 
-## API credentials and secrets
+## 6. Особенности LibreGram
 
-- Obtain your own credentials using the [official Telegram instructions](https://core.telegram.org/api/obtaining_api_id).
-- Do not paste real values into public issues, pull requests, screenshots, or committed files.
-- If you use an IDE configuration file for local credentials, make sure it stays untracked.
+- Исполняемый файл называется `LibreGram`.
+- Для сборки нужны credentials собственного приложения Telegram. Они не встроены в репозиторий.
+- Автоматическое обновление пока отключено: у LibreGram ещё нет собственного проверенного канала обновлений с подписанными релизами.
+- Внутренние имена унаследованных CMake-целей и сборочного контейнера могут оставаться прежними. Это не меняет имя приложения.
+- Существующие окна, компоновка и элементы Qt сохраняются. Новые возможности добавляются поверх текущего интерфейса.
 
-## Notes
+## 7. Частые проблемы
 
-The build scripts and Docker environment are inherited from the Telegram Desktop/Kotatogram build system. LibreGram-specific packaging and build steps may evolve; please report outdated instructions through the repository issue tracker.
+**Docker daemon недоступен.** Убедитесь, что Docker Engine установлен и запущен, а текущий пользователь имеет право обращаться к Docker.
+
+**Не найдены библиотеки или подмодули.** Повторите `git submodule update --init --recursive`, затем снова запустите подготовку контейнера.
+
+**Ошибка API credentials.** Проверьте, что `api_id` является числом, `api_hash` введён полностью, а оба значения принадлежат одному Telegram-приложению.
+
+**Сборка падает после обновления ветки.** Сохраните полный вывод ошибки, commit SHA и конфигурацию CMake. Не удаляйте `tdata` и локальные сессии ради исправления ошибки сборки.
+
+## Ссылки
+
+- [LibreGram Desktop](https://github.com/W0rd3r566/libregram-desktop)
+- [Ветка разработки](https://github.com/W0rd3r566/libregram-desktop/tree/main)
+- [Telegram API credentials](api_credentials.md)
+- [Аудит исходников](UPSTREAM_AUDIT.md)

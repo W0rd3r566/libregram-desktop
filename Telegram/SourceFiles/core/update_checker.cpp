@@ -2384,21 +2384,8 @@ bool checkReadyUpdate() {
 
 void UpdateApplication() {
 	if (UpdaterDisabled()) {
-		const auto url = [&] {
-#ifdef OS_WIN_STORE
-			return "https://www.microsoft.com/en-us/store/p/telegram-desktop/9nztwsqntd0s";
-#elif defined OS_MAC_STORE // OS_WIN_STORE
-			return "https://itunes.apple.com/ae/app/telegram-desktop/id946399090";
-#else // OS_WIN_STORE || OS_MAC_STORE
-			if (KSandbox::isFlatpak()) {
-				return "https://github.com/W0rd3r566/libregram-desktop/releases";
-			//} else if (KSandbox::isSnap()) {
-			//	return "https://snapcraft.io/telegram-desktop";
-			}
-			return "https://github.com/kotatogram/kotatogram-desktop";
-#endif // OS_WIN_STORE || OS_MAC_STORE
-		}();
-		UrlClickHandler::Open(url);
+		UrlClickHandler::Open(
+			"https://github.com/W0rd3r566/libregram-desktop/releases");
 	} else {
 		cSetAutoUpdate(true);
 		const auto window = Core::IsAppLaunched()

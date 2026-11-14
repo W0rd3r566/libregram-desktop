@@ -569,6 +569,7 @@ void Application::startDomain() {
 
 void Application::startSettingsAndBackground() {
 	Local::rewriteSettingsIfNeeded();
+	libreGramWsProxy().startOnLaunch();
 	Window::Theme::Background()->start();
 	checkSystemDarkMode();
 	Ui::SetScreenReaderModeDisabled(
@@ -2098,7 +2099,7 @@ void Application::RegisterUrlScheme() {
 		.arguments = arguments,
 		.protocol = u"tg"_q,
 		.protocolName = u"Telegram Link"_q,
-		.shortAppName = u"ktgdesktop"_q,
+		.shortAppName = u"libregram"_q,
 		.longAppName = QCoreApplication::applicationName(),
 		.displayAppName = AppName.utf16(),
 		.displayAppDescription = AppName.utf16(),
@@ -2109,7 +2110,7 @@ void Application::RegisterUrlScheme() {
 		.arguments = arguments,
 		.protocol = u"tonsite"_q,
 		.protocolName = u"TonSite Link"_q,
-		.shortAppName = u"ktgdesktop"_q,
+		.shortAppName = u"libregram"_q,
 		.longAppName = QCoreApplication::applicationName(),
 		.displayAppName = AppName.utf16(),
 		.displayAppDescription = AppName.utf16(),

@@ -1440,6 +1440,8 @@ PRIVATE
     kotato/boxes/kotato_radio_box.h
     kotato/boxes/kotato_unpin_box.cpp
     kotato/boxes/kotato_unpin_box.h
+    libregram/profiles/libregram_profiles.cpp
+    libregram/profiles/libregram_profiles.h
     kotato/kotato_lang.cpp
     kotato/kotato_lang.h
     kotato/kotato_radius.cpp
@@ -2653,6 +2655,7 @@ if (LINUX AND DESKTOP_APP_USE_PACKAGED)
     configure_file("../lib/xdg/io.github.w0rd3r566.libregram.metainfo.xml" "${CMAKE_CURRENT_BINARY_DIR}/io.github.w0rd3r566.libregram.metainfo.xml" @ONLY)
     #generate_appstream_changelog(Telegram "${CMAKE_SOURCE_DIR}/changelog.txt" "${CMAKE_CURRENT_BINARY_DIR}/io.github.w0rd3r566.libregram.metainfo.xml")
     install(TARGETS Telegram RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" BUNDLE DESTINATION "${CMAKE_INSTALL_BINDIR}")
+    install(FILES "Resources/art/libregram-logo.svg" DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/scalable/apps" RENAME "io.github.w0rd3r566.libregram.svg")
     install(FILES "Resources/art/icon16.png" DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/16x16/apps" RENAME "io.github.w0rd3r566.libregram.png")
     install(FILES "Resources/art/icon16@2x.png" DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/16x16@2/apps" RENAME "io.github.w0rd3r566.libregram.png")
     install(FILES "Resources/art/icon32.png" DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/32x32/apps" RENAME "io.github.w0rd3r566.libregram.png")

@@ -196,19 +196,32 @@ void WsProxyBox(not_null<Ui::GenericBox*> box) {
 	box->setWidth(st::boxWideWidth);
 	const auto content = box->verticalLayout();
 	Ui::AddDividerText(content, tr::lng_libregram_ws_about());
+	const auto proxy = &Core::App().libreGramWsProxy();
+	const auto autostart = AddButtonWithIcon(
+		content,
+		tr::lng_libregram_ws_auto_start(),
+		st::settingsButtonNoIcon)->toggleOn(proxy->autoStartValue());
+	autostart->toggledChanges() | rpl::on_next([=](bool enabled) {
+		proxy->setAutoStart(enabled);
+	}, autostart->lifetime());
 	const auto fallback = AddButtonWithIcon(
 		content,
 		tr::lng_libregram_ws_tcp_fallback(),
-		st::settingsButtonNoIcon)->toggleOn(rpl::single(false));
+		st::settingsButtonNoIcon)->toggleOn(proxy->tcpFallbackValue());
+	fallback->toggledChanges() | rpl::on_next([=](bool enabled) {
+		proxy->setTcpFallback(enabled);
+	}, fallback->lifetime());
 	const auto status = Ui::AddDividerText(
 		content,
 		rpl::single(QString()));
-	const auto proxy = &Core::App().libreGramWsProxy();
 	const auto start = box->addButton(tr::lng_libregram_ws_start(), [=] {
-		proxy->start(fallback->toggled());
+		proxy->start();
 	});
 	const auto stop = box->addButton(tr::lng_libregram_ws_stop(), [=] {
 		proxy->stop();
+	});
+	const auto restart = box->addLeftButton(tr::lng_restart_button(), [=] {
+		proxy->restart();
 	});
 	box->addButton(tr::lng_close(), [=] { box->closeBox(); });
 	proxy->state() | rpl::on_next([=](State state) {
@@ -224,11 +237,12 @@ void WsProxyBox(not_null<Ui::GenericBox*> box) {
 			Unexpected("WS Proxy state");
 		}();
 		status->setText(message);
-		const auto active = (state == State::Starting || state == State::Listening);
+		const auto active = Core::LibreGramWsProxy::IsActive(state);
 		const auto canStart = !active && (state != State::Stopping);
 		start->setDisabled(!canStart);
 		fallback->setDisabled(!canStart);
 		stop->setDisabled(!active);
+		restart->setDisabled(state != State::Listening);
 	}, box->lifetime());
 }
 

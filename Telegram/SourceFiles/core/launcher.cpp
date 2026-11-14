@@ -34,9 +34,6 @@ extern "C" {
 namespace Core {
 namespace {
 
-constexpr auto kApiIdVarName = "KTGDESKTOP_API_ID"_cs;
-constexpr auto kApiHashVarName = "KTGDESKTOP_API_HASH"_cs;
-
 uint64 InstallationTag = 0;
 
 base::options::toggle OptionHighDpiDownscale({
@@ -437,17 +434,37 @@ int Launcher::exec() {
 	Platform::start();
 	ThirdParty::start();
 
-	if (::Kotato::JsonSettings::GetBool("api_use_env")
-		&& qEnvironmentVariableIsSet(kApiIdVarName.utf8().constData())
-		&& qEnvironmentVariableIsSet(kApiHashVarName.utf8().constData())) {
-		::Kotato::JsonSettings::Set("api_id", qgetenv(kApiIdVarName.utf8().constData()).toInt());
-		::Kotato::JsonSettings::Set("api_hash", QString::fromLatin1(qgetenv(kApiHashVarName.utf8().constData())));
+	const auto applyApiCredentialsFromEnvironment = [](
+			const char *apiIdVariable,
+			const char *apiHashVariable) {
+		if (!qEnvironmentVariableIsSet(apiIdVariable)
+			|| !qEnvironmentVariableIsSet(apiHashVariable)) {
+			return false;
+		}
+		const auto apiId = qgetenv(apiIdVariable).toInt();
+		const auto apiHash = QString::fromLatin1(qgetenv(apiHashVariable));
+		if (apiId <= 0 || apiHash.isEmpty()) {
+			return false;
+		}
+		::Kotato::JsonSettings::Set("api_id", apiId);
+		::Kotato::JsonSettings::Set("api_hash", apiHash);
 		::Kotato::JsonSettings::Set("api_start_params", false);
+		return true;
+	};
+	if (::Kotato::JsonSettings::GetBool("api_use_env")) {
+		// Prefer LibreGram credentials. Keep the legacy pair for existing setups.
+		if (!applyApiCredentialsFromEnvironment(
+				"LIBREGRAM_API_ID",
+				"LIBREGRAM_API_HASH")) {
+			applyApiCredentialsFromEnvironment(
+				"KTGDESKTOP_API_ID",
+				"KTGDESKTOP_API_HASH");
+		}
 	}
 
 	auto result = executeApplication();
 
-	DEBUG_LOG(("Kotatogram finished, result: %1").arg(result));
+	DEBUG_LOG(("LibreGram finished, result: %1").arg(result));
 
 	if (!UpdaterDisabled() && cRestartingUpdate()) {
 		DEBUG_LOG(("Sandbox Info: executing updater to install update."));
@@ -455,7 +472,7 @@ int Launcher::exec() {
 			base::Platform::DeleteDirectory(cWorkingDir() + u"tupdates/temp"_q);
 		}
 	} else if (cRestarting()) {
-		DEBUG_LOG(("Sandbox Info: executing Kotatogram because of restart."));
+		DEBUG_LOG(("Sandbox Info: executing LibreGram because of restart."));
 		launchUpdater(UpdaterLaunch::JustRelaunch);
 	}
 

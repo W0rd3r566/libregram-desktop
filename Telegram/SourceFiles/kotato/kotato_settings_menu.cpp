@@ -9,6 +9,7 @@ https://github.com/kotatogram/kotatogram-desktop/blob/dev/LEGAL
 
 #include "kotato/kotato_lang.h"
 #include "kotato/kotato_settings.h"
+#include "libregram/profiles/libregram_profiles.h"
 #include "base/options.h"
 #include "base/platform/base_platform_info.h"
 #include "settings/settings_common.h"
@@ -46,6 +47,14 @@ https://github.com/kotatogram/kotatogram-desktop/blob/dev/LEGAL
 #include "ui/platform/ui_platform_utility.h"
 #include "ui/vertical_list.h"
 #include "styles/style_menu_icons.h"
+
+#include "ui/widgets/fields/input_field.h"
+
+#include <QtCore/QDateTime>
+#include <QtCore/QLocale>
+
+#include <utility>
+#include <vector>
 
 namespace Settings {
 
@@ -141,6 +150,306 @@ QString ChatIdLabel(int option) {
 			Unexpected("Option in Settings::ChatIdLabel.");
 	}
 	return QString();
+}
+
+void LibreGramProfilesBox(not_null<Ui::GenericBox*> box);
+void LibreGramArchivedProfilesBox(not_null<Ui::GenericBox*> box);
+void LibreGramProfilesBoxImpl(not_null<Ui::GenericBox*> box, bool archivedView);
+
+void LibreGramEditProfileBox(
+		not_null<Ui::GenericBox*> box,
+		const ::LibreGram::Profiles::Profile &profile,
+		bool archivedView) {
+	box->setTitle(ktr("ktg_profiles_edit"));
+
+	const auto name = box->addRow(
+		object_ptr<Ui::InputField>(
+			box,
+			st::defaultInputField,
+			rpl::single(ktr("ktg_profiles_prompt"))),
+		st::boxRowPadding);
+	name->setMaxLength(64);
+	name->setText(profile.name);
+
+	const auto group = box->addRow(
+		object_ptr<Ui::InputField>(
+			box,
+			st::defaultInputField,
+			rpl::single(ktr("ktg_profiles_group"))),
+		st::boxRowPadding);
+	group->setMaxLength(40);
+	group->setText(profile.group);
+
+	const auto tags = box->addRow(
+		object_ptr<Ui::InputField>(
+			box,
+			st::defaultInputField,
+			rpl::single(ktr("ktg_profiles_tags"))),
+		st::boxRowPadding);
+	tags->setMaxLength(8 * 24 + 7 * 2);
+	tags->setText(profile.tags.join(u", "_q));
+
+	box->setFocusCallback([=] {
+		name->setFocusFast();
+	});
+
+	const auto save = [=] {
+		QString error;
+		if (!::LibreGram::Profiles::Update(
+				profile.id,
+				name->getLastText(),
+				group->getLastText(),
+				tags->getLastText().split(',', Qt::SkipEmptyParts),
+				&error)) {
+			Ui::show(Ui::MakeInformBox(error));
+			return;
+		}
+		box->closeBox();
+		Ui::show(Box<Ui::GenericBox>(
+			archivedView ? LibreGramArchivedProfilesBox : LibreGramProfilesBox));
+	};
+	tags->submits() | rpl::on_next(save, tags->lifetime());
+	box->addButton(tr::lng_settings_save(), save);
+	box->addButton(tr::lng_cancel(), [=] {
+		box->closeBox();
+	});
+	box->setWidth(st::aboutWidth);
+}
+
+void LibreGramCreateProfileBox(not_null<Ui::GenericBox*> box) {
+	box->setTitle(ktr("ktg_profiles_create"));
+	const auto input = box->addRow(
+		object_ptr<Ui::InputField>(
+			box,
+			st::defaultInputField,
+			rpl::single(ktr("ktg_profiles_prompt"))),
+		st::boxRowPadding);
+	input->setMaxLength(64);
+	box->setFocusCallback([=] {
+		input->setFocusFast();
+	});
+
+	const auto create = [=] {
+		QString error;
+		if (!::LibreGram::Profiles::Create(
+				input->getLastText(),
+				nullptr,
+				&error)) {
+			input->showError();
+			Ui::show(Ui::MakeInformBox(error));
+			return;
+		}
+		box->closeBox();
+		Ui::show(Box<Ui::GenericBox>(LibreGramProfilesBox));
+	};
+	input->submits() | rpl::on_next(create, input->lifetime());
+	box->addButton(rktr("ktg_profiles_create"), create);
+	box->addButton(tr::lng_cancel(), [=] {
+		box->closeBox();
+	});
+	box->setWidth(st::aboutWidth);
+}
+
+void LibreGramProfilesBoxImpl(
+		not_null<Ui::GenericBox*> box,
+		bool archivedView) {
+	box->setTitle(ktr("ktg_profiles_title"));
+	auto layout = box->verticalLayout();
+	layout->add(
+		object_ptr<Ui::FlatLabel>(
+			box,
+			ktr("ktg_profiles_description"),
+			st::aboutLabel),
+		st::boxRowPadding);
+
+	const auto navigation = layout->add(object_ptr<Button>(
+		box,
+		archivedView
+			? rktr("ktg_profiles_back_to_active")
+			: rktr("ktg_profiles_show_archived"),
+		st::settingsButtonNoIcon), st::boxRowPadding);
+	navigation->addClickHandler([=] {
+		box->closeBox();
+		Ui::show(Box<Ui::GenericBox>(
+			archivedView ? LibreGramProfilesBox : LibreGramArchivedProfilesBox));
+	});
+
+	QString loadError;
+	const auto profiles = archivedView
+		? ::LibreGram::Profiles::ListArchived(&loadError)
+		: ::LibreGram::Profiles::List(&loadError);
+	if (!loadError.isEmpty()) {
+		layout->add(
+			object_ptr<Ui::FlatLabel>(
+				box,
+				loadError,
+				st::aboutLabel),
+			st::boxRowPadding);
+	} else if (profiles.empty()) {
+		layout->add(
+			object_ptr<Ui::FlatLabel>(
+				box,
+				ktr(archivedView
+					? "ktg_profiles_archived_empty"
+					: "ktg_profiles_empty"),
+				st::aboutLabel),
+			st::boxRowPadding);
+	} else {
+		const auto search = layout->add(
+			object_ptr<Ui::InputField>(
+				box,
+				st::defaultInputField,
+				rpl::single(ktr("ktg_profiles_search"))),
+			st::boxRowPadding);
+
+		auto rows = std::vector<std::pair<
+			Ui::SlideWrap<Ui::VerticalLayout>*,
+			QString>>();
+		rows.reserve(profiles.size());
+		for (const auto &profile : profiles) {
+			const auto row = layout->add(
+				object_ptr<Ui::SlideWrap<Ui::VerticalLayout>>(
+					box,
+					object_ptr<Ui::VerticalLayout>(box)));
+			const auto inner = row->entity();
+			const auto button = inner->add(object_ptr<Button>(
+				inner,
+				rpl::single(profile.name),
+				st::settingsButtonNoIcon));
+
+			auto details = QStringList();
+			if (!profile.group.isEmpty()) {
+				details.push_back(profile.group);
+			}
+			if (!profile.tags.isEmpty()) {
+				details.push_back(profile.tags.join(u" · "_q));
+			}
+			if (profile.lastLaunchedAt.isEmpty()) {
+				details.push_back(ktr("ktg_profiles_never_launched"));
+			} else {
+				const auto lastLaunchedAt = QDateTime::fromString(
+					profile.lastLaunchedAt,
+					Qt::ISODateWithMs);
+				if (lastLaunchedAt.isValid()) {
+					details.push_back(ktr(
+						"ktg_profiles_last_launched",
+						{
+							"time",
+							QLocale().toString(
+								lastLaunchedAt.toLocalTime(),
+								QLocale::ShortFormat)
+						}));
+				}
+			}
+			if (!details.isEmpty()) {
+				inner->add(
+					object_ptr<Ui::FlatLabel>(
+						inner,
+						details.join(u"  •  "_q),
+						st::aboutLabel),
+					st::boxRowPadding);
+			}
+
+			const auto favorite = inner->add(
+				object_ptr<Ui::Checkbox>(
+					inner,
+					ktr("ktg_profiles_favorite"),
+					profile.favorite,
+					st::settingsCheckbox),
+				st::settingsCheckboxPadding);
+			favorite->checkedChanges() | rpl::on_next(
+				[=](bool enabled) {
+					QString error;
+					if (!::LibreGram::Profiles::SetFavorite(
+							profile.id,
+							enabled,
+							&error)) {
+						Ui::show(Ui::MakeInformBox(error));
+					}
+				},
+				box->lifetime());
+
+			const auto edit = inner->add(object_ptr<Button>(
+				inner,
+				rktr("ktg_profiles_edit"),
+				st::settingsButtonNoIcon));
+			edit->addClickHandler([=] {
+				box->closeBox();
+				Ui::show(Box<Ui::GenericBox>(
+					[=](not_null<Ui::GenericBox*> editBox) {
+						LibreGramEditProfileBox(editBox, profile, archivedView);
+					}));
+			});
+
+			const auto archive = inner->add(object_ptr<Button>(
+				inner,
+				archivedView
+					? rktr("ktg_profiles_restore")
+					: rktr("ktg_profiles_archive"),
+				st::settingsButtonNoIcon));
+			archive->addClickHandler([=] {
+				QString error;
+				if (!::LibreGram::Profiles::SetArchived(
+						profile.id,
+						!archivedView,
+						&error)) {
+					Ui::show(Ui::MakeInformBox(error));
+					return;
+				}
+				box->closeBox();
+				Ui::show(Box<Ui::GenericBox>(
+					archivedView
+						? LibreGramArchivedProfilesBox
+						: LibreGramProfilesBox));
+			});
+
+			auto searchValue = profile.name + u" "_q + profile.group
+				+ u" "_q + profile.tags.join(u" "_q);
+			rows.emplace_back(row, searchValue);
+			button->addClickHandler([=] {
+				QString error;
+				if (!::LibreGram::Profiles::Launch(profile.id, &error)) {
+					Ui::show(Ui::MakeInformBox(error));
+					return;
+				}
+				box->closeBox();
+			});
+		}
+
+		const auto filterProfiles = [=] {
+			const auto query = search->getLastText().trimmed();
+			for (const auto &[row, searchValue] : rows) {
+				row->toggle(
+					query.isEmpty()
+					|| searchValue.contains(query, Qt::CaseInsensitive),
+					anim::type::normal);
+			}
+		};
+		search->changes() | rpl::on_next(filterProfiles, search->lifetime());
+	}
+
+	if (!archivedView) {
+		box->addButton(rktr("ktg_profiles_create"), [=] {
+			if (!loadError.isEmpty()) {
+				Ui::show(Ui::MakeInformBox(loadError));
+				return;
+			}
+			box->closeBox();
+			Ui::show(Box<Ui::GenericBox>(LibreGramCreateProfileBox));
+		});
+	}
+	box->addButton(tr::lng_close(), [=] {
+		box->closeBox();
+	});
+	box->setWidth(st::aboutWidth);
+}
+
+void LibreGramProfilesBox(not_null<Ui::GenericBox*> box) {
+	LibreGramProfilesBoxImpl(box, false);
+}
+
+void LibreGramArchivedProfilesBox(not_null<Ui::GenericBox*> box) {
+	LibreGramProfilesBoxImpl(box, true);
 }
 
 } // namespace
@@ -694,6 +1003,10 @@ void KotatoTopBarOptions(const Ui::Menu::MenuCallback &addAction) {
 	addAction(
 		ktr("ktg_settings_show_json_settings"),
 		[] { File::ShowInFolder(::Kotato::JsonSettings::CustomFilePath()); },
+		&st::menuIconSettings);
+	addAction(
+		ktr("ktg_profiles_menu"),
+		[] { Ui::show(Box<Ui::GenericBox>(LibreGramProfilesBox)); },
 		&st::menuIconSettings);
 	addAction(
 		ktr("ktg_settings_restart"),

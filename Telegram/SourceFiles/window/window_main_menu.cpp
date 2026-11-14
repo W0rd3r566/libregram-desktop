@@ -19,6 +19,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "calls/calls_instance.h"
 #include "core/application.h"
 #include "core/click_handler_types.h"
+#include "core/libregram_ws_proxy.h"
 #include "data/data_changes.h"
 #include "data/data_document_media.h"
 #include "data/data_folder.h"
@@ -729,6 +730,24 @@ void MainMenu::setupMenu() {
 	)->setClickedCallback([=] {
 		controller->showSettings();
 	});
+
+	using Proxy = Core::LibreGramWsProxy;
+	const auto proxy = &Core::App().libreGramWsProxy();
+	const auto wsToggle = addAction(
+		tr::lng_libregram_ws_proxy(),
+		{ &st::menuIconManage }
+	)->toggleOn(proxy->state() | rpl::map(Proxy::IsActive), true);
+	wsToggle->setClickedCallback([=] { proxy->toggle(); });
+	proxy->state() | rpl::on_next([=](Proxy::State state) {
+		wsToggle->setDisabled(state == Proxy::State::Stopping);
+	}, wsToggle->lifetime());
+	proxy->state() | rpl::skip(1) | rpl::on_next([=](Proxy::State state) {
+		if (state == Proxy::State::Failed) {
+			controller->showToast(tr::lng_libregram_ws_failed(tr::now));
+		} else if (state == Proxy::State::Unavailable) {
+			controller->showToast(tr::lng_libregram_ws_unavailable(tr::now));
+		}
+	}, wsToggle->lifetime());
 
 	_nightThemeToggle = addAction(
 		tr::lng_menu_night_mode(),

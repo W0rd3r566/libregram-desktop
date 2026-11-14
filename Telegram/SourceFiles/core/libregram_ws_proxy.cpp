@@ -5,6 +5,7 @@ For license and upstream attribution, see LICENSE and LEGAL.
 #include "core/libregram_ws_proxy.h"
 
 #include "core/application.h"
+#include "core/core_settings.h"
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QFileInfo>
@@ -16,11 +17,15 @@ namespace {
 constexpr auto kStartTimeout = 10000;
 constexpr auto kStopTimeout = 2000;
 constexpr auto kReadyLimit = 512;
+constexpr auto kAutoStartPref = "libregram/ws-proxy/auto-start";
+constexpr auto kTcpFallbackPref = "libregram/ws-proxy/tcp-fallback";
 
 } // namespace
 
 LibreGramWsProxy::LibreGramWsProxy(Application &app)
-: _app(app) {
+: _app(app)
+, _autoStart(app.settings().readPref<bool>(kAutoStartPref))
+, _tcpFallback(app.settings().readPref<bool>(kTcpFallbackPref)) {
 	_deadline.setSingleShot(true);
 	_process.setStandardErrorFile(QProcess::nullDevice());
 	QObject::connect(&_process, &QProcess::readyReadStandardOutput,
@@ -35,7 +40,11 @@ LibreGramWsProxy::LibreGramWsProxy(Application &app)
 		_deadline.stop();
 		_app.setTemporaryWsProxy({});
 		if (_state.current() == State::Stopping) {
+			const auto restart = std::exchange(_restartPending, false);
 			_state = State::Off;
+			if (restart) {
+				start();
+			}
 		} else {
 			_state = State::Failed;
 		}
@@ -60,7 +69,13 @@ LibreGramWsProxy::~LibreGramWsProxy() {
 	}
 }
 
-void LibreGramWsProxy::start(bool tcpFallback) {
+void LibreGramWsProxy::startOnLaunch() {
+	if (!std::exchange(_startupChecked, true) && _autoStart.current()) {
+		start();
+	}
+}
+
+void LibreGramWsProxy::start() {
 	if (_process.state() != QProcess::NotRunning) {
 		return;
 	}
@@ -92,11 +107,16 @@ void LibreGramWsProxy::start(bool tcpFallback) {
 		u"--no-outbound-proxy"_q,
 		u"--quiet"_q,
 		u"--pinned-upstream"_q,
-		tcpFallback ? u"ws,tcp"_q : u"ws"_q,
+		_tcpFallback.current() ? u"ws,tcp"_q : u"ws"_q,
 	});
 }
 
 void LibreGramWsProxy::stop() {
+	_restartPending = false;
+	stopProcess();
+}
+
+void LibreGramWsProxy::stopProcess() {
 	if (_process.state() == QProcess::NotRunning
 		|| _state.current() == State::Stopping) {
 		return;
@@ -107,8 +127,46 @@ void LibreGramWsProxy::stop() {
 	_deadline.start(kStopTimeout);
 }
 
+void LibreGramWsProxy::restart() {
+	if (_state.current() == State::Listening) {
+		_restartPending = true;
+		stopProcess();
+	}
+}
+
+void LibreGramWsProxy::toggle() {
+	const auto current = _state.current();
+	if (IsActive(current)) {
+		stop();
+	} else if (current != State::Stopping) {
+		start();
+	}
+}
+
+void LibreGramWsProxy::setAutoStart(bool enabled) {
+	_app.settings().writePref<bool>(kAutoStartPref, enabled);
+	_autoStart = enabled;
+}
+
+rpl::producer<bool> LibreGramWsProxy::autoStartValue() const {
+	return _autoStart.value();
+}
+
+void LibreGramWsProxy::setTcpFallback(bool enabled) {
+	_app.settings().writePref<bool>(kTcpFallbackPref, enabled);
+	_tcpFallback = enabled;
+}
+
+rpl::producer<bool> LibreGramWsProxy::tcpFallbackValue() const {
+	return _tcpFallback.value();
+}
+
 rpl::producer<LibreGramWsProxy::State> LibreGramWsProxy::state() const {
 	return _state.value();
+}
+
+bool LibreGramWsProxy::IsActive(State state) {
+	return (state == State::Starting || state == State::Listening);
 }
 
 void LibreGramWsProxy::readReady() {

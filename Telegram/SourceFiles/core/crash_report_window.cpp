@@ -485,7 +485,7 @@ LastCrashedWindow::LastCrashedWindow(
 	});
 	_saveReport.setText(u"SAVE TO FILE"_q);
 	connect(&_saveReport, &QPushButton::clicked, [=] { saveReport(); });
-	_getApp.setText(u"GET THE LATEST OFFICIAL VERSION OF LIBREGRAM DESKTOP"_q);
+	_getApp.setText(u"OPEN THE LIBREGRAM PROJECT PAGE"_q);
 	connect(&_getApp, &QPushButton::clicked, [=] {
 		QDesktopServices::openUrl(u"https://github.com/W0rd3r566/libregram-desktop"_q);
 	});

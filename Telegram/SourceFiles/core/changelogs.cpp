@@ -56,7 +56,7 @@ Changelogs::Changelogs(not_null<Main::Session*> session, int oldVersion, int old
 , _oldVersion(oldVersion)
 , _oldKotatoVersion(oldKotatoVersion) {
 
-	LOG(("Previous Kotatogram version: %1").arg(_oldKotatoVersion));
+	LOG(("Previous LibreGram data version: %1").arg(_oldKotatoVersion));
 
 	_session->data().chatsListChanges(
 	) | rpl::filter([](Data::Folder *folder) {
@@ -88,25 +88,10 @@ void Changelogs::addKotatoLogs() {
 	if (_addedSomeLocal) {
 		return;
 	}
-	auto baseLang = Lang::GetInstance().baseId();
-	auto currentLang = Lang::Id();
-	QString channelLink;
-
-	for (const auto language : { "ru", "uk", "be" }) {
-		if (baseLang.startsWith(QLatin1String(language)) || currentLang == QString(language)) {
-			channelLink = "https://t.me/kotatogram_ru";
-			break;
-		}
-	}
-
-	if (channelLink.isEmpty()) {
-		channelLink = "https://t.me/kotatogram";
-	}
-
 	const auto text = ktr("ktg_new_version",
 		{ "version", QString::fromLatin1(AppKotatoVersionStr) },
 		{ "td_version", QString::fromLatin1(AppVersionStr) },
-		{ "link", channelLink });
+		{ "link", u"https://github.com/W0rd3r566/libregram-desktop/releases"_q });
 	addLocalLog(text.trimmed());
 }
 

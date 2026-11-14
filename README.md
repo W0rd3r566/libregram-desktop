@@ -4,7 +4,7 @@
 
 **An experimental Telegram Desktop fork with a familiar Kotatogram-inspired experience.**
 
-[![Development branch](https://img.shields.io/badge/development-dev-20242B?style=flat-square)](https://github.com/W0rd3r566/libregram-desktop/tree/dev)
+[![Development branch](https://img.shields.io/badge/development-main-20242B?style=flat-square)](https://github.com/W0rd3r566/libregram-desktop/tree/main)
 [![License](https://img.shields.io/badge/license-see%20LICENSE-20242B?style=flat-square)](LICENSE)
 
 [LibreGram on Telegram](https://t.me/libregramm)
@@ -16,6 +16,8 @@
 LibreGram Desktop is an independent project based on the Telegram Desktop codebase and the Kotatogram fork. The goal is to build on the familiar desktop experience while developing LibreGram-specific improvements.
 
 LibreGram is **not affiliated with Telegram** or Telegram FZ-LLC.
+
+LibreGram adds native settings, the Graphite theme, and a [WS Proxy](docs/libregram/ws-proxy.md) switch with optional auto-start. The [profile manager](docs/MULTI_ACCOUNT.md) opens independent workspaces with their own data.
 
 ## What the current codebase brings
 
@@ -45,7 +47,7 @@ You need your own Telegram API credentials (**api_id** and **api_hash**) to buil
 
 ## Downloads
 
-There are currently no public binary releases. Prebuilt packages will be linked here when they are ready.
+See [GitHub Releases](https://github.com/W0rd3r566/libregram-desktop/releases) for published builds.
 
 ## Project structure
 

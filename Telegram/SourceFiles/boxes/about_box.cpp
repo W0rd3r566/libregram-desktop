@@ -47,7 +47,7 @@ rpl::producer<TextWithEntities> Text2() {
 		lt_gpl_link,
 		rpl::single(tr::link(
 			"GNU GPL",
-			"https://github.com/W0rd3r566/libregram-desktop/blob/dev/LICENSE")),
+			"https://github.com/W0rd3r566/libregram-desktop/blob/main/LICENSE")),
 		lt_github_link,
 		rpl::single(tr::link(
 			"GitHub",
