@@ -2,7 +2,7 @@
 , fontconfig, freetype, libglvnd, libpulseaudio, alsa-lib, pipewire, dbus
 , libx11, libxcb, libxext, libxrender, libxfixes, libxrandr, libxi
 , libxcomposite, libxdamage, libxtst, libxcb-keysyms, libdrm, mesa, udev
-, vulkan-loader, wayland, gtk3
+, vulkan-loader, wayland, gtk3, xkeyboard_config
 , archive, version
 }:
 
@@ -31,6 +31,7 @@ stdenvNoCC.mkDerivation {
     install -Dm644 LICENSE "$out/share/licenses/libregram-desktop/LICENSE"
     install -m644 LEGAL tg-ws-proxy-rs.LICENSE "$out/share/licenses/libregram-desktop/"
     makeWrapper "$out/libexec/libregram/LibreGram" "$out/bin/LibreGram" \
+      --set-default XKB_CONFIG_ROOT "${xkeyboard_config}/etc/X11/xkb" \
       --prefix LD_LIBRARY_PATH : "/run/opengl-driver/lib:${lib.makeLibraryPath [ libglvnd libpulseaudio alsa-lib pipewire dbus vulkan-loader wayland libx11 libxcb libxcb-keysyms libdrm mesa udev gtk3 ]}"
     runHook postInstall
   '';
