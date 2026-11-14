@@ -59,6 +59,40 @@ You need your own Telegram API credentials (**api_id** and **api_hash**) to buil
 | Windows x64 | Установщик `.exe` будет в [Releases](https://github.com/W0rd3r566/libregram-desktop/releases/tag/v0.1.0-beta.1) после успешной сборки. |
 | macOS | Пакета этой беты пока нет. |
 
+### Команды скачивания
+
+Команды сохраняют файл в текущей папке.
+
+**Arch Linux и CachyOS**
+
+```bash
+curl -fLO 'https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.1/libregram-0.1.0beta1-1-x86_64.pkg.tar.zst'
+```
+
+**Ubuntu 24.04 и 26.04, Debian 12 и 13**
+
+```bash
+curl -fLO 'https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.1/libregram-desktop_0.1.0.beta.1_amd64.deb'
+```
+
+**NixOS с flakes**
+
+```bash
+curl -fLO 'https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.1/LibreGram-NixOS-x86_64-flakes.tar.gz'
+```
+
+**NixOS без flakes**
+
+```bash
+curl -fLO 'https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.1/LibreGram-NixOS-x86_64-no-flakes.tar.gz'
+```
+
+**Другие Linux с glibc**
+
+```bash
+curl -fLO 'https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.1/LibreGram-0.1.0-beta.1-linux-x86_64.tar.xz'
+```
+
 ## Project structure
 
 - `Telegram/` — application source and build system
