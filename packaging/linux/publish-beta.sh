@@ -42,7 +42,7 @@ if jq -e '
         "LibreGram-Windows-x86_64-portable.zip",
         "SHA256SUMS-windows-x86_64",
         "LibreGram-0.1.0-beta.2-linux-x86_64.tar.xz",
-        "libregram-desktop_0.1.0~beta.2_amd64.deb",
+        "libregram-desktop_0.1.0.beta.2_amd64.deb",
         "SHA256SUMS-linux",
         "libregram-0.1.0beta2-1-x86_64.pkg.tar.zst",
         "libregram-0.1.0beta2-1-x86_64.pkg.tar.zst.sha256",

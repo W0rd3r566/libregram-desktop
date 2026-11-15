@@ -327,9 +327,11 @@ jobs:
           LIBREGRAM_API_HASH: ${{ secrets.LIBREGRAM_API_HASH }}
         run: |
           test -n "$LIBREGRAM_API_ID" && test -n "$LIBREGRAM_API_HASH"
-          (cd dist && sha256sum -- *.deb *.tar.xz > SHA256SUMS-linux)
           archive=$(basename dist/*.tar.xz)
-          pkg=$(basename dist/*.deb)
+          built_pkg=$(basename dist/*.deb)
+          pkg=${built_pkg//\~/.}
+          mv -- "dist/$built_pkg" "dist/$pkg"
+          (cd dist && sha256sum -- "$pkg" "$archive" > SHA256SUMS-linux)
           nix_root=$(mktemp -d)
           mkdir -p "$nix_root/packaging" "$nix_root/docs/libregram"
           cp -a default.nix flake.nix flake.lock "$nix_root/"

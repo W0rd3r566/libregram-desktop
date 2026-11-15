@@ -313,6 +313,41 @@ jobs:
           Set-Content (Join-Path $profile "README.txt") "LibreGram stores its portable profile in this folder."
           Compress-Archive -Path artifact/* -DestinationPath "LibreGram-Windows-$env:OUTPUT_ARCH-portable.zip"
 
+      - name: Check the installed WS Proxy listener
+        shell: pwsh
+        run: |
+          $start = [Diagnostics.ProcessStartInfo]::new()
+          $start.FileName = Join-Path $env:LIBREGRAM_INSTALL_DIR "libregram-ws-proxy.exe"
+          $start.UseShellExecute = $false
+          $start.RedirectStandardInput = $true
+          $start.RedirectStandardOutput = $true
+          foreach ($arg in @("--host", "127.0.0.1", "--link-ip", "127.0.0.1", "--port", "0")) {
+            $start.ArgumentList.Add($arg)
+          }
+          $helper = [Diagnostics.Process]::Start($start)
+          try {
+            $link = $helper.StandardOutput.ReadLineAsync()
+            if (!$link.Wait(15000)) { throw "WS Proxy did not announce a listener" }
+            $match = [regex]::Match([string]$link.Result, '^tg://proxy\?server=127\.0\.0\.1&port=([1-9]\d*)&')
+            if (!$match.Success) { throw "WS Proxy announced an invalid listener" }
+            $port = [int]$match.Groups[1].Value
+            $client = [Net.Sockets.TcpClient]::new()
+            try {
+              if (!$client.ConnectAsync("127.0.0.1", $port).Wait(5000)) {
+                throw "WS Proxy did not accept a connection"
+              }
+            } finally {
+              $client.Dispose()
+            }
+            $helper.StandardInput.Close()
+            if (!$helper.WaitForExit(10000) -or $helper.ExitCode -ne 0) {
+              throw "WS Proxy did not stop cleanly"
+            }
+          } finally {
+            if (!$helper.HasExited) { $helper.Kill() }
+            $helper.Dispose()
+          }
+
       - name: Start the installed and portable clients
         shell: pwsh
         run: |
