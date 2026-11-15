@@ -216,9 +216,12 @@ jobs:
           fi
           echo "TDESKTOP_BUILD_API=$API" >> $GITHUB_ENV
 
-      - name: Free up some disk space.
+      - name: Remove intermediate dependency builds
         shell: bash
-        run: find $LibrariesPath '(' '(' ! '(' -name '*.lib' -o -name '*.a' -o -name '*.exe' -o -name '*.h' -o -name '*.hpp' -o -name '*.inc' -o -name '*.cmake' -o -name '*.pc' -o -path '*/include/*' -o -path '*/objects-*' -o -path '*/cache_keys/*' -o -path '*/patches/*' -o -path '*/nv-codec-headers/*' ')' -type f ')' -o -empty ')' -delete
+        run: |
+          find "$LibrariesPath" \
+            '(' '(' ! '(' -name '*.lib' -o -name '*.a' -o -name '*.exe' -o -name '*.h' -o -name '*.hpp' -o -name '*.inc' -o -name '*.cmake' -o -name '*.pc' -o -path '*/include/*' -o -path '*/objects-*' -o -path '*/cache_keys/*' -o -path '*/patches/*' -o -path '*/nv-codec-headers/*' ')' -type f ')' -o -empty ')' -delete
+          df -h "$LibrariesPath"
 
       - name: LibreGram Desktop build.
         run: |
@@ -230,11 +233,16 @@ jobs:
           ${{ matrix.qt }} ^
           %TDESKTOP_BUILD_API% ^
           -D CMAKE_CONFIGURATION_TYPES=Debug ^
+          -D "CMAKE_C_FLAGS_DEBUG=/O1" ^
+          -D "CMAKE_CXX_FLAGS_DEBUG=/O1" ^
+          -D "CMAKE_EXE_LINKER_FLAGS_DEBUG=/DEBUG:NONE /INCREMENTAL:NO /OPT:REF" ^
+          -D "CMAKE_SHARED_LINKER_FLAGS_DEBUG=/DEBUG:NONE /INCREMENTAL:NO /OPT:REF" ^
           -D CMAKE_COMPILE_WARNING_AS_ERROR=ON ^
           -D CMAKE_MSVC_DEBUG_INFORMATION_FORMAT= ^
           -D DESKTOP_APP_DISABLE_AUTOUPDATE=OFF ^
           -D DESKTOP_APP_DISABLE_CRASH_REPORTS=OFF
 
+          if errorlevel 1 exit /b 1
           cmake --build ..\out --config Debug --parallel
 
       - name: Move artifact.
@@ -270,31 +278,6 @@ jobs:
             }
           }
 
-      - name: Start and exit the Windows client
-        shell: pwsh
-        run: |
-          $binary = (Resolve-Path artifact/LibreGram.exe).Path
-          $profile = Join-Path $env:RUNNER_TEMP "LibreGram-smoke-$PID"
-          New-Item -ItemType Directory -Path $profile | Out-Null
-          $argsList = "-workdir `"$profile`" -noupdate"
-          $app = Start-Process -FilePath $binary -ArgumentList $argsList -PassThru
-          try {
-            $window = $false
-            for ($i = 0; $i -lt 60; $i++) {
-              $app.Refresh()
-              if ($app.HasExited) { throw "LibreGram exited before opening a window" }
-              if ($app.MainWindowHandle -ne 0) { $window = $true; break }
-              Start-Sleep -Milliseconds 500
-            }
-            if (!$window) { throw "LibreGram did not open a window" }
-            $quit = Start-Process -FilePath $binary -ArgumentList "$argsList -quit" -PassThru
-            if (!$quit.WaitForExit(10000) -or !$app.WaitForExit(10000) -or $app.ExitCode -ne 0) {
-              throw "LibreGram did not exit cleanly"
-            }
-          } finally {
-            if (!$app.HasExited) { $app.Kill() }
-          }
-
       - name: Build and verify the Windows installer
         shell: pwsh
         run: |
@@ -312,7 +295,8 @@ jobs:
           $installerName = "LibreGram-Windows-$env:OUTPUT_ARCH.exe"
           & $iscc "/DLibreGramPayload=$source" "/DLibreGramArch=$env:OUTPUT_ARCH" "/O$PWD" $project
           if ($LASTEXITCODE -ne 0) { throw "LibreGram installer build failed" }
-          $target = Join-Path $env:RUNNER_TEMP "LibreGram-install-$PID"
+          $target = Join-Path $env:RUNNER_TEMP "LibreGram-install"
+          "LIBREGRAM_INSTALL_DIR=$target" >> $env:GITHUB_ENV
           $installer = Start-Process -FilePath (Join-Path $PWD $installerName) -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /DIR=`"$target`"" -Wait -PassThru
           if ($installer.ExitCode -ne 0) { throw "Silent installation failed" }
           foreach ($name in @("LibreGram.exe", "libregram-ws-proxy.exe")) {
@@ -328,6 +312,46 @@ jobs:
           New-Item -ItemType Directory -Path $profile | Out-Null
           Set-Content (Join-Path $profile "README.txt") "LibreGram stores its portable profile in this folder."
           Compress-Archive -Path artifact/* -DestinationPath "LibreGram-Windows-$env:OUTPUT_ARCH-portable.zip"
+
+      - name: Start the installed and portable clients
+        shell: pwsh
+        run: |
+          function Test-LibreGram($binary, $argsList) {
+            $app = Start-Process -FilePath $binary -ArgumentList $argsList -PassThru
+            try {
+              for ($i = 0; $i -lt 60; $i++) {
+                $app.Refresh()
+                if ($app.HasExited) { throw "$binary exited before opening a window" }
+                if ($app.MainWindowHandle -ne 0) { break }
+                Start-Sleep -Milliseconds 500
+              }
+              if ($app.MainWindowHandle -eq 0) { throw "$binary did not open a window" }
+              $quit = Start-Process -FilePath $binary -ArgumentList "$argsList -quit" -PassThru
+              if (!$quit.WaitForExit(10000) -or $quit.ExitCode -ne 0 -or
+                  !$app.WaitForExit(10000) -or $app.ExitCode -ne 0) {
+                throw "$binary did not exit cleanly"
+              }
+            } finally {
+              if (!$app.HasExited) { $app.Kill() }
+            }
+          }
+
+          $profile = Join-Path $env:RUNNER_TEMP "LibreGram-smoke-$PID"
+          New-Item -ItemType Directory -Path $profile | Out-Null
+          Test-LibreGram (Join-Path $env:LIBREGRAM_INSTALL_DIR "LibreGram.exe") "-workdir `"$profile`" -noupdate"
+
+          $portable = Join-Path $env:RUNNER_TEMP "LibreGram-portable-$PID"
+          Expand-Archive "LibreGram-Windows-$env:OUTPUT_ARCH-portable.zip" $portable
+          foreach ($name in @("LibreGram.exe", "libregram-ws-proxy.exe")) {
+            if ((Get-FileHash (Join-Path $portable $name)).Hash -ne
+                (Get-FileHash (Join-Path artifact $name)).Hash) {
+              throw "Portable $name failed its hash check"
+            }
+          }
+          Test-LibreGram (Join-Path $portable "LibreGram.exe") "-noupdate"
+          if (!(Test-Path (Join-Path $portable "TelegramForcePortable/tdata"))) {
+            throw "LibreGram did not create its portable profile"
+          }
 
       - uses: actions/upload-artifact@v7
         with:
