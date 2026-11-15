@@ -1,4 +1,10 @@
 {
+	"ktg_libregram_dnd": "Не беспокоить",
+	"ktg_libregram_dnd_resume": "Возобновить уведомления",
+	"ktg_libregram_dnd_about": "Приостанавливает уведомления чатов на этом компьютере.",
+	"ktg_libregram_dnd_hour": "На час",
+	"ktg_libregram_dnd_tomorrow": "До завтра",
+	"ktg_libregram_dnd_manual": "Пока не выключу",
 	"ktg_libregram_seasonal_icon": "Сезонная иконка приложения",
 	"ktg_libregram_seasonal_icon_about": "Цвет акцента зависит от времени года. Если вы выбрали свою иконку, клиент покажет её.",
 	"ktg_libregram_local_premium_badge": "Локальный значок Premium",

@@ -20,6 +20,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/history_item_helpers.h"
 #include "history/view/history_view_chat_section.h"
 #include "lang/lang_keys.h"
+#include "kotato/kotato_settings.h"
 #include "data/notify/data_notify_settings.h"
 #include "data/stickers/data_custom_emoji.h"
 #include "data/data_document_media.h"
@@ -46,6 +47,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/text/text_utilities.h"
 #include "platform/platform_specific.h"
 
+#include <QtCore/QDateTime>
 #include <QtGui/QWindow>
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
@@ -59,6 +61,8 @@ namespace Notifications {
 namespace {
 
 // not more than one sound in 500ms from one peer - grouping
+const auto kLocalPauseKey = u"libregram/notification_pause_until"_q;
+
 constexpr auto kMinimalDelay = crl::time(100);
 constexpr auto kMinimalForwardDelay = crl::time(500);
 constexpr auto kMinimalAlertDelay = crl::time(500);
@@ -209,7 +213,8 @@ System::NotificationInHistoryKey::NotificationInHistoryKey(
 System::System()
 : _waitTimer([=] { showNext(); })
 , _waitForAllGroupedTimer([=] { showGrouped(); })
-, _manager(std::make_unique<DummyManager>(this)) {
+, _manager(std::make_unique<DummyManager>(this))
+, _localPauseTimer([=] { updateLocalPauseTimer(); }) {
 	settingsChanged(
 	) | rpl::on_next([=](ChangeType type) {
 		if (type == ChangeType::DesktopEnabled) {
@@ -228,6 +233,67 @@ System::System()
 	 ) | rpl::on_next([=] {
 		createManager();
 	}, lifetime());
+}
+
+void System::restoreLocalPause() {
+	const auto stored = ::Kotato::JsonSettings::GetString(
+		kLocalPauseKey).toLongLong();
+	if (stored == kPauseUntilResumed
+		|| stored > QDateTime::currentSecsSinceEpoch()) {
+		_localPauseUntil = stored;
+		updateLocalPauseTimer();
+	}
+}
+
+void System::setLocalPauseUntil(qint64 timestamp) {
+	if (timestamp != kPauseUntilResumed
+		&& timestamp <= QDateTime::currentSecsSinceEpoch()) {
+		timestamp = 0;
+	}
+	if (_localPauseUntil.current() == timestamp) {
+		return;
+	}
+	_localPauseUntil = timestamp;
+	if (timestamp) {
+		_waitTimer.cancel();
+		_waitForAllGroupedTimer.cancel();
+		_lastForwardedCount = 0;
+		_lastHistoryItemId = FullMsgId();
+		_lastHistorySessionId = 0;
+		_lastSoundId.reset();
+		clearAll();
+	}
+	::Kotato::JsonSettings::Set(
+		kLocalPauseKey,
+		timestamp ? QString::number(timestamp) : QString());
+	::Kotato::JsonSettings::Write();
+	updateLocalPauseTimer();
+}
+
+bool System::localNotificationsPaused() const {
+	const auto timestamp = _localPauseUntil.current();
+	return (timestamp == kPauseUntilResumed)
+		|| (timestamp > QDateTime::currentSecsSinceEpoch());
+}
+
+rpl::producer<bool> System::localNotificationsPausedValue() const {
+	return _localPauseUntil.value() | rpl::map([=] {
+		return localNotificationsPaused();
+	}) | rpl::distinct_until_changed();
+}
+
+void System::updateLocalPauseTimer() {
+	_localPauseTimer.cancel();
+	const auto until = _localPauseUntil.current();
+	if (until <= 0) {
+		return;
+	}
+	const auto remaining = until - QDateTime::currentSecsSinceEpoch();
+	if (remaining <= 0) {
+		setLocalPauseUntil(0);
+	} else {
+		_localPauseTimer.callOnce(std::min(remaining, qint64(60)) * 1000);
+	}
 }
 
 void System::createManager() {
@@ -437,6 +503,10 @@ void System::schedule(Data::ItemNotification notification) {
 	const auto item = notification.item;
 	const auto type = notification.type;
 	const auto thread = item->notificationThread();
+	if (localNotificationsPaused()) {
+		thread->popNotification(notification);
+		return;
+	}
 	const auto skip = skipNotification(notification);
 	if (skip.value == SkipState::Skip) {
 		thread->popNotification(notification);
@@ -684,6 +754,10 @@ void System::checkDelayed() {
 void System::showGrouped() {
 	Expects(_manager != nullptr);
 
+	if (localNotificationsPaused()) {
+		return;
+	}
+
 	if (const auto session = findSession(_lastHistorySessionId)) {
 		if (const auto lastItem = session->data().message(_lastHistoryItemId)) {
 			_waitForAllGroupedTimer.cancel();
@@ -703,7 +777,7 @@ void System::showGrouped() {
 void System::showNext() {
 	Expects(_manager != nullptr);
 
-	if (Core::Quitting()) {
+	if (Core::Quitting() || localNotificationsPaused()) {
 		return;
 	}
 
@@ -754,6 +828,9 @@ void System::showNext() {
 			if (const auto window = Core::App().windowFor(peer)) {
 				if (const auto controller = window->sessionController()) {
 					_manager->maybeFlashBounce(crl::guard(controller, [=] {
+						if (localNotificationsPaused()) {
+							return;
+						}
 						if (const auto handle = window->widget()->windowHandle()) {
 							handle->alert(kSystemAlertDuration);
 							// (handle, SLOT(_q_clearAlert())); in the future.
@@ -775,6 +852,9 @@ void System::showNext() {
 					Data::DefaultNotifyType(alertThread->peer()));
 			}
 			_manager->maybePlaySound(crl::guard(&owner->session(), [=] {
+				if (localNotificationsPaused()) {
+					return;
+				}
 				const auto track = lookupSound(owner, id);
 				track->playOnce(volume ? volume * 0.01 : 0);
 				Media::Player::mixer()->suppressAll(track->getLengthMs());

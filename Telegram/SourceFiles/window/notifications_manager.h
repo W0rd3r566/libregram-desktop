@@ -104,6 +104,13 @@ public:
 	[[nodiscard]] rpl::producer<> managerChanged() const;
 	[[nodiscard]] bool nativeEnforced() const;
 
+	static constexpr auto kPauseUntilResumed = qint64(-1);
+
+	void restoreLocalPause();
+	void setLocalPauseUntil(qint64 timestamp);
+	[[nodiscard]] bool localNotificationsPaused() const;
+	[[nodiscard]] rpl::producer<bool> localNotificationsPausedValue() const;
+
 	void checkDelayed();
 	void schedule(Data::ItemNotification notification);
 	void clearFromTopic(not_null<Data::ForumTopic*> topic);
@@ -190,6 +197,7 @@ private:
 		not_null<HistoryItem*> item,
 		base::flat_map<SentNotificationId, crl::time> &already) const;
 
+	void updateLocalPauseTimer();
 	void showNext();
 	void showGrouped();
 	void ensureSoundCreated();
@@ -242,6 +250,8 @@ private:
 	std::optional<DocumentId> _lastSoundId;
 
 	rpl::lifetime _lifetime;
+	base::Timer _localPauseTimer;
+	rpl::variable<qint64> _localPauseUntil = 0;
 
 };
 

@@ -1,4 +1,10 @@
 {
+	"ktg_libregram_dnd": "Do not disturb",
+	"ktg_libregram_dnd_resume": "Resume notifications",
+	"ktg_libregram_dnd_about": "Pause chat notifications on this computer.",
+	"ktg_libregram_dnd_hour": "For one hour",
+	"ktg_libregram_dnd_tomorrow": "Until tomorrow",
+	"ktg_libregram_dnd_manual": "Until I turn it off",
 	"ktg_libregram_seasonal_icon": "Seasonal app icon",
 	"ktg_libregram_seasonal_icon_about": "Follows the season on your device. A custom app icon takes precedence.",
 	"ktg_libregram_local_premium_badge": "Local Premium badge",

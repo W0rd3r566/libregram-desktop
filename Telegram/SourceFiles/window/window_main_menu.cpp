@@ -34,6 +34,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "info/profile/info_profile_icon.h"
 #include "info/stories/info_stories_widget.h"
 #include "lang/lang_keys.h"
+#include "kotato/kotato_lang.h"
 #include "main/main_account.h"
 #include "main/main_domain.h"
 #include "main/main_session.h"
@@ -59,11 +60,13 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/ui_utility.h"
 #include "ui/unread_badge_paint.h"
 #include "ui/vertical_list.h"
+#include "ui/layers/generic_box.h"
 #include "ui/widgets/menu/menu_add_action_callback_factory.h"
 #include "ui/widgets/popup_menu.h"
 #include "ui/widgets/scroll_area.h"
 #include "ui/widgets/shadow.h"
 #include "ui/wrap/slide_wrap.h"
+#include "window/notifications_manager.h"
 #include "window/themes/window_theme.h"
 #include "window/window_controller.h"
 #include "window/window_main_menu_helpers.h"
@@ -75,6 +78,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "styles/style_window.h"
 #include "styles/style_window_main_menu.h"
 
+#include <QtCore/QDateTime>
 #include <QtGui/QWindow>
 #include <QtGui/QScreen>
 
@@ -750,6 +754,48 @@ void MainMenu::setupMenu() {
 			controller->showToast(tr::lng_libregram_ws_unavailable(tr::now));
 		}
 	}, wsToggle->lifetime());
+
+	const auto notifications = &Core::App().notifications();
+	auto pause = addAction(
+		notifications->localNotificationsPausedValue()
+		| rpl::map([](bool paused) {
+			return rktr(paused
+				? "ktg_libregram_dnd_resume"
+				: "ktg_libregram_dnd");
+		}) | rpl::flatten_latest(),
+		{ &st::menuIconMute });
+	pause->setClickedCallback([=] {
+		if (notifications->localNotificationsPaused()) {
+			notifications->setLocalPauseUntil(0);
+			return;
+		}
+		controller->show(Box([=](not_null<Ui::GenericBox*> box) {
+			box->setTitle(rktr("ktg_libregram_dnd"));
+			const auto content = box->verticalLayout();
+			Ui::AddDividerText(content, rktr("ktg_libregram_dnd_about"));
+			const auto addChoice = [&](const QString &key, Fn<qint64()> until) {
+				AddButtonWithIcon(
+					content,
+					rktr(key),
+					st::settingsButtonNoIcon
+				)->setClickedCallback([=, until = std::move(until)] {
+					notifications->setLocalPauseUntil(until());
+					box->closeBox();
+				});
+			};
+			addChoice(u"ktg_libregram_dnd_hour"_q, [] {
+				return QDateTime::currentSecsSinceEpoch() + 60 * 60;
+			});
+			addChoice(u"ktg_libregram_dnd_tomorrow"_q, [] {
+				return QDate::currentDate().addDays(1)
+					.startOfDay().toSecsSinceEpoch();
+			});
+			addChoice(u"ktg_libregram_dnd_manual"_q, [] {
+				return Notifications::System::kPauseUntilResumed;
+			});
+			box->addButton(tr::lng_cancel(), [=] { box->closeBox(); });
+		}));
+	});
 
 	_nightThemeToggle = addAction(
 		tr::lng_menu_night_mode(),

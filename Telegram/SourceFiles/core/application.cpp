@@ -319,6 +319,7 @@ void Application::run() {
 	_notifications = std::make_unique<Window::Notifications::System>();
 
 	startLocalStorage();
+	_notifications->restoreLocalPause();
 
 	style::SetCustomFont(settings().customFontFamily());
 	style::SetCustomFontSettings({
