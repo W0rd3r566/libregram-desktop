@@ -254,7 +254,7 @@ jobs:
         run: |
           strip --strip-debug --strip-unneeded out/Debug/artifact/LibreGram
           packaging/linux/package.sh out/Debug/artifact/LibreGram \
-            out/Debug/artifact/libregram-ws-proxy dist '0.1.0~beta.1'
+            out/Debug/artifact/libregram-ws-proxy dist '0.1.0~beta.2'
 
       - uses: actions/upload-artifact@v7
         with:
@@ -300,7 +300,7 @@ jobs:
       - name: Build against pinned nixpkgs
         run: |
           archive=$(realpath dist/*.tar.xz)
-          nix build --expr "(builtins.getFlake (toString ./.)).lib.mkLibreGram { archive = $archive; version = \"0.1.0-beta.1\"; }" --impure
+          nix build --expr "(builtins.getFlake (toString ./.)).lib.mkLibreGram { archive = $archive; version = \"0.1.0-beta.2\"; }" --impure
           sudo apt-get update
           sudo apt-get install -y xvfb xauth x11-utils
           bash packaging/linux/smoke.sh result/bin/LibreGram result/libexec/libregram/libregram-ws-proxy
@@ -314,6 +314,8 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v7
+        with:
+          submodules: recursive
       - uses: actions/download-artifact@v4
         with:
           name: LibreGram Linux x86_64 packages
@@ -326,4 +328,31 @@ jobs:
         run: |
           test -n "$LIBREGRAM_API_ID" && test -n "$LIBREGRAM_API_HASH"
           (cd dist && sha256sum -- *.deb *.tar.xz > SHA256SUMS-linux)
-          bash packaging/linux/publish-beta.sh dist/*.deb dist/*.tar.xz dist/SHA256SUMS-linux
+          archive=$(basename dist/*.tar.xz)
+          pkg=$(basename dist/*.deb)
+          nix_root=$(mktemp -d)
+          mkdir -p "$nix_root/packaging" "$nix_root/docs/libregram"
+          cp -a default.nix flake.nix flake.lock "$nix_root/"
+          cp -a packaging/nix "$nix_root/packaging/"
+          cp docs/libregram/install.md "$nix_root/docs/libregram/"
+          sha=$(sha256sum "dist/$archive" | cut -d' ' -f1)
+          sed -i -E \
+            -e 's/0\.1\.0-beta\.1/0.1.0-beta.2/g' \
+            -e "s/[a-f0-9]{64}/$sha/" "$nix_root/packaging/nix/release.nix"
+          grep -F "/$archive" "$nix_root/packaging/nix/release.nix"
+          grep -F "$sha" "$nix_root/packaging/nix/release.nix"
+          tar -C "$nix_root" -czf dist/LibreGram-NixOS-x86_64-flakes.tar.gz \
+            default.nix flake.nix flake.lock packaging/nix docs/libregram/install.md
+          tar -C "$nix_root" -czf dist/LibreGram-NixOS-x86_64-no-flakes.tar.gz \
+            default.nix packaging/nix docs/libregram/install.md
+          (cd dist && sha256sum LibreGram-NixOS-*.tar.gz > SHA256SUMS-nix)
+          git submodule status --recursive | awk 'substr($0, 1, 1) != " " { print; bad=1 } END { exit bad }'
+          source_name=libregram-desktop-v0.1.0-beta.2-full
+          tar --exclude=.git --exclude=./dist --transform="flags=rh;s,^\.,$source_name," \
+            -czf "dist/$source_name.tar.gz" .
+          bash packaging/linux/publish-beta.sh \
+            "dist/$pkg#Ubuntu / Debian 64 bit: DEB package" \
+            "dist/$archive#Linux 64 bit: Binary" dist/SHA256SUMS-linux \
+            "dist/LibreGram-NixOS-x86_64-flakes.tar.gz#NixOS 64 bit: With flakes" \
+            "dist/LibreGram-NixOS-x86_64-no-flakes.tar.gz#NixOS 64 bit: Without flakes" \
+            dist/SHA256SUMS-nix "dist/$source_name.tar.gz#Source code (tar.gz, full)"

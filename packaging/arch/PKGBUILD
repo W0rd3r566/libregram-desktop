@@ -3,7 +3,7 @@
 # The resulting binary contains the API credentials used at build time.
 
 pkgname=libregram
-pkgver=0.1.0beta1
+pkgver=0.1.0beta2
 pkgrel=1
 pkgdesc='Independent desktop Telegram client with local customization'
 arch=('x86_64')

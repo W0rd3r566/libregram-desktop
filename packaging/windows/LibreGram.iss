@@ -1,5 +1,5 @@
 #define AppName "LibreGram Desktop"
-#define AppVersion "0.1.0-beta.1"
+#define AppVersion "0.1.0-beta.2"
 #ifndef LibreGramPayload
   #error LibreGramPayload must point to the Windows build artifacts
 #endif

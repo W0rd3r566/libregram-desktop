@@ -61,7 +61,7 @@ jobs:
                 LIBREGRAM_SOURCE_REF="$LIBREGRAM_SOURCE_REF" \
                 CMAKE_BUILD_PARALLEL_LEVEL=2 \
                 makepkg --noconfirm --syncdeps --clean --cleanbuild
-              package=libregram-0.1.0beta1-1-x86_64.pkg.tar.zst
+              package=libregram-0.1.0beta2-1-x86_64.pkg.tar.zst
               test -f "$package"
               pacman -U --noconfirm "$package"
               test -x /usr/bin/LibreGram
@@ -79,12 +79,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: libregram-arch-x86_64
-          path: packaging/arch/libregram-0.1.0beta1-1-x86_64.pkg.tar.zst
+          path: packaging/arch/libregram-0.1.0beta2-1-x86_64.pkg.tar.zst
           if-no-files-found: error
           retention-days: 14
 
   publish-beta:
-    name: Publish LibreGram Desktop 0.1.0 beta 1
+    name: Publish LibreGram Desktop 0.1.0 beta 2
     needs: build
     if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || inputs.publish)
     runs-on: ubuntu-24.04
@@ -100,6 +100,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          package=libregram-0.1.0beta1-1-x86_64.pkg.tar.zst
+          package=libregram-0.1.0beta2-1-x86_64.pkg.tar.zst
           (cd dist && sha256sum "$package" > "$package.sha256")
-          bash packaging/linux/publish-beta.sh "dist/$package" "dist/$package.sha256"
+          bash packaging/linux/publish-beta.sh "dist/$package#Arch Linux / CachyOS 64 bit: pacman package" "dist/$package.sha256"

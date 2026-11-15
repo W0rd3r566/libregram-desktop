@@ -406,14 +406,9 @@ jobs:
         run: |
           test -n "$LIBREGRAM_API_ID"
           test -n "$LIBREGRAM_API_HASH"
-          tag=v0.1.0-beta.1
-          base=$(gh api "repos/$GITHUB_REPOSITORY/commits/$tag" --jq .sha)
-          git fetch --no-tags origin "$base"
-          git diff --exit-code "$base" HEAD -- .gitmodules cmake CMakeLists.txt Telegram/CMakeLists.txt \
-            Telegram/SourceFiles Telegram/Resources Telegram/ThirdParty Telegram/lib_* Telegram/build/ws-proxy
-          cd dist
           installer=LibreGram-Windows-$ARCH.exe
           portable=LibreGram-Windows-$ARCH-portable.zip
-          sha256sum "$installer" "$portable" > "SHA256SUMS-windows-$ARCH"
-          gh release upload "$tag" "$installer#$LABEL: Installer" "$portable#$LABEL: Portable" \
-            "SHA256SUMS-windows-$ARCH" --repo "$GITHUB_REPOSITORY" --clobber
+          (cd dist && sha256sum "$installer" "$portable" > "SHA256SUMS-windows-$ARCH")
+          bash packaging/linux/publish-beta.sh \
+            "dist/$installer#$LABEL: Installer" "dist/$portable#$LABEL: Portable" \
+            "dist/SHA256SUMS-windows-$ARCH"
