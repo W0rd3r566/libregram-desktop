@@ -310,6 +310,13 @@ const std::map<QString, Definition, std::greater<QString>> DefinitionMap {
 	{ "use_telegram_panel_icon", {
 		.type = SettingType::BoolSetting,
 		.defaultValue = false, }},
+	{ "libregram/seasonal_icon", {
+		.type = SettingType::BoolSetting,
+		.defaultValue = false, }},
+	{ "libregram/local_premium_badge", {
+		.scope = SettingScope::Account,
+		.type = SettingType::BoolSetting,
+		.defaultValue = false, }},
 	{ "custom_app_icon", {
 		.type = SettingType::IntSetting,
 		.defaultValue = 0,

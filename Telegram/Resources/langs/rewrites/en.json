@@ -1,4 +1,8 @@
 {
+	"ktg_libregram_seasonal_icon": "Seasonal app icon",
+	"ktg_libregram_seasonal_icon_about": "Follows the season on your device. A custom app icon takes precedence.",
+	"ktg_libregram_local_premium_badge": "Local Premium badge",
+	"ktg_libregram_local_premium_badge_about": "Shows a star next to your name in Settings and the main menu on this device. Telegram Premium features require a subscription.",
 	"ktg_intro_about": "Welcome to unofficial messaging app\nbased on Telegram Desktop.",
 	"ktg_about_text1": "Experimental unofficial {tdesktop_link} fork.",
 	"ktg_about_text1_tdesktop": "Telegram Desktop",

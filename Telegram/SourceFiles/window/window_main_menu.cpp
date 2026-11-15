@@ -320,11 +320,12 @@ MainMenu::MainMenu(
 	this,
 	st::settingsInfoPeerBadge,
 	&controller->session(),
-	Info::Profile::BadgeContentForPeer(controller->session().user()),
+	Info::Profile::BadgeContentForOwnProfile(&controller->session()),
 	_emojiStatusPanel.get(),
 	[=] { return controller->isGifPausedAtLeastFor(GifPauseReason::Layer); },
 	kPlayStatusLimit,
-	Info::Profile::BadgeType::Premium))
+	Info::Profile::BadgeType::Premium
+		| Info::Profile::BadgeType::LocalPremium))
 , _scroll(this, st::defaultSolidScroll)
 , _inner(_scroll->setOwnedWidget(
 	object_ptr<Ui::VerticalLayout>(_scroll.data())))
@@ -398,6 +399,7 @@ MainMenu::MainMenu(
 		rpl::single(rpl::empty) | rpl::then(_badge->updated())
 	) | rpl::on_next([=] {
 		moveBadge();
+		update();
 	}, lifetime());
 	_badge->setPremiumClickCallback([=] {
 		chooseEmojiStatus();

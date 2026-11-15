@@ -15,6 +15,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/stickers/data_custom_emoji.h"
 #include "info/profile/info_profile_values.h"
 #include "info/profile/info_profile_emoji_status_panel.h"
+#include "kotato/kotato_lang.h"
+#include "kotato/kotato_settings.h"
 #include "lang/lang_keys.h"
 #include "ui/widgets/buttons.h"
 #include "ui/painter.h"
@@ -93,6 +95,8 @@ void Badge::setContent(Content content) {
 				return tr::lng_profile_bot_emoji_status_access(tr::now);
 			}
 			return tr::lng_premium_summary_title(tr::now);
+		case BadgeType::LocalPremium:
+			return ktr("ktg_libregram_local_premium_badge");
 		case BadgeType::Scam:
 			return tr::lng_scam_badge(tr::now);
 		case BadgeType::Fake:
@@ -106,6 +110,7 @@ void Badge::setContent(Content content) {
 	switch (_content.badge) {
 	case BadgeType::Verified:
 	case BadgeType::BotVerified:
+	case BadgeType::LocalPremium:
 	case BadgeType::Premium: {
 		const auto id = _content.emojiStatusId;
 		const auto emoji = id
@@ -249,6 +254,7 @@ void Badge::move(int left, int top, int bottom) {
 	const auto &style = st();
 	const auto star = !_emojiStatus
 		&& (_content.badge == BadgeType::Premium
+			|| _content.badge == BadgeType::LocalPremium
 			|| _content.badge == BadgeType::Verified);
 	const auto fake = !_emojiStatus && !star;
 	const auto skip = fake ? 0 : style.position.x();
@@ -293,6 +299,26 @@ rpl::producer<Badge::Content> BadgeContentForPeer(not_null<PeerData*> peer) {
 		}
 		return Badge::Content{ badge, emojiStatusId };
 	});
+}
+
+rpl::producer<Badge::Content> BadgeContentForOwnProfile(
+		not_null<Main::Session*> session) {
+	const auto key = u"libregram/local_premium_badge"_q;
+	const auto accountId = session->userId().bare;
+	const auto test = session->isTestMode();
+	const auto enabled = [=] {
+		return ::Kotato::JsonSettings::GetBool(key, accountId, test);
+	};
+	return rpl::combine(
+		BadgeContentForPeer(session->user()),
+		rpl::single(enabled()) | rpl::then(
+			::Kotato::JsonSettings::Events(key, accountId, test)
+			| rpl::map(enabled)),
+		[](Badge::Content content, bool local) {
+			return (local && content.badge == BadgeType::None)
+				? Badge::Content{ BadgeType::LocalPremium }
+				: content;
+		});
 }
 
 rpl::producer<Badge::Content> VerifiedContentForPeer(

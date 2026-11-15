@@ -6,6 +6,7 @@ For license and upstream attribution, see LICENSE and LEGAL.
 
 #include "core/application.h"
 #include "core/libregram_ws_proxy.h"
+#include "kotato/kotato_lang.h"
 #include "kotato/kotato_settings.h"
 #include "kotato/kotato_settings_menu.h"
 #include "lang/lang_keys.h"
@@ -79,6 +80,44 @@ void BuildAppearance(SectionBuilder &builder) {
 		.icon = { &st::menuIconChatBubble },
 		.keywords = { u"libretheme"_q, u"appearance"_q },
 	});
+
+	const auto seasonalKey = u"libregram/seasonal_icon"_q;
+	const auto seasonal = [=] {
+		return ::Kotato::JsonSettings::GetBool(seasonalKey);
+	};
+	AddToggle(builder, {
+		.id = u"libregram/seasonal-icon"_q,
+		.title = rktr("ktg_libregram_seasonal_icon"),
+		.st = &st::settingsButtonNoIcon,
+		.toggled = rpl::single(seasonal()) | rpl::then(
+			::Kotato::JsonSettings::Events(seasonalKey) | rpl::map(seasonal)),
+		.keywords = { u"season"_q, u"icon"_q },
+	}, seasonal, [=](bool enabled) {
+		::Kotato::JsonSettings::Set(seasonalKey, enabled);
+		::Kotato::JsonSettings::Write();
+	});
+	builder.addDividerText(rktr("ktg_libregram_seasonal_icon_about"));
+
+	const auto premiumKey = u"libregram/local_premium_badge"_q;
+	const auto session = builder.session();
+	const auto accountId = session->userId().bare;
+	const auto test = session->isTestMode();
+	const auto localPremium = [=] {
+		return ::Kotato::JsonSettings::GetBool(premiumKey, accountId, test);
+	};
+	AddToggle(builder, {
+		.id = u"libregram/local-premium-badge"_q,
+		.title = rktr("ktg_libregram_local_premium_badge"),
+		.st = &st::settingsButtonNoIcon,
+		.toggled = rpl::single(localPremium()) | rpl::then(
+			::Kotato::JsonSettings::Events(premiumKey, accountId, test)
+			| rpl::map(localPremium)),
+		.keywords = { u"premium"_q, u"badge"_q },
+	}, localPremium, [=](bool enabled) {
+		::Kotato::JsonSettings::Set(premiumKey, enabled, accountId, test);
+		::Kotato::JsonSettings::Write();
+	});
+	builder.addDividerText(rktr("ktg_libregram_local_premium_badge_about"));
 
 	const auto compact = [] {
 		return ::Kotato::JsonSettings::GetInt(u"chat_list_lines"_q) == 1;

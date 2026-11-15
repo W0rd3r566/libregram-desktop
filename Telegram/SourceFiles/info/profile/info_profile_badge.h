@@ -43,6 +43,7 @@ enum class BadgeType : uchar {
 	Scam = 0x08,
 	Fake = 0x10,
 	Direct = 0x20,
+	LocalPremium = 0x40,
 };
 inline constexpr bool is_flag_type(BadgeType) { return true; }
 
@@ -99,6 +100,8 @@ private:
 
 [[nodiscard]] rpl::producer<Badge::Content> BadgeContentForPeer(
 	not_null<PeerData*> peer);
+[[nodiscard]] rpl::producer<Badge::Content> BadgeContentForOwnProfile(
+	not_null<Main::Session*> session);
 [[nodiscard]] rpl::producer<Badge::Content> VerifiedContentForPeer(
 	not_null<PeerData*> peer);
 [[nodiscard]] rpl::producer<Badge::Content> BotVerifyBadgeForPeer(
