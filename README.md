@@ -23,18 +23,19 @@ LibreGram adds native settings, the Graphite theme, and a [WS Proxy](docs/libreg
 
 ## Скачать
 
-[LibreGram Desktop 0.1.0 beta 1 · GitHub Releases](https://github.com/W0rd3r566/libregram-desktop/releases/tag/v0.1.0-beta.1)
+[**Packages — все сборки для скачивания**](https://github.com/W0rd3r566/libregram-desktop/releases/tag/v0.1.0-beta.2)
 
-| Дистрибутив или ОС | Пакет для x86-64 |
+| Дистрибутив или ОС | Скачать |
 | --- | --- |
-| Arch Linux, CachyOS | [Пакет для pacman](https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.1/libregram-0.1.0beta1-1-x86_64.pkg.tar.zst) |
-| Ubuntu 24.04 и 26.04, Debian 12 и 13 | [Пакет .deb](https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.1/libregram-desktop_0.1.0.beta.1_amd64.deb) |
-| NixOS с flakes | [Архив .tar.gz](https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.1/LibreGram-NixOS-x86_64-flakes.tar.gz) · [Установка](docs/libregram/install.md#nixos-с-flakes) |
-| NixOS без flakes | [Архив .tar.gz](https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.1/LibreGram-NixOS-x86_64-no-flakes.tar.gz) · [Установка](docs/libregram/install.md#nixos-без-flakes) |
-| Другие Linux с glibc | [Переносной архив .tar.xz](https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.1/LibreGram-0.1.0-beta.1-linux-x86_64.tar.xz) |
-| Windows ARM64 | Portable `.zip` и установщик `.exe` после проверки сборки |
-| Windows x64 | Portable `.zip` и установщик `.exe` после проверки сборки |
-| Windows x86 (32 бит) | Portable `.zip` и установщик `.exe` после проверки сборки |
+| Arch Linux, CachyOS · x86-64 | [Пакет для pacman](https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.2/libregram-0.1.0beta2-1-x86_64.pkg.tar.zst) |
+| Ubuntu 24.04 и 26.04, Debian 12 и 13 · amd64 | [Пакет .deb](https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.2/libregram-desktop_0.1.0.beta.2_amd64.deb) |
+| NixOS x86-64 с flakes · beta 1 | [Архив .tar.gz](https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.2/LibreGram-NixOS-x86_64-flakes.tar.gz) · [Установка](docs/libregram/install.md#nixos-с-flakes) |
+| NixOS x86-64 без flakes · beta 1 | [Архив .tar.gz](https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.2/LibreGram-NixOS-x86_64-no-flakes.tar.gz) · [Установка](docs/libregram/install.md#nixos-без-flakes) |
+| Другие Linux с glibc · x86-64 | [TAR.GZ](https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.2/LibreGram-0.1.0-beta.2-linux-x86_64.tar.gz) · [TAR.XZ](https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.2/LibreGram-0.1.0-beta.2-linux-x86_64.tar.xz) |
+| Windows x64 | [Установщик EXE](https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.2/LibreGram-Windows-x86_64.exe) · [Portable ZIP](https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.2/LibreGram-Windows-x86_64-portable.zip) |
+| Windows x86 (32 бит) | [Установщик EXE](https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.2/LibreGram-Windows-x86.exe) · [Portable ZIP](https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.2/LibreGram-Windows-x86-portable.zip) |
+
+Windows, DEB, Arch и переносной Linux — **beta 2**. Для NixOS пока доступны рецепты **beta 1**. NixOS beta 2 и Windows ARM64 добавятся после исправления проверок запуска и завершения.
 
 ### Команды скачивания
 
@@ -43,47 +44,63 @@ LibreGram adds native settings, the Graphite theme, and a [WS Proxy](docs/libreg
 **Arch Linux и CachyOS**
 
 ```bash
-curl -fLO 'https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.1/libregram-0.1.0beta1-1-x86_64.pkg.tar.zst'
+curl -fLO 'https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.2/libregram-0.1.0beta2-1-x86_64.pkg.tar.zst'
 ```
 
 **Ubuntu 24.04 и 26.04, Debian 12 и 13**
 
 ```bash
-curl -fLO 'https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.1/libregram-desktop_0.1.0.beta.1_amd64.deb'
+curl -fLO 'https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.2/libregram-desktop_0.1.0.beta.2_amd64.deb'
 ```
 
 **NixOS с flakes**
 
 ```bash
-curl -fLO 'https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.1/LibreGram-NixOS-x86_64-flakes.tar.gz'
+curl -fLO 'https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.2/LibreGram-NixOS-x86_64-flakes.tar.gz'
 ```
 
 **NixOS без flakes**
 
 ```bash
-curl -fLO 'https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.1/LibreGram-NixOS-x86_64-no-flakes.tar.gz'
+curl -fLO 'https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.2/LibreGram-NixOS-x86_64-no-flakes.tar.gz'
 ```
 
 **Другие Linux с glibc**
 
 ```bash
-curl -fLO 'https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.1/LibreGram-0.1.0-beta.1-linux-x86_64.tar.xz'
+curl -fLO 'https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.2/LibreGram-0.1.0-beta.2-linux-x86_64.tar.gz'
+```
+
+**Windows x64**
+
+```powershell
+Invoke-WebRequest 'https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.2/LibreGram-Windows-x86_64.exe' -OutFile '.\LibreGram-Windows-x86_64.exe'
+```
+
+**Windows x86 (32 бит)**
+
+```powershell
+Invoke-WebRequest 'https://github.com/W0rd3r566/libregram-desktop/releases/download/v0.1.0-beta.2/LibreGram-Windows-x86.exe' -OutFile '.\LibreGram-Windows-x86.exe'
 ```
 
 ## Быстрый старт
 
 Выполняйте команды установки из папки, куда скачали пакет.
 
+**Windows**
+
+Запустите скачанный установщик EXE. Для portable-версии распакуйте ZIP и откройте `LibreGram.exe` из этой папки.
+
 **Arch Linux и CachyOS**
 
 ```bash
-sudo pacman -U ./libregram-0.1.0beta1-1-x86_64.pkg.tar.zst
+sudo pacman -U ./libregram-0.1.0beta2-1-x86_64.pkg.tar.zst
 ```
 
 **Ubuntu и Debian**
 
 ```bash
-sudo apt install ./libregram-desktop_0.1.0.beta.1_amd64.deb
+sudo apt install ./libregram-desktop_0.1.0.beta.2_amd64.deb
 ```
 
 После установки откройте LibreGram из меню приложений.
