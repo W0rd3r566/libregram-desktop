@@ -68,6 +68,7 @@ makedepends=(
   'libtg_owt'
   'boost'
   'cargo'
+  'ccache'
   'cmake'
   'git'
   'glib2-devel'
@@ -144,6 +145,8 @@ build() {
   # tde2e CMake package to be installed before configuring Telegram Desktop.
   cmake -S "$srcdir/td" -B "$_td_builddir" -G Ninja \
     -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+    -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
     -DCMAKE_INSTALL_PREFIX="$_td_prefix" \
     -DCMAKE_INSTALL_LIBDIR=lib \
     -DBUILD_TESTING=OFF \
@@ -155,6 +158,8 @@ build() {
 
   cmake -S "$srcdir/$pkgname" -B "$_builddir" -G Ninja \
     -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+    -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DCMAKE_INSTALL_LIBDIR=lib \
     -DDESKTOP_APP_USE_PACKAGED=ON \
