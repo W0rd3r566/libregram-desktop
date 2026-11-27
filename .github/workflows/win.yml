@@ -1,9 +1,5 @@
 name: Windows.
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: false
-
 on:
   push:
     # Pushes to the canary branches run only canary.yml, see there.
@@ -63,6 +59,9 @@ jobs:
 
   ws-proxy:
     name: WS Proxy (${{ matrix.output_arch }})
+    concurrency:
+      group: windows-ws-${{ matrix.output_arch }}-${{ github.ref }}
+      cancel-in-progress: false
     if: >
       !(github.event_name == 'push'
         && contains(github.event.head_commit.message, '[skip ci]'))
@@ -104,6 +103,9 @@ jobs:
 
   windows:
     name: Windows
+    concurrency:
+      group: windows-client-${{ matrix.output_arch }}-${{ github.ref }}
+      cancel-in-progress: false
     needs: ws-proxy
     if: >
       !(github.event_name == 'push'
