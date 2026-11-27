@@ -344,7 +344,7 @@ jobs:
           $installerName = "LibreGram-Windows-$env:OUTPUT_ARCH.exe"
           & $iscc "/DLibreGramPayload=$source" "/DLibreGramArch=$env:OUTPUT_ARCH" "/O$PWD" $project
           if ($LASTEXITCODE -ne 0) { throw "LibreGram installer build failed" }
-          $target = Join-Path $env:RUNNER_TEMP "LibreGram-install"
+          $target = Join-Path $env:RUNNER_TEMP "LibreGram install"
           "LIBREGRAM_INSTALL_DIR=$target" >> $env:GITHUB_ENV
           $installer = Start-Process -FilePath (Join-Path $PWD $installerName) -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /DIR=`"$target`"" -Wait -PassThru
           if ($installer.ExitCode -ne 0) { throw "Silent installation failed" }
@@ -352,6 +352,17 @@ jobs:
             $expected = (Get-FileHash (Join-Path $source $name)).Hash
             $installed = (Get-FileHash (Join-Path $target $name)).Hash
             if ($installed -ne $expected) { throw "Installed $name failed its hash check" }
+          }
+
+      - name: Verify the Start menu shortcut
+        shell: pwsh
+        run: |
+          $link = Join-Path ([Environment]::GetFolderPath('Programs')) 'LibreGram Desktop/LibreGram.lnk'
+          if (!(Test-Path $link)) { throw "LibreGram Start menu shortcut is missing" }
+          $shell = New-Object -ComObject WScript.Shell
+          $shortcut = $shell.CreateShortcut($link)
+          if ($shortcut.TargetPath -ne (Join-Path $env:LIBREGRAM_INSTALL_DIR 'LibreGram.exe')) {
+            throw "LibreGram Start menu shortcut points to a different executable"
           }
 
       - name: Create the portable ZIP
@@ -422,9 +433,11 @@ jobs:
 
           $profile = Join-Path $env:RUNNER_TEMP "LibreGram-smoke-$PID"
           New-Item -ItemType Directory -Path $profile | Out-Null
+          "LIBREGRAM_SMOKE_PROFILE=$profile" >> $env:GITHUB_ENV
           Test-LibreGram (Join-Path $env:LIBREGRAM_INSTALL_DIR "LibreGram.exe") "-workdir `"$profile`" -noupdate"
 
-          $portable = Join-Path $env:RUNNER_TEMP "LibreGram-portable-$PID"
+          $portable = Join-Path $env:RUNNER_TEMP "LibreGram portable $PID"
+          "LIBREGRAM_PORTABLE_DIR=$portable" >> $env:GITHUB_ENV
           Expand-Archive "LibreGram-Windows-$env:OUTPUT_ARCH-portable.zip" $portable
           foreach ($name in @("LibreGram.exe", "libregram-ws-proxy.exe")) {
             if ((Get-FileHash (Join-Path $portable $name)).Hash -ne
@@ -435,6 +448,22 @@ jobs:
           Test-LibreGram (Join-Path $portable "LibreGram.exe") "-noupdate"
           if (!(Test-Path (Join-Path $portable "TelegramForcePortable/tdata"))) {
             throw "LibreGram did not create its portable profile"
+          }
+
+      - name: Verify uninstallation preserves profiles
+        shell: pwsh
+        run: |
+          $uninstaller = Join-Path $env:LIBREGRAM_INSTALL_DIR 'unins000.exe'
+          $uninstall = Start-Process -FilePath $uninstaller -ArgumentList '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART' -Wait -PassThru
+          if ($uninstall.ExitCode -ne 0) { throw "LibreGram uninstallation failed" }
+          if (Test-Path (Join-Path $env:LIBREGRAM_INSTALL_DIR 'LibreGram.exe')) {
+            throw "Uninstaller left the installed executable behind"
+          }
+          if (!(Test-Path (Join-Path $env:LIBREGRAM_SMOKE_PROFILE 'tdata'))) {
+            throw "Uninstaller removed the user's profile"
+          }
+          if (!(Test-Path (Join-Path $env:LIBREGRAM_PORTABLE_DIR 'TelegramForcePortable/tdata'))) {
+            throw "Uninstaller removed the portable profile"
           }
 
       - uses: actions/upload-artifact@v7
