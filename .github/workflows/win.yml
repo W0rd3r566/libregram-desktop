@@ -515,11 +515,29 @@ jobs:
             LibreGram-Windows-${{ matrix.output_arch }}-portable.zip
           if-no-files-found: error
 
-      - uses: actions/upload-artifact@v7
+      - name: Prepare a diagnostic log without API credentials
+        id: public-log
         if: failure()
+        shell: pwsh
+        env:
+          LIBREGRAM_API_ID: ${{ secrets.LIBREGRAM_API_ID }}
+          LIBREGRAM_API_HASH: ${{ secrets.LIBREGRAM_API_HASH }}
+        run: |
+          $source = Join-Path $env:RUNNER_TEMP 'libregram-build.log'
+          if (Test-Path $source) {
+            $log = [IO.File]::ReadAllText($source)
+            foreach ($secret in @($env:LIBREGRAM_API_ID, $env:LIBREGRAM_API_HASH)) {
+              if ($secret) { $log = $log.Replace($secret, '[redacted]') }
+            }
+            $log = $log -replace '(?i)(TDESKTOP_API_(?:ID|HASH)=)[^\s"]+', '$1[redacted]'
+            [IO.File]::WriteAllText((Join-Path $env:RUNNER_TEMP 'libregram-build-public.log'), $log)
+          }
+
+      - uses: actions/upload-artifact@v7
+        if: failure() && steps.public-log.outcome == 'success'
         with:
           name: libregram-build-log-windows-${{ matrix.output_arch }}
-          path: ${{ runner.temp }}/libregram-build.log
+          path: ${{ runner.temp }}/libregram-build-public.log
           if-no-files-found: ignore
 
   publish-beta:
