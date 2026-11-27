@@ -29,8 +29,8 @@ if [[ $(jq -r .isDraft <<<"$release") == true ]]; then
         gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA"
     fi
 elif [[ $(gh api "repos/$GITHUB_REPOSITORY/commits/$tag" --jq .sha) != "$GITHUB_SHA" ]]; then
-    printf 'Published release %s points to another source revision.\n' "$tag" >&2
-    exit 1
+    printf 'Published release %s is unchanged; this commit keeps its packages in CI artifacts.\n' "$tag"
+    exit 0
 fi
 
 receipt_dir=$(mktemp -d)

@@ -113,9 +113,9 @@ class ReleaseStagingTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertTrue(state["release"]["isDraft"])
 
-    def test_published_releases_cannot_be_retargeted(self):
+    def test_published_releases_are_not_replaced_by_a_new_commit(self):
         result, state = self.run_staging(target=OLD_REVISION, draft=False)
-        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(state["actions"], [])
         self.assertEqual(state["release"]["targetCommitish"], OLD_REVISION)
 

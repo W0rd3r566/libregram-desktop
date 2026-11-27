@@ -36,7 +36,9 @@ LibreGramWsProxy::LibreGramWsProxy(Application &app)
 				fail();
 			}
 		});
-	QObject::connect(&_process, &QProcess::finished, &_process, [=, this] {
+	const auto finished = qOverload<int, QProcess::ExitStatus>(
+		&QProcess::finished);
+	QObject::connect(&_process, finished, &_process, [=, this] {
 		_deadline.stop();
 		_app.setTemporaryWsProxy({});
 		if (_state.current() == State::Stopping) {
