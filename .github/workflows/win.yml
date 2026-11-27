@@ -303,6 +303,21 @@ jobs:
             ${{ env.LibrariesPath }}\cache_keys\[qQ]t[_-]*
           key: ${{ runner.OS }}-${{ matrix.arch }}-${{ matrix.qt || 'qt5-metadata-v2' }}-${{ env.CACHE_KEY }}
 
+      - name: Put client intermediates on the workspace volume
+        shell: pwsh
+        run: |
+          $logical = Join-Path $env:TBUILD "$env:REPO_NAME/out"
+          $physical = Join-Path $env:GITHUB_WORKSPACE 'libregram-client-build'
+          $disk = [IO.DriveInfo]::new([IO.Path]::GetPathRoot($physical))
+          Write-Host "Client build volume $($disk.Name): $([math]::Round($disk.AvailableFreeSpace / 1GB, 1)) GB free"
+          if ($disk.AvailableFreeSpace -lt 30GB) {
+            throw 'The client build needs at least 30 GB of free workspace space'
+          }
+          if (Test-Path $logical) { throw 'The client output directory already exists' }
+          New-Item -ItemType Directory -Path $physical | Out-Null
+          New-Item -ItemType Junction -Path $logical -Target $physical | Out-Null
+          "LIBREGRAM_BUILD_VOLUME=$($disk.Name)" >> $env:GITHUB_ENV
+
       - name: LibreGram Desktop build.
         run: |
           C:
@@ -339,6 +354,8 @@ jobs:
               } else {
                 Write-Host 'C++ compilation is still running.'
               }
+              $disk = [IO.DriveInfo]::new($env:LIBREGRAM_BUILD_VOLUME)
+              Write-Host "Free build space: $([math]::Round($disk.AvailableFreeSpace / 1GB, 1)) GB"
             }
             if ((Get-Item $errors).Length) {
               Get-Content $errors | Add-Content $log
