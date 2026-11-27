@@ -21,6 +21,7 @@ on:
       - "snap/snapcraft.yaml"
       - ".github/workflows/**"
       - "tools/ci/**"
+      - "packaging/linux/publish-beta.sh"
   pull_request:
     paths:
       - "CMakeLists.txt"
@@ -39,6 +40,7 @@ on:
       - "snap/snapcraft.yaml"
       - ".github/workflows/**"
       - "tools/ci/**"
+      - "packaging/linux/publish-beta.sh"
   workflow_dispatch:
 
 permissions:
@@ -53,4 +55,6 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Validate LibreGram
-        run: python3 tools/ci/validate_project.py
+        run: |
+          python3 tools/ci/validate_project.py
+          python3 tools/ci/test_release_staging.py

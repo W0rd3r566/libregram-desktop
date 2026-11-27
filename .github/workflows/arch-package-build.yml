@@ -99,6 +99,7 @@ jobs:
       - name: Publish the checked Arch package
         env:
           GH_TOKEN: ${{ github.token }}
+          LIBREGRAM_PACKAGE_PLATFORM: arch
         run: |
           package=libregram-0.1.0beta2-1-x86_64.pkg.tar.zst
           (cd dist && sha256sum "$package" > "$package.sha256")

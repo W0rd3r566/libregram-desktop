@@ -519,6 +519,7 @@ jobs:
         if: steps.artifact.outputs.available == '1'
         env:
           GH_TOKEN: ${{ github.token }}
+          LIBREGRAM_PACKAGE_PLATFORM: windows-${{ matrix.arch }}
           LIBREGRAM_API_ID: ${{ secrets.LIBREGRAM_API_ID }}
           LIBREGRAM_API_HASH: ${{ secrets.LIBREGRAM_API_HASH }}
           ARCH: ${{ matrix.arch }}

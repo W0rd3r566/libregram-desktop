@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 tag=v0.1.0-beta.2
-: "${GITHUB_REPOSITORY:?}" "${GITHUB_SHA:?}"
+: "${GITHUB_REPOSITORY:?}" "${GITHUB_SHA:?}" "${LIBREGRAM_PACKAGE_PLATFORM:?}"
+case "$LIBREGRAM_PACKAGE_PLATFORM" in
+    linux|arch|windows-x86|windows-x86_64|windows-arm64) ;;
+    *) printf 'Unknown package platform.\n' >&2; exit 1 ;;
+esac
+[[ "$GITHUB_SHA" =~ ^[a-f0-9]{40}$ ]]
 (( $# > 0 ))
 head=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')
 if [[ "$head" != "$GITHUB_SHA" ]]; then
@@ -20,22 +25,25 @@ if ! release=$(release_info 2>/dev/null); then
     release=$(release_info)
 fi
 if [[ $(jq -r .isDraft <<<"$release") == true ]]; then
-    target=$(jq -er .targetCommitish <<<"$release")
-else
-    target=$(gh api "repos/$GITHUB_REPOSITORY/commits/$tag" --jq .sha)
-fi
-if [[ "$target" != "$GITHUB_SHA" ]]; then
-    printf 'Release %s points to another source revision.\n' "$tag" >&2
+    if [[ $(jq -er .targetCommitish <<<"$release") != "$GITHUB_SHA" ]]; then
+        gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA"
+    fi
+elif [[ $(gh api "repos/$GITHUB_REPOSITORY/commits/$tag" --jq .sha) != "$GITHUB_SHA" ]]; then
+    printf 'Published release %s points to another source revision.\n' "$tag" >&2
     exit 1
 fi
 
-gh release upload "$tag" "$@" --repo "$GITHUB_REPOSITORY" --clobber
+receipt_dir=$(mktemp -d)
+trap 'rm -rf -- "$receipt_dir"' EXIT
+receipt="$receipt_dir/BUILD-REVISION-$GITHUB_SHA-$LIBREGRAM_PACKAGE_PLATFORM.txt"
+printf '%s\n' "$GITHUB_SHA" > "$receipt"
+gh release upload "$tag" "$@" "$receipt" --repo "$GITHUB_REPOSITORY" --clobber
 release=$(release_info)
 if [[ $(jq -r .isDraft <<<"$release") != true ]]; then
     exit 0
 fi
 
-if jq -e '
+if jq -e --arg revision "$GITHUB_SHA" '
     [.assets[].name] as $uploaded
     | [
         "LibreGram-Windows-x86_64.exe",
@@ -49,7 +57,10 @@ if jq -e '
         "LibreGram-NixOS-x86_64-flakes.tar.gz",
         "LibreGram-NixOS-x86_64-no-flakes.tar.gz",
         "SHA256SUMS-nix",
-        "libregram-desktop-v0.1.0-beta.2-full.tar.gz"
+        "libregram-desktop-v0.1.0-beta.2-full.tar.gz",
+        "BUILD-REVISION-\($revision)-linux.txt",
+        "BUILD-REVISION-\($revision)-arch.txt",
+        "BUILD-REVISION-\($revision)-windows-x86_64.txt"
       ] | all(. as $name | $uploaded | index($name) != null)
   ' <<<"$release" >/dev/null; then
     gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --draft=false
