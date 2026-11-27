@@ -61,8 +61,50 @@ on:
 
 jobs:
 
+  ws-proxy:
+    name: WS Proxy (${{ matrix.output_arch }})
+    if: >
+      !(github.event_name == 'push'
+        && contains(github.event.head_commit.message, '[skip ci]'))
+      && !(github.event_name == 'pull_request'
+        && github.event.pull_request.head.repo.full_name == github.event.pull_request.base.repo.full_name)
+    runs-on: ${{ matrix.arch == 'arm64' && 'windows-11-arm' || 'windows-latest' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64_x86
+            output_arch: x86
+            rust_target: i686-pc-windows-msvc
+          - arch: x64
+            output_arch: x86_64
+            rust_target: x86_64-pc-windows-msvc
+          - arch: arm64
+            output_arch: arm64
+            rust_target: aarch64-pc-windows-msvc
+    steps:
+      - uses: actions/checkout@v7
+      - uses: Eden-CI/msvc-dev-cmd@master
+        with:
+          arch: ${{ matrix.arch }}
+      - name: Build WS Proxy
+        shell: bash
+        env:
+          LIBREGRAM_WS_TARGET: ${{ matrix.rust_target }}
+          RUSTFLAGS: '-C target-feature=+crt-static'
+        run: |
+          rustup target add "$LIBREGRAM_WS_TARGET"
+          bash Telegram/build/ws-proxy/build.sh artifact
+          ./artifact/libregram-ws-proxy.exe --help >/dev/null
+      - uses: actions/upload-artifact@v7
+        with:
+          name: libregram-ws-proxy-windows-${{ matrix.output_arch }}
+          path: artifact/
+          if-no-files-found: error
+
   windows:
     name: Windows
+    needs: ws-proxy
     if: >
       !(github.event_name == 'push'
         && contains(github.event.head_commit.message, '[skip ci]'))
@@ -243,22 +285,29 @@ jobs:
           -D DESKTOP_APP_DISABLE_CRASH_REPORTS=OFF
 
           if errorlevel 1 exit /b 1
-          cmake --build ..\out --config Debug --parallel
+          cmake --build ..\out --config Debug --parallel > "%RUNNER_TEMP%\libregram-build.log" 2>&1
+          if errorlevel 1 (
+            powershell -NoProfile -Command "Get-Content -LiteralPath $env:RUNNER_TEMP/libregram-build.log -Tail 120"
+            exit /b 1
+          )
 
       - name: Move artifact.
         run: |
           set OUT=%TBUILD%\%REPO_NAME%\out\Debug
           mkdir artifact
           move %OUT%\LibreGram.exe artifact/
-      - name: Stage the client and WS Proxy
+      - uses: actions/upload-artifact@v7
+        with:
+          name: libregram-client-windows-${{ matrix.output_arch }}
+          path: artifact/LibreGram.exe
+          if-no-files-found: error
+      - uses: actions/download-artifact@v4
+        with:
+          name: libregram-ws-proxy-windows-${{ matrix.output_arch }}
+          path: artifact
+      - name: Stage licenses
         shell: bash
-        run: |
-          repo="$TBUILD/$REPO_NAME"
-          rustup target add "$RUST_TARGET"
-          RUSTFLAGS="-C target-feature=+crt-static" LIBREGRAM_WS_TARGET="$RUST_TARGET" \
-            bash "$repo/Telegram/build/ws-proxy/build.sh" artifact
-          ./artifact/libregram-ws-proxy.exe --help >/dev/null
-          cp "$repo/LICENSE" "$repo/LEGAL" artifact/
+        run: cp "$TBUILD/$REPO_NAME/"{LICENSE,LEGAL} artifact/
 
       - name: Verify the client and helper architectures
         shell: pwsh
@@ -395,6 +444,13 @@ jobs:
             LibreGram-Windows-${{ matrix.output_arch }}.exe
             LibreGram-Windows-${{ matrix.output_arch }}-portable.zip
           if-no-files-found: error
+
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: libregram-build-log-windows-${{ matrix.output_arch }}
+          path: ${{ runner.temp }}/libregram-build.log
+          if-no-files-found: ignore
 
   publish-beta:
     name: Publish ${{ matrix.label }} packages
