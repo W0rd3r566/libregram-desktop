@@ -152,7 +152,7 @@ jobs:
 
       - name: Get repository name.
         shell: bash
-        run: echo "REPO_NAME=${GITHUB_REPOSITORY##*/}" >> $GITHUB_ENV
+        run: echo "REPO_NAME=${GITHUB_REPOSITORY##*/}" >> "$GITHUB_ENV"
 
       - name: Clone.
         uses: actions/checkout@v7
@@ -166,13 +166,13 @@ jobs:
           DOCPATH="$TBUILD/$REPO_NAME/docs/building-win.md"
           SDK="$(sed -nE 's/.*\*\*([0-9.]+)(\*\*)? SDK.*/\1/p' "$DOCPATH")"
           test -n "$SDK"
-          echo "SDK=$SDK" >> $GITHUB_ENV
+          echo "SDK=$SDK" >> "$GITHUB_ENV"
 
           sed -i '/CMAKE_${lang}_FLAGS_DEBUG_INIT/s/${_Zi}//' "$PROGRAMFILES"/CMake/share/cmake*/Modules/Platform/Windows-MSVC.cmake
 
           sha256sum "$TBUILD/$REPO_NAME/$PREPARE_PATH" | cut -d' ' -f1 >> CACHE_KEY.txt
           echo "$SDK" >> CACHE_KEY.txt
-          echo "CACHE_KEY=$(sha256sum CACHE_KEY.txt | awk '{ print $1 }')" >> $GITHUB_ENV
+          echo "CACHE_KEY=$(sha256sum CACHE_KEY.txt | awk '{ print $1 }')" >> "$GITHUB_ENV"
 
           echo "Configurate git for cherry-picks."
           git config --global user.email "you@example.com"
@@ -256,7 +256,7 @@ jobs:
           if [[ "$GITHUB_EVENT_NAME" != pull_request && -n "$LIBREGRAM_API_ID" && -n "$LIBREGRAM_API_HASH" ]]; then
             API="-D TDESKTOP_API_ID=$LIBREGRAM_API_ID -D TDESKTOP_API_HASH=$LIBREGRAM_API_HASH"
           fi
-          echo "TDESKTOP_BUILD_API=$API" >> $GITHUB_ENV
+          echo "TDESKTOP_BUILD_API=$API" >> "$GITHUB_ENV"
 
       - name: Remove intermediate dependency builds
         shell: bash
@@ -321,11 +321,34 @@ jobs:
           -D DESKTOP_APP_DISABLE_CRASH_REPORTS=OFF
 
           if errorlevel 1 exit /b 1
-          cmake --build ..\out --config Debug --parallel > "%RUNNER_TEMP%\libregram-build.log" 2>&1
-          if errorlevel 1 (
-            powershell -NoProfile -Command "Get-Content -LiteralPath $env:RUNNER_TEMP/libregram-build.log -Tail 120"
-            exit /b 1
-          )
+
+      - name: Compile LibreGram with progress reports
+        shell: pwsh
+        working-directory: ${{ env.TBUILD }}\${{ env.REPO_NAME }}\Telegram
+        run: |
+          $log = Join-Path $env:RUNNER_TEMP 'libregram-build.log'
+          $errors = Join-Path $env:RUNNER_TEMP 'libregram-build-errors.log'
+          $build = Start-Process cmake -ArgumentList @('--build', '../out', '--config', 'Debug', '--parallel') -NoNewWindow -RedirectStandardOutput $log -RedirectStandardError $errors -PassThru
+          try {
+            while (!$build.WaitForExit(60000)) {
+              $progress = Get-Content $log -Tail 100 | Select-String '^\[\s*\d+/\d+\]' | Select-Object -Last 1
+              if ($progress) {
+                Write-Host "C++ compilation $($progress.Matches[0].Value)"
+              } else {
+                Write-Host 'C++ compilation is still running.'
+              }
+            }
+            if ((Get-Item $errors).Length) {
+              Get-Content $errors | Add-Content $log
+            }
+            if ($build.ExitCode -ne 0) {
+              Get-Content $log -Tail 120
+              throw "C++ build failed with exit code $($build.ExitCode)"
+            }
+          } finally {
+            if (!$build.HasExited) { $build.Kill($true) }
+            $build.Dispose()
+          }
 
       - name: Move artifact.
         run: |
@@ -447,25 +470,7 @@ jobs:
       - name: Start the installed and portable clients
         shell: pwsh
         run: |
-          function Test-LibreGram($binary, $argsList) {
-            $app = Start-Process -FilePath $binary -ArgumentList $argsList -PassThru
-            try {
-              for ($i = 0; $i -lt 60; $i++) {
-                $app.Refresh()
-                if ($app.HasExited) { throw "$binary exited before opening a window" }
-                if ($app.MainWindowHandle -ne 0) { break }
-                Start-Sleep -Milliseconds 500
-              }
-              if ($app.MainWindowHandle -eq 0) { throw "$binary did not open a window" }
-              $quit = Start-Process -FilePath $binary -ArgumentList "$argsList -quit" -PassThru
-              if (!$quit.WaitForExit(10000) -or $quit.ExitCode -ne 0 -or
-                  !$app.WaitForExit(10000) -or $app.ExitCode -ne 0) {
-                throw "$binary did not exit cleanly"
-              }
-            } finally {
-              if (!$app.HasExited) { $app.Kill() }
-            }
-          }
+          . (Join-Path $env:TBUILD "$env:REPO_NAME/packaging/windows/smoke.ps1")
 
           $profile = Join-Path $env:RUNNER_TEMP "LibreGram-smoke-$PID"
           New-Item -ItemType Directory -Path $profile | Out-Null
