@@ -280,7 +280,9 @@ void Sandbox::NotifySystemShuttingDown() {
 }
 
 void Sandbox::QuitWhenStarted() {
-	if (!QApplication::instance() || !Instance()._started) {
+	if (!QApplication::instance()
+		|| !Instance()._started
+		|| Instance()._applicationStarting) {
 		QuitOnStartRequested = true;
 	} else {
 		// Use exit(0) instead of quit() to avoid recursive
@@ -298,7 +300,8 @@ void Sandbox::launchApplication() {
 	InvokeQueued(this, [=] {
 		if (Quitting()) {
 			quit();
-		} else if (_application) {
+			return;
+		} else if (_application || _applicationStarting) {
 			return;
 		}
 		setupScreenScale();
@@ -316,6 +319,14 @@ void Sandbox::launchApplication() {
 				: nullptr;
 		}, _lifetime);
 
+		_applicationStarting = true;
+		// Startup probes enter nested event loops before run() returns.
+		const auto starting = gsl::finally([&] {
+			_applicationStarting = false;
+			if (QuitOnStartRequested) {
+				QuitWhenStarted();
+			}
+		});
 		_application = std::make_unique<Application>();
 
 		// Ideally this should go to constructor.

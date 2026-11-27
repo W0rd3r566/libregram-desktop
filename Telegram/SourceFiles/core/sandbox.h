@@ -140,6 +140,7 @@ private:
 	std::unique_ptr<QLockFile> _lockFile;
 	bool _secondInstance = false;
 	bool _started = false;
+	bool _applicationStarting = false;
 	static bool QuitOnStartRequested;
 	static bool SystemShuttingDown;
 
