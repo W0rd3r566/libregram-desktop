@@ -263,17 +263,18 @@ jobs:
       - name: Remove intermediate dependency builds
         shell: bash
         run: |
-          find "$LibrariesPath" \
+          libraries=$(cygpath -u "$LibrariesPath")
+          find "$libraries" \
             '(' '(' ! '(' -name '*.lib' -o -name '*.a' -o -name '*.exe' -o -name '*.h' -o -name '*.hpp' -o -name '*.inc' -o -name '*.cmake' -o -name '*.pc' -o -name '*.prl' -o -name '*.pri' -o -path '*/include/*' -o -path '*/objects-*' -o -path '*/cache_keys/*' -o -path '*/patches/*' -o -path '*/nv-codec-headers/*' ')' -type f ')' -o -empty ')' -delete
           if [[ "$OUTPUT_ARCH" == x86 ]]; then
             for module in Core Gui Network; do
-              if ! compgen -G "$LibrariesPath/Qt-5.*/lib/Qt5${module}*.prl" >/dev/null; then
+              if ! compgen -G "$libraries/Qt-5.*/lib/Qt5${module}*.prl" >/dev/null; then
                 echo "Missing Qt 5 static dependency metadata for $module" >&2
                 exit 1
               fi
             done
           fi
-          df -h "$LibrariesPath"
+          df -h "$libraries"
 
       - name: Save prepared build tools
         if: steps.cache-third-party.outputs.cache-hit != 'true'
@@ -361,7 +362,8 @@ jobs:
               Get-Content $errors | Add-Content $log
             }
             if ($build.ExitCode -ne 0) {
-              Get-Content $log -Tail 120
+              Get-Content $log | Select-String '(?i)error [A-Z]+[0-9]+|fatal error|CMake Error|ninja: build stopped' | Select-Object -First 20 | ForEach-Object { $_.Line }
+              Get-Content $log -Tail 40
               throw "C++ build failed with exit code $($build.ExitCode)"
             }
           } finally {
