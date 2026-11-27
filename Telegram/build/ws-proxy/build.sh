@@ -20,7 +20,12 @@ if [[ -n ${LIBREGRAM_WS_TARGET:-} ]]; then
     target_args=(--target "$LIBREGRAM_WS_TARGET")
     build_dir="$build_dir/$LIBREGRAM_WS_TARGET"
 fi
-case "${LIBREGRAM_WS_TARGET:-$(uname -s)}" in
+target=${LIBREGRAM_WS_TARGET:-$(rustc -vV | sed -n 's/^host: //p')}
+if [[ "$target" == *-windows-msvc ]]; then
+    msvc_bin=$(dirname -- "$(command -v cl.exe)")
+    export PATH="$msvc_bin:$PATH"
+fi
+case "$target" in
     *windows*|MINGW*|MSYS*|CYGWIN*) suffix=.exe ;;
     *) suffix= ;;
 esac
